@@ -43,7 +43,7 @@
 
     a {
       display: inline-block;
-      margin: 20px;
+      margin: 20px 10px;
       padding: 10px 20px;
       background-color: #00aaff;
       color: white;
@@ -64,7 +64,6 @@
       color: #999;
     }
 
-    /* Style for the rating stars */
     .stars {
       display: flex;
       justify-content: center;
@@ -87,7 +86,6 @@
       font-size: 1.2em;
       color: #fff;
     }
-
   </style>
 </head>
 <body>
@@ -99,9 +97,14 @@
     <source src="song.mp3" type="audio/mpeg">
     متصفحك لا يدعم تشغيل الصوت.
   </audio>
-  <br><br>
-  <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-  <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">شاهد لعبتي Car Fury</a>
+
+  <!-- روابط الأزرار الرئيسية -->
+  <div style="margin-top: 40px;">
+    <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+    <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">شاهد لعبتي Car Fury</a>
+    <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
+    <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة Car Fury</a>
+  </div>
 
   <!-- Rating Section -->
   <div class="rating">
@@ -125,7 +128,6 @@
     const stars = document.querySelectorAll(".star");
     const ratingResult = document.querySelector(".rating-result");
 
-    // Load the previous rating if it exists
     const savedRating = localStorage.getItem("rating");
     if (savedRating) {
       setStars(parseInt(savedRating));
@@ -140,7 +142,6 @@
     }
 
     function setStars(value) {
-      // Set the stars according to the saved rating
       stars.forEach((star, index) => {
         if (index < value) {
           star.classList.add("selected");
@@ -149,18 +150,14 @@
         }
       });
 
-      // Update the rating percentage
       const ratingPercentage = (value / 5) * 100;
       ratingResult.textContent = `التقييم: ${ratingPercentage}%`;
     }
 
-    // Handle the star click event to select the rating
     stars.forEach(star => {
       star.addEventListener("click", () => {
         const value = parseInt(star.getAttribute("data-value"));
         setStars(value);
-
-        // Save the rating in localStorage
         localStorage.setItem("rating", value);
       });
     });
