@@ -74,6 +74,17 @@
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
       text-align: left;
+      display: none;
+    }
+
+    #nameContainer {
+      width: 80%;
+      margin: 0 auto;
+      background-color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+      text-align: center;
     }
 
     .messagesContainer {
@@ -88,11 +99,6 @@
       margin: 10px 0;
       border-radius: 5px;
       color: white;
-    }
-
-    .message img {
-      max-width: 200px;
-      margin-top: 10px;
     }
 
     input[type="text"], textarea {
@@ -144,12 +150,18 @@
     &copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》
   </footer>
 
+  <!-- Name Input Section -->
+  <div id="nameContainer">
+    <h2>يرجى إدخال اسمك</h2>
+    <input type="text" id="usernameInput" placeholder="أدخل اسمك" required>
+    <button onclick="saveUsername()">تأكيد</button>
+  </div>
+
   <!-- Chat Section -->
   <div id="chatContainer">
     <h2>الدردشة المباشرة</h2>
     <div id="messagesContainer" class="messagesContainer"></div>
-    <input type="text" id="username" placeholder="أدخل اسمك" required>
-    <textarea id="messageInput" placeholder="اكتب رسالتك..." required></textarea>
+    <input type="text" id="messageInput" placeholder="اكتب رسالتك..." required>
     <input type="file" id="imageInput" accept="image/*">
     <button onclick="sendMessage()">إرسال</button>
   </div>
@@ -178,18 +190,45 @@
 
     let username = '';
 
+    // Check if user has a saved username
+    function checkUsername() {
+      const savedUsername = localStorage.getItem('username');
+      if (savedUsername) {
+        username = savedUsername;
+        showChat();
+      } else {
+        showNameInput();
+      }
+    }
+
+    // Show the chat interface
+    function showChat() {
+      document.getElementById('chatContainer').style.display = 'block';
+      document.getElementById('nameContainer').style.display = 'none';
+      getMessages();
+    }
+
+    // Show the name input interface
+    function showNameInput() {
+      document.getElementById('nameContainer').style.display = 'block';
+      document.getElementById('chatContainer').style.display = 'none';
+    }
+
+    // Save username and display the chat
+    function saveUsername() {
+      username = document.getElementById('usernameInput').value;
+      if (username) {
+        localStorage.setItem('username', username);
+        showChat();
+      } else {
+        alert('يرجى إدخال اسمك');
+      }
+    }
+
     function sendMessage() {
       const messageInput = document.getElementById('messageInput');
       const imageInput = document.getElementById('imageInput');
       
-      if (username === '') {
-        username = document.getElementById('username').value;
-        if (username === '') {
-          alert('الرجاء إدخال اسمك');
-          return;
-        }
-      }
-
       let message = messageInput.value;
       let imageFile = imageInput.files[0];
 
@@ -229,27 +268,13 @@
         messageElement.innerHTML = `
           <p><strong>${data.username}</strong>: ${data.message}</p>
           ${data.imageUrl ? `<img src="${data.imageUrl}" alt="image" class="messageImage">` : ''}
-          <button onclick="copyMessage('${data.message}')">نسخ</button>
-          <button onclick="deleteMessage('${snapshot.key}')">حذف</button>
         `;
         messagesContainer.appendChild(messageElement);
       });
     }
 
-    function copyMessage(message) {
-      navigator.clipboard.writeText(message).then(() => {
-        alert('تم نسخ الرسالة');
-      });
-    }
-
-    function deleteMessage(messageId) {
-      db.ref('messages').child(messageId).remove().then(() => {
-        alert('تم حذف الرسالة');
-      });
-    }
-
     window.onload = function() {
-      getMessages();
+      checkUsername();
     };
 
     const audio = document.getElementById("myAudio");
