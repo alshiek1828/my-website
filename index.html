@@ -1,262 +1,89 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-  <meta charset="UTF-8">
-  <title>موقعي الخرافي</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
-      color: #fff;
-      text-align: center;
-      padding: 50px;
-    }
+<!DOCTYPE html>  <html lang="ar">  
+<head>  
+  <meta charset="UTF-8">  
+  <title>موقعي الخرافي</title>  
+  <style>  
+    body {  
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
+      background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);  
+      color: #fff;  
+      text-align: center;  
+      padding: 50px;  
+    }  h1 {  
+  font-size: 3em;  
+  margin-bottom: 10px;  
+  color: #00ffe7;  
+  text-shadow: 0 0 10px #00ffe7;  
+}  
 
-    h1 {
-      font-size: 3em;
-      margin-bottom: 10px;
-      color: #00ffe7;
-      text-shadow: 0 0 10px #00ffe7;
-    }
+p {  
+  font-size: 1.2em;  
+  color: #ccc;  
+  margin-bottom: 40px;  
+}  
 
-    p {
-      font-size: 1.2em;
-      color: #ccc;
-      margin-bottom: 40px;
-    }
+button {  
+  background-color: #ff0066;  
+  color: white;  
+  border: none;  
+  border-radius: 30px;  
+  padding: 15px 30px;  
+  font-size: 1.2em;  
+  cursor: pointer;  
+  box-shadow: 0 0 20px #ff0066;  
+  transition: background-color 0.3s ease, transform 0.2s ease;  
+}  
 
-    a {
-      display: inline-block;
-      margin: 20px;
-      padding: 10px 20px;
-      background-color: #00aaff;
-      color: white;
-      text-decoration: none;
-      border-radius: 20px;
-      box-shadow: 0 0 10px #00aaff;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
+button:hover {  
+  background-color: #ff3388;  
+  transform: scale(1.05);  
+}  
 
-    a:hover {
-      background-color: #33bbff;
-      transform: scale(1.05);
-    }
+a {  
+  display: inline-block;  
+  margin: 20px;  
+  padding: 10px 20px;  
+  background-color: #00aaff;  
+  color: white;  
+  text-decoration: none;  
+  border-radius: 20px;  
+  box-shadow: 0 0 10px #00aaff;  
+  transition: background-color 0.3s ease, transform 0.2s ease;  
+}  
 
-    button {
-      background-color: #ff0066;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 20px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+a:hover {  
+  background-color: #33bbff;  
+  transform: scale(1.05);  
+}  
 
-    button:hover {
-      background-color: #ff3388;
-    }
+footer {  
+  margin-top: 60px;  
+  font-size: 0.9em;  
+  color: #999;  
+}
 
-    footer {
-      margin-top: 60px;
-      font-size: 0.9em;
-      color: #999;
-    }
+  </style>  
+</head>  
+<body>    <h1>Welcome to My Website!</h1>  
+  <p>Created by alshiek</p>  <button onclick="toggleAudio()">تشغيل / إيقاف الأغنية</button>
 
-    #chatContainer, #nameContainer {
-      width: 80%;
-      margin: 0 auto;
-      background-color: #333;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-      text-align: left;
-    }
+  <audio id="myAudio">  
+    <source src="song.mp3" type="audio/mpeg">  
+    متصفحك لا يدعم تشغيل الصوت.  
+  </audio>  <br><br>
+<a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+<a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">شاهد لعبتي Car Fury</a>
 
-    #chatContainer { display: none; }
-
-    .messagesContainer {
-      max-height: 400px;
-      overflow-y: auto;
-      margin-bottom: 20px;
-    }
-
-    .message {
-      background-color: #444;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      color: white;
-    }
-
-    .message img {
-      max-width: 100%;
-      margin-top: 10px;
-      border-radius: 5px;
-    }
-
-    input[type="text"], input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 5px;
-      background-color: #555;
-      color: white;
-    }
-  </style>
-</head>
-<body>
-
-  <h1>Welcome to My Website!</h1>
-  <p>Created by alshiek</p>
-
-  <button onclick="toggleAudio()">تشغيل / إيقاف الأغنية</button>
-
-  <audio id="myAudio">
-    <source src="song.mp3" type="audio/mpeg">
-    متصفحك لا يدعم تشغيل الصوت.
-  </audio>
-
-  <br><br>
-  <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-  <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">شاهد لعبتي Car Fury</a>
-
-  <footer>
-    &copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》
-  </footer>
-
-  <!-- اسم المستخدم -->
-  <div id="nameContainer">
-    <h2>يرجى إدخال اسمك</h2>
-    <input type="text" id="usernameInput" placeholder="أدخل اسمك" required>
-    <button onclick="saveUsername()">تأكيد</button>
-  </div>
-
-  <!-- دردشة -->
-  <div id="chatContainer">
-    <h2>الدردشة المباشرة</h2>
-    <div id="messagesContainer" class="messagesContainer"></div>
-    <input type="text" id="messageInput" placeholder="اكتب رسالتك..." required>
-    <input type="file" id="imageInput" accept="image/*">
-    <button onclick="sendMessage()">إرسال</button>
-  </div>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBwHD40ddsgj7dbfZf7-y9TivXVubnMT8c",
-      authDomain: "application-t3.firebaseapp.com",
-      databaseURL: "https://application-t3-default-rtdb.firebaseio.com",
-      projectId: "application-t3",
-      storageBucket: "application-t3.appspot.com",
-      messagingSenderId: "594354801953",
-      appId: "1:594354801953:android:4e294f4151129a7ed8c260"
-    };
-
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const storage = firebase.storage();
-
-    let username = '';
-
-    function checkUsername() {
-      const savedUsername = localStorage.getItem('username');
-      if (savedUsername) {
-        username = savedUsername;
-        showChat();
-      } else {
-        showNameInput();
-      }
-    }
-
-    function showChat() {
-      document.getElementById('chatContainer').style.display = 'block';
-      document.getElementById('nameContainer').style.display = 'none';
-      getMessages();
-    }
-
-    function showNameInput() {
-      document.getElementById('nameContainer').style.display = 'block';
-      document.getElementById('chatContainer').style.display = 'none';
-    }
-
-    function saveUsername() {
-      username = document.getElementById('usernameInput').value;
-      if (username.trim()) {
-        db.ref('website_chat/' + username).set({ name: username }).then(() => {
-          localStorage.setItem('username', username);
-          showChat();
-        }).catch((error) => {
-          alert('حدث خطأ أثناء حفظ الاسم: ' + error.message);
-        });
-      } else {
-        alert('يرجى إدخال اسمك');
-      }
-    }
-
-    function sendMessage() {
-      const messageInput = document.getElementById('messageInput');
-      const imageInput = document.getElementById('imageInput');
-
-      const message = messageInput.value.trim();
-      const imageFile = imageInput.files[0];
-
-      if (!message && !imageFile) return;
-
-      if (imageFile) {
-        const storageRef = storage.ref('images/' + Date.now() + '_' + imageFile.name);
-        storageRef.put(imageFile).then(snapshot => {
-          snapshot.ref.getDownloadURL().then(url => {
-            saveMessage(message, url);
-          });
-        });
-      } else {
-        saveMessage(message, null);
-      }
-
-      messageInput.value = '';
-      imageInput.value = '';
-    }
-
-    function saveMessage(message, imageUrl) {
-      const newMessageRef = db.ref('messages').push();
-      newMessageRef.set({
-        username: username,
-        message: message,
-        imageUrl: imageUrl || '',
-        timestamp: Date.now()
-      });
-    }
-
-    function getMessages() {
-      const messagesContainer = document.getElementById('messagesContainer');
-      db.ref('messages').on('child_added', snapshot => {
-        const data = snapshot.val();
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        messageElement.innerHTML = `
-          <p><strong>${data.username}</strong>: ${data.message}</p>
-          ${data.imageUrl ? `<img src="${data.imageUrl}" alt="صورة">` : ''}
-        `;
-        messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      });
-    }
-
-    const audio = document.getElementById("myAudio");
-    function toggleAudio() {
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause();
-      }
-    }
-
-    window.onload = checkUsername;
-  </script>
-</body>
+  <footer>  
+    &copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》  
+  </footer>    <script>  
+    const audio = document.getElementById("myAudio");  
+    function toggleAudio() {  
+      if (audio.paused) {  
+        audio.play();  
+      } else {  
+        audio.pause();  
+      }  
+    }  
+  </script>  </body>  
 </html>
