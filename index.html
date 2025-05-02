@@ -1,10 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
-  <title>My Website</title>
+  <meta charset="UTF-8">
+  <title>موقعي الخرافي</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
+      color: #fff;
+      text-align: center;
+      padding: 50px;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      color: #00ffe7;
+      text-shadow: 0 0 10px #00ffe7;
+    }
+
+    p {
+      font-size: 1.2em;
+      color: #ccc;
+      margin-bottom: 40px;
+    }
+
+    button {
+      background-color: #ff0066;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+      box-shadow: 0 0 20px #ff0066;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #ff3388;
+      transform: scale(1.05);
+    }
+
+    a {
+      display: inline-block;
+      margin: 20px;
+      padding: 10px 20px;
+      background-color: #00aaff;
+      color: white;
+      text-decoration: none;
+      border-radius: 20px;
+      box-shadow: 0 0 10px #00aaff;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    a:hover {
+      background-color: #33bbff;
+      transform: scale(1.05);
+    }
+
+    footer {
+      margin-top: 60px;
+      font-size: 0.9em;
+      color: #999;
+    }
+  </style>
 </head>
 <body>
+
   <h1>Welcome to My Website!</h1>
   <p>Created by alshiek1828</p>
+
+  <button onclick="toggleAudio()">تشغيل / إيقاف الأغنية</button>
+
+  <audio id="myAudio">
+    <source src="song.mp3" type="audio/mpeg">
+    متصفحك لا يدعم تشغيل الصوت.
+  </audio>
+
+  <br><br>
+  <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+  <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">شاهد لعبتي Car Fury</a>
+
+  <footer>
+    &copy; 2025 - Made with madness by alshiek1828
+  </footer>
+
+  <script>
+    const audio = document.getElementById("myAudio");
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }
+  </script>
+
 </body>
 </html>
