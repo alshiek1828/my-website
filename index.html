@@ -1,89 +1,156 @@
-<!DOCTYPE html>  <html lang="ar">  
-<head>  
-  <meta charset="UTF-8">  
-  <title>موقعي الخرافي</title>  
-  <style>  
-    body {  
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
-      background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);  
-      color: #fff;  
-      text-align: center;  
-      padding: 50px;  
-    }  h1 {  
-  font-size: 3em;  
-  margin-bottom: 10px;  
-  color: #00ffe7;  
-  text-shadow: 0 0 10px #00ffe7;  
-}  
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>موقعي الخرافي</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
+      color: #fff;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      color: #00ffe7;
+      text-shadow: 0 0 10px #00ffe7;
+    }
 
-p {  
-  font-size: 1.2em;  
-  color: #ccc;  
-  margin-bottom: 40px;  
-}  
+    p {
+      font-size: 1.2em;
+      color: #ccc;
+      margin-bottom: 40px;
+    }
 
-button {  
-  background-color: #ff0066;  
-  color: white;  
-  border: none;  
-  border-radius: 30px;  
-  padding: 15px 30px;  
-  font-size: 1.2em;  
-  cursor: pointer;  
-  box-shadow: 0 0 20px #ff0066;  
-  transition: background-color 0.3s ease, transform 0.2s ease;  
-}  
+    button {
+      background-color: #ff0066;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+      box-shadow: 0 0 20px #ff0066;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
 
-button:hover {  
-  background-color: #ff3388;  
-  transform: scale(1.05);  
-}  
+    button:hover {
+      background-color: #ff3388;
+      transform: scale(1.05);
+    }
 
-a {  
-  display: inline-block;  
-  margin: 20px;  
-  padding: 10px 20px;  
-  background-color: #00aaff;  
-  color: white;  
-  text-decoration: none;  
-  border-radius: 20px;  
-  box-shadow: 0 0 10px #00aaff;  
-  transition: background-color 0.3s ease, transform 0.2s ease;  
-}  
+    a {
+      display: inline-block;
+      margin: 20px;
+      padding: 10px 20px;
+      background-color: #00aaff;
+      color: white;
+      text-decoration: none;
+      border-radius: 20px;
+      box-shadow: 0 0 10px #00aaff;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
 
-a:hover {  
-  background-color: #33bbff;  
-  transform: scale(1.05);  
-}  
+    a:hover {
+      background-color: #33bbff;
+      transform: scale(1.05);
+    }
 
-footer {  
-  margin-top: 60px;  
-  font-size: 0.9em;  
-  color: #999;  
-}
+    footer {
+      margin-top: 60px;
+      font-size: 0.9em;
+      color: #999;
+    }
 
-  </style>  
-</head>  
-<body>    <h1>Welcome to My Website!</h1>  
-  <p>Created by alshiek</p>  <button onclick="toggleAudio()">تشغيل / إيقاف الأغنية</button>
+    /* Style for the rating stars */
+    .stars {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
 
-  <audio id="myAudio">  
-    <source src="song.mp3" type="audio/mpeg">  
-    متصفحك لا يدعم تشغيل الصوت.  
-  </audio>  <br><br>
-<a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-<a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">شاهد لعبتي Car Fury</a>
+    .star {
+      font-size: 2.5em;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
 
-  <footer>  
-    &copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》  
-  </footer>    <script>  
-    const audio = document.getElementById("myAudio");  
-    function toggleAudio() {  
-      if (audio.paused) {  
-        audio.play();  
-      } else {  
-        audio.pause();  
-      }  
-    }  
-  </script>  </body>  
+    .star.selected {
+      color: #ffcc00;
+    }
+
+    .rating-result {
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #fff;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Welcome to My Website!</h1>
+  <p>Created by alshiek</p>
+  <button onclick="toggleAudio()">تشغيل / إيقاف الأغنية</button>
+
+  <audio id="myAudio">
+    <source src="song.mp3" type="audio/mpeg">
+    متصفحك لا يدعم تشغيل الصوت.
+  </audio>
+  <br><br>
+  <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+  <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">شاهد لعبتي Car Fury</a>
+
+  <!-- Rating Section -->
+  <div class="rating">
+    <h2>قيم موقعي</h2>
+    <div class="stars">
+      <span class="star" data-value="1">★</span>
+      <span class="star" data-value="2">★</span>
+      <span class="star" data-value="3">★</span>
+      <span class="star" data-value="4">★</span>
+      <span class="star" data-value="5">★</span>
+    </div>
+    <div class="rating-result">التقييم: 0%</div>
+  </div>
+
+  <footer>
+    &copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》
+  </footer>
+
+  <script>
+    const audio = document.getElementById("myAudio");
+    const stars = document.querySelectorAll(".star");
+    const ratingResult = document.querySelector(".rating-result");
+
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }
+
+    // Handle the star click event to select the rating
+    stars.forEach(star => {
+      star.addEventListener("click", () => {
+        const value = parseInt(star.getAttribute("data-value"));
+        
+        // Set all stars to unselected
+        stars.forEach(star => star.classList.remove("selected"));
+        
+        // Select the stars up to the clicked one
+        for (let i = 0; i < value; i++) {
+          stars[i].classList.add("selected");
+        }
+
+        // Update the rating percentage
+        const ratingPercentage = (value / 5) * 100;
+        ratingResult.textContent = `التقييم: ${ratingPercentage}%`;
+      });
+    });
+  </script>
+</body>
 </html>
