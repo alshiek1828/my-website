@@ -218,13 +218,21 @@
     function saveUsername() {
       username = document.getElementById('usernameInput').value;
       if (username) {
-        localStorage.setItem('username', username);
-        showChat();
+        // Save username in Firebase under 'website_chat' node
+        db.ref('website_chat/' + username).set({
+          name: username
+        }).then(() => {
+          localStorage.setItem('username', username);
+          showChat();
+        }).catch((error) => {
+          alert('حدث خطأ أثناء حفظ الاسم: ' + error.message);
+        });
       } else {
         alert('يرجى إدخال اسمك');
       }
     }
 
+    // Send a message
     function sendMessage() {
       const messageInput = document.getElementById('messageInput');
       const imageInput = document.getElementById('imageInput');
@@ -232,7 +240,6 @@
       let message = messageInput.value;
       let imageFile = imageInput.files[0];
 
-      // إرسال صورة إذا كانت موجودة
       if (imageFile) {
         const storageRef = storage.ref();
         const fileRef = storageRef.child('images/' + imageFile.name);
@@ -249,6 +256,7 @@
       imageInput.value = '';
     }
 
+    // Save message to Firebase
     function saveMessage(message, imageUrl) {
       const newMessageRef = db.ref('messages').push();
       newMessageRef.set({
@@ -259,6 +267,7 @@
       });
     }
 
+    // Get messages from Firebase
     function getMessages() {
       const messagesContainer = document.getElementById('messagesContainer');
       db.ref('messages').on('child_added', (snapshot) => {
@@ -273,10 +282,12 @@
       });
     }
 
+    // Run check on page load
     window.onload = function() {
       checkUsername();
     };
 
+    // Audio toggle function
     const audio = document.getElementById("myAudio");
     function toggleAudio() {
       if (audio.paused) {
