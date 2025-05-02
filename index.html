@@ -25,23 +25,6 @@
       margin-bottom: 40px;
     }
 
-    button {
-      background-color: #ff0066;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      padding: 15px 30px;
-      font-size: 1.2em;
-      cursor: pointer;
-      box-shadow: 0 0 20px #ff0066;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    button:hover {
-      background-color: #ff3388;
-      transform: scale(1.05);
-    }
-
     a {
       display: inline-block;
       margin: 20px;
@@ -59,14 +42,27 @@
       transform: scale(1.05);
     }
 
+    button {
+      background-color: #ff0066;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ff3388;
+    }
+
     footer {
       margin-top: 60px;
       font-size: 0.9em;
       color: #999;
     }
 
-    /* Chat Section */
-    #chatContainer {
+    #chatContainer, #nameContainer {
       width: 80%;
       margin: 0 auto;
       background-color: #333;
@@ -74,18 +70,9 @@
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
       text-align: left;
-      display: none;
     }
 
-    #nameContainer {
-      width: 80%;
-      margin: 0 auto;
-      background-color: #333;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-      text-align: center;
-    }
+    #chatContainer { display: none; }
 
     .messagesContainer {
       max-height: 400px;
@@ -101,7 +88,13 @@
       color: white;
     }
 
-    input[type="text"], textarea {
+    .message img {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    input[type="text"], input[type="file"] {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -109,24 +102,6 @@
       border-radius: 5px;
       background-color: #555;
       color: white;
-    }
-
-    input[type="file"] {
-      margin: 10px 0;
-    }
-
-    button {
-      background-color: #ff0066;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 20px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #ff3388;
     }
   </style>
 </head>
@@ -150,14 +125,14 @@
     &copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》
   </footer>
 
-  <!-- Name Input Section -->
+  <!-- اسم المستخدم -->
   <div id="nameContainer">
     <h2>يرجى إدخال اسمك</h2>
     <input type="text" id="usernameInput" placeholder="أدخل اسمك" required>
     <button onclick="saveUsername()">تأكيد</button>
   </div>
 
-  <!-- Chat Section -->
+  <!-- دردشة -->
   <div id="chatContainer">
     <h2>الدردشة المباشرة</h2>
     <div id="messagesContainer" class="messagesContainer"></div>
@@ -172,7 +147,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
 
   <script>
-    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBwHD40ddsgj7dbfZf7-y9TivXVubnMT8c",
       authDomain: "application-t3.firebaseapp.com",
@@ -183,14 +157,12 @@
       appId: "1:594354801953:android:4e294f4151129a7ed8c260"
     };
 
-    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const storage = firebase.storage();
 
     let username = '';
 
-    // Check if user has a saved username
     function checkUsername() {
       const savedUsername = localStorage.getItem('username');
       if (savedUsername) {
@@ -201,27 +173,21 @@
       }
     }
 
-    // Show the chat interface
     function showChat() {
       document.getElementById('chatContainer').style.display = 'block';
       document.getElementById('nameContainer').style.display = 'none';
       getMessages();
     }
 
-    // Show the name input interface
     function showNameInput() {
       document.getElementById('nameContainer').style.display = 'block';
       document.getElementById('chatContainer').style.display = 'none';
     }
 
-    // Save username and display the chat
     function saveUsername() {
       username = document.getElementById('usernameInput').value;
-      if (username) {
-        // Save username in Firebase under 'website_chat' node
-        db.ref('website_chat/' + username).set({
-          name: username
-        }).then(() => {
+      if (username.trim()) {
+        db.ref('website_chat/' + username).set({ name: username }).then(() => {
           localStorage.setItem('username', username);
           showChat();
         }).catch((error) => {
@@ -232,20 +198,20 @@
       }
     }
 
-    // Send a message
     function sendMessage() {
       const messageInput = document.getElementById('messageInput');
       const imageInput = document.getElementById('imageInput');
-      
-      let message = messageInput.value;
-      let imageFile = imageInput.files[0];
+
+      const message = messageInput.value.trim();
+      const imageFile = imageInput.files[0];
+
+      if (!message && !imageFile) return;
 
       if (imageFile) {
-        const storageRef = storage.ref();
-        const fileRef = storageRef.child('images/' + imageFile.name);
-        fileRef.put(imageFile).then((snapshot) => {
-          snapshot.ref.getDownloadURL().then((downloadURL) => {
-            saveMessage(message, downloadURL);
+        const storageRef = storage.ref('images/' + Date.now() + '_' + imageFile.name);
+        storageRef.put(imageFile).then(snapshot => {
+          snapshot.ref.getDownloadURL().then(url => {
+            saveMessage(message, url);
           });
         });
       } else {
@@ -256,38 +222,31 @@
       imageInput.value = '';
     }
 
-    // Save message to Firebase
     function saveMessage(message, imageUrl) {
       const newMessageRef = db.ref('messages').push();
       newMessageRef.set({
         username: username,
         message: message,
-        imageUrl: imageUrl,
+        imageUrl: imageUrl || '',
         timestamp: Date.now()
       });
     }
 
-    // Get messages from Firebase
     function getMessages() {
       const messagesContainer = document.getElementById('messagesContainer');
-      db.ref('messages').on('child_added', (snapshot) => {
+      db.ref('messages').on('child_added', snapshot => {
         const data = snapshot.val();
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
         messageElement.innerHTML = `
           <p><strong>${data.username}</strong>: ${data.message}</p>
-          ${data.imageUrl ? `<img src="${data.imageUrl}" alt="image" class="messageImage">` : ''}
+          ${data.imageUrl ? `<img src="${data.imageUrl}" alt="صورة">` : ''}
         `;
         messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
       });
     }
 
-    // Run check on page load
-    window.onload = function() {
-      checkUsername();
-    };
-
-    // Audio toggle function
     const audio = document.getElementById("myAudio");
     function toggleAudio() {
       if (audio.paused) {
@@ -296,7 +255,8 @@
         audio.pause();
       }
     }
-  </script>
 
+    window.onload = checkUsername;
+  </script>
 </body>
 </html>
