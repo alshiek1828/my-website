@@ -2,265 +2,165 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ALSHIEK_الشـيــخ</title>
   <style>
-    /* Reset & Basic Styles */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
       color: #fff;
       text-align: center;
-      padding: 20px;
+      padding: 50px;
     }
-    h1 { font-size: 3em; color: #00ffe7; text-shadow: 0 0 10px #00ffe7; margin-bottom: 10px; }
-    p { font-size: 1.2em; color: #ccc; margin-bottom: 20px; }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      color: #00ffe7;
+      text-shadow: 0 0 10px #00ffe7;
+    }
 
-    /* Buttons & Links */
-    button, select { margin: 10px; padding: 10px 20px; font-size: 1em; border: none; border-radius: 8px; cursor: pointer; }
-    button { background: #ff0066; color: #fff; box-shadow: 0 0 10px #ff0066; transition: .3s; }
-    button:hover { background: #ff3388; transform: scale(1.05); }
-    select { background: #00aaff; color: #fff; }
-    a { margin: 5px; padding: 10px 15px; display: inline-block; background: #00aaff; color: #fff; border-radius: 8px; text-decoration: none; box-shadow: 0 0 10px #00aaff; transition: .3s; }
-    a:hover { background: #33bbff; transform: scale(1.05); }
-    footer { margin-top: 40px; font-size: .9em; color: #999; }
+    p {
+      font-size: 1.2em;
+      color: #ccc;
+      margin-bottom: 40px;
+    }
 
-    /* Clock Containers */
-    #clocks { display: flex; justify-content: space-around; flex-wrap: wrap; margin-top: 30px; }
-    .clock-container { position: relative; width: 250px; height: 250px; margin: 15px; background: #222; border-radius: 50%; box-shadow: inset 0 0 20px rgba(0,0,0,.5); }
-    .clock-canvas { position: absolute; top: 0; left: 0; }
-    .digital-clock { color: #00ffe7; font-size: 1.4em; margin-top: 10px; }
+    button {
+      background-color: #ff0066;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+      box-shadow: 0 0 20px #ff0066;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
 
-    /* Prayer Times Table */
-    #prayer-section { margin-top: 40px; }
-    #prayers { width: 100%; max-width: 500px; margin: 0 auto; border-collapse: collapse; }
-    #prayers th, #prayers td { padding: 8px 12px; border: 1px solid #444; }
-    #prayers th { background: #333; }
+    button:hover {
+      background-color: #ff3388;
+      transform: scale(1.05);
+    }
 
-    /* Qibla Direction */
-    #qibla { margin-top: 30px; }
-    #qibla-canvas { background: #222; border-radius: 50%; }
+    a {
+      display: inline-block;
+      margin: 20px 10px;
+      padding: 10px 20px;
+      background-color: #00aaff;
+      color: white;
+      text-decoration: none;
+      border-radius: 20px;
+      box-shadow: 0 0 10px #00aaff;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    a:hover {
+      background-color: #33bbff;
+      transform: scale(1.05);
+    }
+
+    footer {
+      margin-top: 60px;
+      font-size: 0.9em;
+      color: #999;
+    }
+
+    .stars {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .star {
+      font-size: 2.5em;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .star.selected {
+      color: #ffcc00;
+    }
+
+    .rating-result {
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
-  <h1>مرحبا بك في موقع الشيخ</h1>
-  <p>تم التطوير بواسطة alshiek</p>
-
-  <!-- Audio Toggle -->
+  <h1>Welcome to My Website!</h1>
+  <p>Created by alshiek</p>
   <button onclick="toggleAudio()">تشغيل / إيقاف الأغنية</button>
-  <audio id="myAudio" loop>
+
+  <audio id="myAudio">
     <source src="song.mp3" type="audio/mpeg">
     متصفحك لا يدعم تشغيل الصوت.
   </audio>
 
-  <!-- Clocks Section -->
-  <div id="clocks">
-    <div class="clock-container">
-      <canvas id="analogClock" class="clock-canvas" width="250" height="250"></canvas>
-      <div id="digitalClock" class="digital-clock"></div>
-    </div>
-    <div class="clock-container">
-      <canvas id="analogClockLeb" class="clock-canvas" width="250" height="250"></canvas>
-      <div id="digitalClockLeb" class="digital-clock"></div>
-    </div>
-  </div>
-
-  <!-- Prayer Times Selection -->
-  <div id="prayer-section">
-    <h2>مواقيت الصلاة</h2>
-    <select id="countrySelect"></select>
-    <table id="prayers">
-      <thead>
-        <tr><th>الصلاة</th><th>الوقت</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <!-- Qibla Direction -->
-  <div id="qibla">
-    <h2>اتجاه القبلة</h2>
-    <canvas id="qibla-canvas" width="200" height="200"></canvas>
-    <div id="qibla-angle"></div>
-  </div>
-
-  <!-- Links -->
-  <div style="margin-top: 30px;">
+  <!-- روابط الأزرار الرئيسية -->
+  <div style="margin-top: 40px;">
     <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-    <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
+    <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">رابط تحميل لعبة CarFury</a>
     <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
     <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة Car Fury</a>
   </div>
 
-  <footer>&copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》</footer>
+  <!-- Rating Section -->
+  <div class="rating">
+    <h2>قيم موقعي</h2>
+    <div class="stars">
+      <span class="star" data-value="1">★</span>
+      <span class="star" data-value="2">★</span>
+      <span class="star" data-value="3">★</span>
+      <span class="star" data-value="4">★</span>
+      <span class="star" data-value="5">★</span>
+    </div>
+    <div class="rating-result">التقييم: 0%</div>
+  </div>
+
+  <footer>
+    &copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》
+  </footer>
 
   <script>
-    // Audio Toggle
+    const audio = document.getElementById("myAudio");
+    const stars = document.querySelectorAll(".star");
+    const ratingResult = document.querySelector(".rating-result");
+
+    const savedRating = localStorage.getItem("rating");
+    if (savedRating) {
+      setStars(parseInt(savedRating));
+    }
+
     function toggleAudio() {
-      const audio = document.getElementById('myAudio');
-      audio.paused ? audio.play() : audio.pause();
-    }
-
-    // Draw Analog Clock
-    function drawClock(canvas, date) {
-      const ctx = canvas.getContext('2d');
-      const radius = canvas.width / 2;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.translate(radius, radius);
-      ctx.strokeStyle = '#00ffe7';
-      ctx.fillStyle = '#000';
-      ctx.lineWidth = radius * 0.05;
-      ctx.lineCap = 'round';
-
-      // Face
-      ctx.beginPath();
-      ctx.arc(0, 0, radius * 0.95, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.stroke();
-
-      // Numbers
-      ctx.font = radius * 0.15 + 'px arial';
-      ctx.textBaseline = 'middle';
-      ctx.textAlign = 'center';
-      for (let num = 1; num <= 12; num++) {
-        const ang = num * Math.PI / 6;
-        ctx.rotate(ang);
-        ctx.translate(0, -radius * 0.8);
-        ctx.rotate(-ang);
-        ctx.fillStyle = '#fff';
-        ctx.fillText(num.toString(), 0, 0);
-        ctx.rotate(ang);
-        ctx.translate(0, radius * 0.8);
-        ctx.rotate(-ang);
-      }
-
-      // Hands
-      const sec = date.getSeconds();
-      const min = date.getMinutes();
-      const hr = date.getHours();
-      drawHand(ctx, ((hr % 12 + min / 60 + sec / 3600) * Math.PI / 6), radius * 0.5, radius * 0.07);
-      drawHand(ctx, ((min + sec / 60) * Math.PI / 30), radius * 0.8, radius * 0.07);
-      drawHand(ctx, (sec * Math.PI / 30), radius * 0.9, radius * 0.02, '#ff0066');
-
-      ctx.translate(-radius, -radius);
-    }
-
-    function drawHand(ctx, pos, length, width, color) {
-      ctx.beginPath();
-      ctx.lineWidth = width;
-      ctx.strokeStyle = color || '#00ffe7';
-      ctx.moveTo(0, 0);
-      ctx.rotate(pos);
-      ctx.lineTo(0, -length);
-      ctx.stroke();
-      ctx.rotate(-pos);
-    }
-
-    // Initialize Clocks
-    function initClocks() {
-      const c1 = document.getElementById('analogClock');
-      const c2 = document.getElementById('analogClockLeb');
-      function update() {
-        const now = new Date();
-        drawClock(c1, now);
-        document.getElementById('digitalClock').textContent =
-          now.toLocaleTimeString('ar-EG');
-        const lebNow = new Date(now.toLocaleString('en-US', {
-          timeZone: 'Asia/Beirut'
-        }));
-        drawClock(c2, lebNow);
-        document.getElementById('digitalClockLeb').textContent =
-          lebNow.toLocaleTimeString('ar-EG');
-      }
-      setInterval(update, 1000);
-      update();
-    }
-
-    // Prayer Times via Aladhan API
-    const countries = ['Lebanon', 'Egypt', 'Saudi Arabia', 'Jordan', 'UAE'];
-    function initPrayerSection() {
-      const sel = document.getElementById('countrySelect');
-      countries.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.text = c;
-        sel.add(opt);
-      });
-      sel.addEventListener('change', fetchPrayers);
-      fetchPrayers();
-    }
-    function fetchPrayers() {
-      const country = document.getElementById('countrySelect').value;
-      fetch(`https://api.aladhan.com/v1/timingsByCity?city=${country}&country=${country}&method=2`)
-        .then(res => res.json())
-        .then(data => {
-          const times = data.data.timings;
-          const tbody = document.querySelector('#prayers tbody');
-          tbody.innerHTML = '';
-          ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(p => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${p}</td><td>${times[p]}</td>`;
-            tbody.appendChild(tr);
-          });
-        })
-        .catch(err => console.error(err));
-    }
-
-    // Qibla Direction
-    function initQibla() {
-      const canvas = document.getElementById('qibla-canvas');
-      const ctx = canvas.getContext('2d');
-      const info = document.getElementById('qibla-angle');
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos => {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          const kaabaLat = 21.422487;
-          const kaabaLon = 39.826206;
-          const dLon = (kaabaLon - lon) * Math.PI / 180;
-          const y = Math.sin(dLon) * Math.cos(kaabaLat * Math.PI / 180);
-          const x = Math.cos(lat * Math.PI / 180) * Math.sin(kaabaLat * Math.PI / 180)
-                  - Math.sin(lat * Math.PI / 180) * Math.cos(kaabaLat * Math.PI / 180) * Math.cos(dLon);
-          let brng = Math.atan2(y, x) * 180 / Math.PI;
-          brng = (brng + 360) % 360;
-          info.textContent = `الاتجاه نحو الكعبة: ${Math.round(brng)}°`;
-          drawCompass(ctx, brng);
-        }, err => info.textContent = 'يرجى تفعيل تحديد الموقع.');
+      if (audio.paused) {
+        audio.play();
       } else {
-        info.textContent = 'المتصفح لا يدعم تحديد الموقع.';
+        audio.pause();
       }
     }
-    function drawCompass(ctx, angle) {
-      const size = ctx.canvas.width;
-      const r = size / 2;
-      ctx.clearRect(0, 0, size, size);
-      ctx.save();
-      ctx.translate(r, r);
-      // Outer circle
-      ctx.beginPath();
-      ctx.arc(0, 0, r * 0.9, 0, 2 * Math.PI);
-      ctx.strokeStyle = '#00ffe7';
-      ctx.lineWidth = 4;
-      ctx.stroke();
-      // Arrow
-      ctx.rotate((angle - 90) * Math.PI / 180);
-      ctx.beginPath();
-      ctx.moveTo(0, -r * 0.7);
-      ctx.lineTo(r * 0.1, -r * 0.2);
-      ctx.lineTo(-r * 0.1, -r * 0.2);
-      ctx.closePath();
-      ctx.fillStyle = '#ff0066';
-      ctx.fill();
-      ctx.restore();
+
+    function setStars(value) {
+      stars.forEach((star, index) => {
+        if (index < value) {
+          star.classList.add("selected");
+        } else {
+          star.classList.remove("selected");
+        }
+      });
+
+      const ratingPercentage = (value / 5) * 100;
+      ratingResult.textContent = `التقييم: ${ratingPercentage}%`;
     }
 
-    // Initialize All Features
-    window.onload = () => {
-      initClocks();
-      initPrayerSection();
-      initQibla();
-    };
+    stars.forEach(star => {
+      star.addEventListener("click", () => {
+        const value = parseInt(star.getAttribute("data-value"));
+        setStars(value);
+        localStorage.setItem("rating", value);
+      });
+    });
   </script>
 </body>
-</html>
+</html
