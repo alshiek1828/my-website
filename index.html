@@ -2,26 +2,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ALS​HIEK الشــيخ - ألعاب تفاعلية</title>
+  <title>ALS​HIEK الشــيخ - اختبارات تفاعلية</title>
   <style>
     /* Reset */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(120deg,#1c1c1c,#2b2b2b); color: #eee; display: flex; flex-direction: column; }
-    header, footer { background: rgba(0,0,0,0.5); padding: 10px; text-align: center; }
+    header, footer { background: rgba(0,0,0,0.6); padding: 10px; text-align: center; }
     nav ul { list-style: none; display: flex; justify-content: center; gap: 20px; }
     nav a { color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: background .3s; }
     nav a:hover, nav a.active { background: rgba(255,255,255,0.1); }
     main { flex: 1; padding: 20px; }
-    section { display: none; max-width: 600px; margin: 0 auto; background: rgba(10,10,10,0.8); padding: 20px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.7); }
+    section { display: none; max-width: 800px; margin: 0 auto; background: rgba(10,10,10,0.9); padding: 20px; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
     section.active { display: block; }
     h2 { color: #00ffe7; margin-bottom: 15px; text-shadow:0 0 5px #00ffe7; }
-    button { padding: 10px 20px; margin: 5px; border:none; border-radius:20px; background:#ff0066; color:#fff; cursor:pointer; transition:transform .2s,bg .3s; }
+    button { padding: 10px 20px; margin: 5px; border:none; border-radius:20px; background:#ff0066; color:#fff; cursor:pointer; transition:transform .2s, background .3s; }
     button:hover { transform:scale(1.05); background:#ff3388; }
-    canvas { display: block; margin:0 auto; background:#111; }
-    /* Tic-Tac-Toe */
-    #ttt-board { display: grid; grid-template: repeat(3,1fr)/repeat(3,1fr); gap:5px; margin:20px 0; }
-    #ttt-board div { width:60px; height:60px; background:#222; display:flex; align-items:center; justify-content:center; font-size:2rem; cursor:pointer; }
+    #digital-clock { font-size:2rem; padding:10px 20px; background:rgba(0,0,0,0.7); border-radius:10px; display:inline-block; margin-bottom:20px; }
+    .option-btn { display:block; width:100%; max-width:600px; margin:10px auto; text-align:left; }
+    #score-display { margin-top:20px; font-size:1.2rem; }
   </style>
 </head>
 <body>
@@ -29,103 +28,91 @@
     <nav>
       <ul>
         <li><a href="#" data-nav="home" class="active">الرئيسية</a></li>
-        <li><a href="#" data-nav="tic-tac-toe">تيك تاك تو</a></li>
-        <li><a href="#" data-nav="snake">لعبة الثعبان</a></li>
+        <li><a href="#" data-nav="quiz">اختبارات</a></li>
       </ul>
     </nav>
   </header>
   <main>
     <section id="home" class="active">
-      <h2>مرحبا بك في بوابة الألعاب</h2>
-      <p>اختر اللعبة التي تريدها من القائمة أعلاه</p>
+      <h2>مرحبا بك في بوابة الاختبارات</h2>
+      <div id="digital-clock"></div>
+      <p>اختر اختباراً من القائمة للبدء!</p>
     </section>
-    <section id="tic-tac-toe">
-      <h2>تيك تاك تو</h2>
-      <div id="ttt-board"></div>
-      <p id="ttt-status"></p>
-      <button id="ttt-reset">إعادة اللعب</button>
-    </section>
-    <section id="snake">
-      <h2>لعبة الثعبان</h2>
-      <canvas id="snake-canvas" width="400" height="400"></canvas>
-      <p id="snake-score">النتيجة: 0</p>
-      <button id="snake-reset">إعادة اللعب</button>
+    <section id="quiz">
+      <h2>اختبارات متنوعة</h2>
+      <div id="quiz-container">
+        <div id="quiz-selection">
+          <button class="btn" id="start-science">اختبار علمي</button>
+          <button class="btn" id="start-religion">اختبار ديني</button>
+        </div>
+        <div id="question-area" style="display:none;">
+          <div id="question"></div>
+          <div id="options"></div>
+          <div id="score-display"></div>
+          <button class="btn" id="next-btn" style="display:none;">السؤال التالي</button>
+        </div>
+      </div>
     </section>
   </main>
   <footer>&copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》</footer>
   <script>
     // Navigation
     document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',e=>{
-      e.preventDefault();
-      document.querySelectorAll('nav a').forEach(x=>x.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-      const target = e.currentTarget.getAttribute('data-nav');
+      e.preventDefault(); document.querySelectorAll('nav a').forEach(x=>x.classList.remove('active'));
+      e.currentTarget.classList.add('active'); const target=e.currentTarget.dataset.nav;
       document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
       document.getElementById(target).classList.add('active');
     }));
-    // Tic-Tac-Toe Logic
-    const tttBoard = document.getElementById('ttt-board');
-    const tttStatus = document.getElementById('ttt-status');
-    const tttReset = document.getElementById('ttt-reset');
-    let tttCells, tttTurn, tttMoves;
-    function initTTT(){
-      tttBoard.innerHTML=''; tttTurn='X'; tttMoves=0; tttStatus.textContent='دور: ' + tttTurn;
-      for(let i=0;i<9;i++){
-        const cell=document.createElement('div'); cell.addEventListener('click', ()=>playTTT(i)); tttBoard.append(cell);
-      }
-      tttCells = Array(9).fill(null);
-    }
-    function playTTT(i){
-      if(tttCells[i]||checkWinner()) return;
-      tttCells[i]=tttTurn; tttBoard.children[i].textContent=tttTurn; tttMoves++;
-      if(checkWinner()){ tttStatus.textContent='فاز ' + tttTurn + '!'; }
-      else if(tttMoves===9){ tttStatus.textContent='تعادل!'; }
-      else{ tttTurn = tttTurn==='X'?'O':'X'; tttStatus.textContent='دور: ' + tttTurn; }
-    }
-    function checkWinner(){
-      const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-      return wins.some(w=>{
-        const [a,b,c]=w; return tttCells[a]&&tttCells[a]===tttCells[b]&&tttCells[b]===tttCells[c];
-      });
-    }
-    tttReset.addEventListener('click', initTTT);
-    initTTT();
-    // Snake Logic
-    const canvas = document.getElementById('snake-canvas');
-    const ctx = canvas.getContext('2d');
-    const scale=20; const rows=canvas.height/scale; const cols=canvas.width/scale;
-    let snake, food, score, game;
-    function initSnake(){
-      snake=[{x:cols/2,y:rows/2}]; score=0; document.getElementById('snake-score').textContent='النتيجة: '+score;
-      spawnFood(); dir={x:0,y:0}; clearInterval(game); game=setInterval(run,100);
-    }
-    function spawnFood(){ food={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)}; }
-    let dir;
-    window.addEventListener('keydown',e=>{
-      switch(e.key){
-        case 'ArrowUp': if(dir.y!==1) dir={x:0,y:-1}; break;
-        case 'ArrowDown': if(dir.y!==-1) dir={x:0,y:1}; break;
-        case 'ArrowLeft': if(dir.x!==1) dir={x:-1,y:0}; break;
-        case 'ArrowRight': if(dir.x!==-1) dir={x:1,y:0}; break;
-      }
-    });
-    function run(){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      // move snake
-      const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
-      if(head.x<0||head.x>=cols||head.y<0||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y)){
-        clearInterval(game); alert('انتهت اللعبة! نتيجتك: '+score); return;
-      }
-      snake.unshift(head);
-      if(head.x===food.x&&head.y===food.y){ score++; document.getElementById('snake-score').textContent='النتيجة: '+score; spawnFood(); }
-      else snake.pop();
-      // draw food
-      ctx.fillStyle='#ff0066'; ctx.fillRect(food.x*scale,food.y*scale,scale,scale);
-      // draw snake
-      ctx.fillStyle='#00ffe7'; snake.forEach(s=>ctx.fillRect(s.x*scale,s.y*scale,scale,scale));
-    }
-    document.getElementById('snake-reset').addEventListener('click', initSnake);
-    initSnake();
+    // Clock
+    function updateClock(){ const now=new Date(); let h=now.getHours(), m=now.getMinutes(), s=now.getSeconds(); const ampm = h>=12?'م':'ص'; h=h%12||12; const pad=n=>n<10?'0'+n:n;
+      document.getElementById('digital-clock').textContent=`${pad(h)}:${pad(m)}:${pad(s)} ${ampm}`; }
+    setInterval(updateClock,1000); updateClock();
+    // Quiz Data
+    const scienceQuestions = [
+      {q:'أقرب كوكب إلى الشمس هو؟', opts:['الزهرة','عطارد','المريخ','المشتري'], a:1},
+      {q:'الوحدة الأساسية للمادة هي؟', opts:['البروتون','الجزيء','الذرة','الإلكترون'], a:2},
+      {q:'سرعة الضوء في الفراغ تقريباً؟', opts:['300,000 كم/ث','150,000 كم/ث','30,000 كم/ث','3,000 كم/ث'], a:0},
+      {q:'علم دراسة الحشرات يُسمى؟', opts:['علم النبات','علم الحياة','علم الحيوان','علم الحشرات'], a:3},
+      {q:'المادة التي توصل الكهرباء هي؟', opts:['خشب','زجاج','نحاس','مطاط'], a:2},
+      {q:'أكبر كوكب في المجموعة الشمسية هو؟', opts:['المشتري','المريخ','الأرض','زحل'], a:0},
+      {q:'أقوى قوة في الطبيعة هي؟', opts:['القوة النووية الضعيفة','القوة الكهرومغناطيسية','القوة النووية الشديدة','الجاذبية'], a:2},
+      {q:'العنصر الأكثر وفرة في الكون هو؟', opts:['الهيدروجين','الأكسجين','الكربون','الهيليوم'], a:0},
+      {q:'ما تعريف الطيف الكهرومغناطيسي؟', opts:['مجموعة الألوان المرئية فقط','مجموعة جميع الترددات','الأشعة السينية فقط','الأشعة تحت الحمراء فقط'], a:1},
+      {q:'الNewton هي وحدة قياس؟', opts:['القوة','الطاقة','الكتلة','الزمن'], a:0}
+    ];
+    const religionQuestions = [
+      {q:'عدد أركان الإسلام؟', opts:['3','4','5','6'], a:2},
+      {q:'أول سورة نزلت؟', opts:['الفاتحة','العلق','الفرقان','الأنعام'], a:1},
+      {q:'ليلة القدر تكون في؟', opts:['شوال','رمضان','ذو الحجة','شعبان'], a:1},
+      {q:'عدد ركعات الفجر؟', opts:['1','2','3','4'], a:1},
+      {q:'بنى الكعبة؟', opts:['محمد','إبراهيم','نوح','إسماعيل'], a:1},
+      {q:'أول مسجد بُني؟', opts:['الحرام','النبوي','الأقصى','القبة الصخرية'], a:1},
+      {q:'كم عدد سور القرآن؟', opts:['114','113','115','110'], a:0},
+      {q:'مدة الصيام في رمضان؟', opts:['20 يوماً','28 يوماً','29-30 يوماً','31 يوماً'], a:2},
+      {q:'من جابر بن عبدالله؟', opts:['صحابي','تابعي','تابع التابعين','أحد الخلفاء'], a:0},
+      {q:'مصحف عثمان؟', opts:['1','2','3','4'], a:0}
+    ];
+    let currentSet, indexQuiz, score;
+    const startSci=document.getElementById('start-science'), startRel=document.getElementById('start-religion');
+    const selDiv=document.getElementById('quiz-selection'), qa=document.getElementById('question-area');
+    const qEl=document.getElementById('question'), optsEl=document.getElementById('options'), scoreEl=document.getElementById('score-display');
+    const nextBtn=document.getElementById('next-btn');
+    startSci.onclick=()=>startQuiz(scienceQuestions);
+    startRel.onclick=()=>startQuiz(religionQuestions);
+    function startQuiz(set){ currentSet=set; indexQuiz=0; score=0; selDiv.style.display='none'; qa.style.display='block'; nextBtn.style.display='none'; showQuestion(); updateScore(); }
+    function showQuestion(){ const item=currentSet[indexQuiz]; qEl.textContent=item.q; optsEl.innerHTML=''; item.opts.forEach((opt,i)=>{
+      const b=document.createElement('button'); b.className='option-btn'; b.textContent=opt;
+      b.onclick=()=>selectOption(i); optsEl.append(b);
+    }); }
+    function selectOption(i){ // lock
+      Array.from(optsEl.children).forEach(btn=>btn.disabled=true);
+      if(i===currentSet[indexQuiz].a){ score++; }
+      nextBtn.style.display='inline-block'; }
+    nextBtn.onclick=()=>{
+      indexQuiz++; if(indexQuiz<currentSet.length){ showQuestion(); updateScore(); nextBtn.style.display='none'; }
+      else finishQuiz(); };
+    function updateScore(){ scoreEl.textContent=`النقاط: ${score}`; }
+    function finishQuiz(){ qEl.textContent='انتهى الاختبار'; optsEl.innerHTML=`<p>النقاط النهائية: ${score} / ${currentSet.length}</p>`; nextBtn.style.display='none'; }
   </script>
 </body>
 </html>
