@@ -2,139 +2,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ALS​HIEK الشــيخ - الألعاب والاختبارات</title>
+  <title>ALS​HIEK الشــيخ - الألعاب والاختبارات (Admin)</title>
   <style>
-    /* Reset */
+    /* Reset & Base */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-           background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
-           color: #fff; text-align: center; padding: 20px; }
-    header, footer { margin: 20px 0; }
-    h1 { font-size: 3em; color: #00ffe7; text-shadow: 0 0 10px #00ffe7; }
-    p { font-size: 1.2em; color: #ccc; margin-bottom: 20px; }
-    button, .btn { background-color: #ff0066; color: white; border: none;
-             border-radius: 30px; padding: 10px 20px; font-size: 1.1em;
-             cursor: pointer; box-shadow: 0 0 20px #ff0066;
-             transition: background-color 0.3s ease, transform 0.2s ease; }
-    button:hover, .btn:hover { background-color: #ff3388; transform: scale(1.05); }
-    a { display: inline-block; margin: 10px; padding: 8px 16px;
-        background-color: #00aaff; color: white; text-decoration: none;
-        border-radius: 20px; box-shadow: 0 0 10px #00aaff;
-        transition: background-color 0.3s ease, transform 0.2s ease; }
-    a:hover { background-color: #33bbff; transform: scale(1.05); }
-    .rating { margin: 20px 0; }
-    .stars { display: flex; justify-content: center; }
-    .star { font-size: 2.5em; color: #ccc; cursor: pointer;
-             transition: color 0.3s ease; }
-    .star.selected { color: #ffcc00; }
-    .rating-result { margin-top: 10px; font-size: 1.2em; color: #fff; }/* Quiz */
-#quiz-container { margin-top: 30px; }
-#question-area { display: none; margin-top: 20px; }
-#question { font-size: 1.2em; margin-bottom: 15px; }
-.option-btn { display: block; width: 100%; max-width: 600px;
-              margin: 8px auto; text-align: left; background:#444; }
-.feedback { position: fixed; top: 20px; left:50%; transform:translateX(-50%);
-            background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px;
-            border-radius: 10px; font-size:1.2em; display:none; }
-#score-display { margin-top: 15px; font-size: 1.2em; }
-
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1c1c1c; color: #fff; }
+    header { background: #222; padding: 10px; display: flex; align-items: center; justify-content: space-between; }
+    header h1 { font-size: 1.5em; }
+    #admin-section { display: flex; height: calc(100% - 50px); }
+    nav#admin-menu { width: 200px; background: #2b2b2b; padding: 10px; }
+    nav#admin-menu button { width: 100%; margin:5px 0; background: #444; border:none; color:#fff; padding:8px; cursor:pointer; }
+    nav#admin-menu button.active, nav#admin-menu button:hover { background: #ff0066; }
+    main#admin-content { flex:1; padding:20px; overflow-y:auto; }
+    section.admin-tab { display: none; }
+    section.admin-tab.active { display: block; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { border:1px solid #555; padding:8px; text-align:left; }
+    .btn-small { padding:5px 10px; font-size:0.9em; }
+    input, select, textarea { width:100%; padding:8px; margin:5px 0; background:#333; border:1px solid #555; color:#fff; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Welcome to My Website!</h1>
-    <p>Created by alshiek</p>
-    <button onclick="toggleAudio()">تشغيل / إيقاف الأغنية</button>
-    <audio id="myAudio">
-      <source src="song.mp3" type="audio/mpeg">
-      متصفحك لا يدعم تشغيل الصوت.
-    </audio>
-    <div style="margin-top:20px;">
-      <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-      <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">رابط تحميل CarFury</a>
-      <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
-      <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة Car Fury</a>
-    </div>
-    <div class="rating">
-      <h2>قيم موقعي</h2>
-      <div class="stars">
-        <span class="star" data-value="1">★</span>
-        <span class="star" data-value="2">★</span>
-        <span class="star" data-value="3">★</span>
-        <span class="star" data-value="4">★</span>
-        <span class="star" data-value="5">★</span>
-      </div>
-      <div class="rating-result">التقييم: 0%</div>
-    </div>
-  </header>  <div class="feedback" id="feedback"></div>
-  <div id="quiz-container">
-    <button class="btn" id="start-science">اختبار علمي</button>
-    <button class="btn" id="start-religion">اختبار ديني</button>
-    <div id="question-area">
-      <div id="question"></div>
-      <div id="options"></div>
-      <button class="btn" id="next-btn" style="display:none;">السؤال التالي</button>
-      <div id="score-display"></div>
-    </div>
-  </div>  <footer>&copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》</footer>  <script>
-    // Audio toggle
-    const audio = document.getElementById('myAudio');
-    function toggleAudio(){ audio.paused? audio.play(): audio.pause(); }
+    <h1>لوحة إدارة الموقع</h1>
+    <button onclick="logoutAdmin()">تسجيل خروج</button>
+  </header>
+  <div id="admin-section">
+    <nav id="admin-menu">
+      <button data-tab="users" class="active">المستخدمين</button>
+      <button data-tab="messages">الرسائل</button>
+      <button data-tab="maintenance">الصيانة</button>
+      <button data-tab="permissions">الصلاحيات</button>
+      <button data-tab="scores">نقاط المستخدمين</button>
+      <button data-tab="settings">إعدادات</button>
+      <button data-tab="logs">السجلات</button>
+    </nav>
+    <main id="admin-content">
+      <!-- Users -->
+      <section id="users" class="admin-tab active">
+        <h2>إدارة المستخدمين</h2>
+        <input type="text" id="search-user" placeholder="ابحث باسم أو ID" />
+        <div id="user-list"></div>
+      </section>
+      <!-- Messages -->
+      <section id="messages" class="admin-tab">
+        <h2>إرسال رسالة</h2>
+        <label>إلى (ID مستخدم)</label><input type="text" id="msg-userid" />
+        <label>المحتوى</label><textarea id="msg-content"></textarea>
+        <label>عدد مرات الإرسال</label><input type="number" id="msg-count" value="1" min="1" />
+        <button id="send-msg" class="btn-small">إرسال</button>
+      </section>
+      <!-- Maintenance -->
+      <section id="maintenance" class="admin-tab">
+        <h2>وضع الصيانة</h2>
+        <label>نشط؟</label><select id="maintenance-mode"><option value="off">إيقاف</option><option value="on">تشغيل</option></select>
+        <label>مدة الصيانة (دقائق)</label><input type="number" id="maintenance-time" />
+        <button id="apply-maint" class="btn-small">تطبيق</button>
+      </section>
+      <!-- Permissions -->
+      <section id="permissions" class="admin-tab">
+        <h2>إدارة الصلاحيات</h2>
+        <label>منح صلاحية أدمن (ID)</label><input type="text" id="grant-userid" />
+        <button id="grant-admin" class="btn-small">منح</button>
+      </section>
+      <!-- Scores -->
+      <section id="scores" class="admin-tab">
+        <h2>تعديل نقاط المستخدمين</h2>
+        <label>User ID</label><input type="text" id="score-userid" />
+        <label>النقاط الجديدة</label><input type="number" id="new-score" />
+        <button id="update-score" class="btn-small">تحديث</button>
+      </section>
+      <!-- Settings -->
+      <section id="settings" class="admin-tab">
+        <h2>إعدادات إضافية</h2>
+        <p>هنا يمكنك إضافة المزيد من الإعدادات الزائفة مثل تخصيص واجهة، تغيير الثيمات، ضبط الساعات، ...</p>
+      </section>
+      <!-- Logs -->
+      <section id="logs" class="admin-tab">
+        <h2>سجلات النظام</h2>
+        <pre id="log-output">لا توجد سجلات بعد.</pre>
+      </section>
+    </main>
+  </div>  <script>
+    // Admin UI logic
+    document.querySelectorAll('#admin-menu button').forEach(btn=>btn.onclick=e=>{
+      document.querySelectorAll('#admin-menu button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.admin-tab').forEach(tab=>tab.classList.remove('active'));
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
 
-    // Rating
-    const stars = document.querySelectorAll('.star');
-    const ratingResult = document.querySelector('.rating-result');
-    const savedRating = localStorage.getItem('rating');
-    if(savedRating) setStars(parseInt(savedRating));
-    function setStars(val){ stars.forEach((s,i)=> s.classList.toggle('selected', i<val));
-      ratingResult.textContent = `التقييم: ${(val/5)*100}%`; }
-    stars.forEach(s=> s.addEventListener('click', ()=>{ const v=+s.dataset.value; setStars(v); localStorage.setItem('rating', v); }));
-
-    // Quiz setup
-    const feedbackEl = document.getElementById('feedback');
-    const scienceQ=[
-      {q:'أقرب كوكب إلى الشمس هو؟', opts:['الزهرة','عطارد','المريخ','المشتري'], a:1},
-      {q:'الوحدة الأساسية للمادة هي؟', opts:['البروتون','الجزيء','الذرة','الإلكترون'], a:2},
-      {q:'سرعة الضوء في الفراغ تقريباً؟', opts:['300,000 كم/ث','150,000 كم/ث','30,000 كم/ث','3,000 كم/ث'], a:0}
-    ];
-    const religionQ=[
-      {q:'عدد أركان الإسلام؟', opts:['3','4','5','6'], a:2},
-      {q:'أول سورة نزلت؟', opts:['الفاتحة','العلق','الفرقان','الأنعام'], a:1},
-      {q:'ليلة القدر تكون في؟', opts:['شوال','رمضان','ذو الحجة','شعبان'], a:1}
-    ];
-    let currentSet, currentIndex=0, score=0;
-
-    document.getElementById('start-science').onclick = ()=> startQuiz(scienceQ);
-    document.getElementById('start-religion').onclick = ()=> startQuiz(religionQ);
-    const selBtn=document.querySelectorAll('#quiz-container .btn'), qa=document.getElementById('question-area');
-    const qEl=document.getElementById('question'), optsEl=document.getElementById('options');
-    const nextBtn=document.getElementById('next-btn'), scoreEl=document.getElementById('score-display');
-
-    function startQuiz(set){ currentSet=set; currentIndex=0; score=0;
-      selBtn.forEach(b=> b.style.display='none'); qa.style.display='block'; nextBtn.style.display='none'; updateScore(); showQuestion(); }
-    function showQuestion(){ const item=currentSet[currentIndex]; qEl.textContent=item.q; optsEl.innerHTML='';
-      item.opts.forEach((opt,i)=>{
-        const b=document.createElement('button'); b.className='option-btn'; b.textContent=opt;
-        b.onclick = ()=> handleAnswer(i); optsEl.append(b);
+    // User management
+    function loadUsers(filter=''){
+      const users = JSON.parse(localStorage.getItem('users')||'{}');
+      const container = document.getElementById('user-list'); container.innerHTML='';
+      Object.entries(users).forEach(([id,u])=>{
+        if(!u.name.includes(filter) && !id.includes(filter)) return;
+        let div = document.createElement('div');
+        div.style.display='flex'; div.style.justifyContent='space-between'; div.style.padding='5px 0';
+        div.innerHTML = \`<span>\${u.name} (\${id})</span>
+          <span>\${u.bannedUntil>Date.now()?'محظور':'نشط'}</span>
+          <span>
+            <button class='btn-small' onclick="banUser('\${id}',60)">حظر 60د</button>
+            <button class='btn-small' onclick="unbanUser('\${id}')">فك الحظر</button>
+            <button class='btn-small' onclick="removeUser('\${id}')">حذف</button>
+          </span>\`;
+        container.append(div);
       });
     }
-    function handleAnswer(i){ const correct = currentSet[currentIndex].a;
-      showFeedback(i===correct ? 'جوابك صحيح' : 'جوابك خطأ');
-      if(i===correct) score++;
-      optsEl.querySelectorAll('button').forEach(b=> b.disabled=true);
-      nextBtn.style.display='inline-block'; updateScore();
-    }
-    function showFeedback(msg){ feedbackEl.textContent=msg; feedbackEl.style.display='block';
-      setTimeout(()=> feedbackEl.style.display='none', 2800);
-    }
-    nextBtn.onclick = ()=>{
-      currentIndex++;
-      if(currentIndex<currentSet.length){ showQuestion(); nextBtn.style.display='none'; }
-      else finishQuiz();
+    document.getElementById('search-user').oninput=e=>loadUsers(e.target.value);
+    function banUser(id,mins){ const users=JSON.parse(localStorage.getItem('users')); users[id].bannedUntil=Date.now()+mins*60000; localStorage.setItem('users',JSON.stringify(users)); loadUsers(); }
+    function unbanUser(id){ const users=JSON.parse(localStorage.getItem('users')); users[id].bannedUntil=0; localStorage.setItem('users',JSON.stringify(users)); loadUsers(); }
+    function removeUser(id){ const users=JSON.parse(localStorage.getItem('users')); delete users[id]; localStorage.setItem('users',JSON.stringify(users)); loadUsers(); }
+    loadUsers();
+
+    // Messaging
+    document.getElementById('send-msg').onclick=()=>{
+      const id=document.getElementById('msg-userid').value;
+      const cnt=parseInt(document.getElementById('msg-count').value)||1;
+      const msg=document.getElementById('msg-content').value;
+      for(let i=0;i<cnt;i++){ console.log(`Message to \${id}: \${msg}`); /* 实际 إرسال */ }
+      alert('تم إرسال الرسالة');
     };
-    function updateScore(){ scoreEl.textContent = `النقاط: ${score}`; }
-    function finishQuiz(){ qEl.textContent='انتهى الاختبار'; optsEl.innerHTML=`<p>النقاط النهائية: ${score} / ${currentSet.length}</p>`;
-      nextBtn.style.display='none'; }
+
+    // Maintenance
+    let maintTimer;
+    document.getElementById('apply-maint').onclick=()=>{
+      const mode=document.getElementById('maintenance-mode').value;
+      const mins=parseInt(document.getElementById('maintenance-time').value)||0;
+      localStorage.setItem('siteMaint', mode);
+      if(mode==='on'){ setTimeout(()=>{
+        localStorage.setItem('siteMaint','off');
+      }, mins*60000);
+      }
+      alert('تم تطبيق وضع الصيانة');
+    };
+    // On load, redirect if in maintenance
+    if(localStorage.getItem('siteMaint')==='on'){ document.body.innerHTML='<h1>الموقع تحت الصيانة</h1><p>سنعود بعد قليل...</p>'; }
+
+    // Permissions
+    document.getElementById('grant-admin').onclick=()=>{
+      const id=document.getElementById('grant-userid').value;
+      const users=JSON.parse(localStorage.getItem('users'));
+      if(users[id]) users[id].isAdmin=true;
+      localStorage.setItem('users',JSON.stringify(users));
+      alert('تم منح صلاحية أدمن لـ ' + id);
+    };
+
+    // Scores update
+    document.getElementById('update-score').onclick=()=>{
+      const id=document.getElementById('score-userid').value;
+      const v=parseInt(document.getElementById('new-score').value)||0;
+      let lb=JSON.parse(localStorage.getItem('leaderboard')||'{}');
+      lb[users[id].name] = v;
+      localStorage.setItem('leaderboard',JSON.stringify(lb));
+      alert('تم تعديل النقاط');
+    };
+
+    // Admin logout
+    function logoutAdmin(){ localStorage.removeItem('adminLogged'); location.reload(); }
+
+    // Initial auth for admin
+authAdmin();
   </script></body>
 </html>
