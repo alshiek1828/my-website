@@ -2,158 +2,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ALS​HIEK الشــيخ - البوابة الشاملة</title>
+  <title>ALS​HIEK الشــيخ - ألعاب تفاعلية</title>
   <style>
-    /* RESET */
+    /* Reset */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(120deg, #1c1c1c, #2b2b2b); color: #eee; display: flex; flex-direction: column; }
-    header, footer { background: rgba(0,0,0,0.5); padding: 10px; }
-    nav ul { list-style: none; display: flex; justify-content: center; gap: 15px; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(120deg,#1c1c1c,#2b2b2b); color: #eee; display: flex; flex-direction: column; }
+    header, footer { background: rgba(0,0,0,0.5); padding: 10px; text-align: center; }
+    nav ul { list-style: none; display: flex; justify-content: center; gap: 20px; }
     nav a { color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: background .3s; }
-    nav a:hover { background: rgba(255,255,255,0.1); }
-    #theme-toggle { position: absolute; top: 10px; right: 10px; padding: 6px 10px; border: none; cursor: pointer; border-radius: 4px; }main { flex: 1; display: grid; place-items: center; padding: 20px; position: relative; }
-section { display: none; width: 100%; max-width: 600px; background: rgba(10,10,10,0.8); padding: 20px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.7); }
-section.active { display: block; }
-h2 { margin-bottom: 15px; color: #00ffe7; text-shadow: 0 0 5px #00ffe7; }
-.btn { display: inline-block; padding: 10px 20px; margin: 10px 5px; border: none; border-radius: 20px; cursor: pointer; background: #ff0066; color: #fff; transition: transform .2s, background .3s; }
-.btn:hover { transform: scale(1.05); background: #ff3388; }
-input, textarea { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #555; background: #222; color: #fff; }
-
-/* Notifications */
-.notification { position: fixed; top: 20px; right: 20px; background: #333; color: #fff; padding: 10px 15px; border-radius: 5px; box-shadow: 0 0 10px #000; opacity: 0; transition: opacity .4s, transform .4s; }
-.notification.show { opacity: 1; transform: translateY(0); }
-
-/* Chat */
-#chat-box { height: 300px; background: #111; overflow-y: auto; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
-.message { margin-bottom: 8px; }
-.message.user { text-align: right; }
-
-/* Dark theme override */
-.dark-theme { --bg: #111; --fg: #eee; }
-
+    nav a:hover, nav a.active { background: rgba(255,255,255,0.1); }
+    main { flex: 1; padding: 20px; }
+    section { display: none; max-width: 600px; margin: 0 auto; background: rgba(10,10,10,0.8); padding: 20px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.7); }
+    section.active { display: block; }
+    h2 { color: #00ffe7; margin-bottom: 15px; text-shadow:0 0 5px #00ffe7; }
+    button { padding: 10px 20px; margin: 5px; border:none; border-radius:20px; background:#ff0066; color:#fff; cursor:pointer; transition:transform .2s,bg .3s; }
+    button:hover { transform:scale(1.05); background:#ff3388; }
+    canvas { display: block; margin:0 auto; background:#111; }
+    /* Tic-Tac-Toe */
+    #ttt-board { display: grid; grid-template: repeat(3,1fr)/repeat(3,1fr); gap:5px; margin:20px 0; }
+    #ttt-board div { width:60px; height:60px; background:#222; display:flex; align-items:center; justify-content:center; font-size:2rem; cursor:pointer; }
   </style>
 </head>
 <body>
   <header>
     <nav>
       <ul>
-        <li><a href="#" data-nav="home">الرئيسية</a></li>
-        <li><a href="#" data-nav="login">دخول/تسجيل</a></li>
-        <li><a href="#" data-nav="profile">صفحتي</a></li>
-        <li><a href="#" data-nav="chat">دردشة</a></li>
+        <li><a href="#" data-nav="home" class="active">الرئيسية</a></li>
+        <li><a href="#" data-nav="tic-tac-toe">تيك تاك تو</a></li>
+        <li><a href="#" data-nav="snake">لعبة الثعبان</a></li>
       </ul>
-      <button id="theme-toggle">🌙</button>
     </nav>
-  </header>  <main>
-    <!-- Home -->
+  </header>
+  <main>
     <section id="home" class="active">
-      <h2>مرحبا بك في بوابتنا الشاملة</h2>
-      <button class="btn" data-nav="chat">ابدأ دردشة</button>
-    </section><!-- Login/Register -->
-<section id="login">
-  <h2>الدخول أو إنشاء حساب</h2>
-  <div id="auth-forms">
-    <button class="btn" id="show-login">تسجيل دخول</button>
-    <button class="btn" id="show-register">تسجيل جديد</button>
-    <form id="form-login" style="display:none;">
-      <input type="text" id="login-user" placeholder="اسم المستخدم" required />
-      <input type="password" id="login-pass" placeholder="كلمة المرور" required />
-      <button type="submit" class="btn">دخول</button>
-    </form>
-    <form id="form-register" style="display:none;">
-      <input type="text" id="reg-user" placeholder="اسم المستخدم" required />
-      <input type="password" id="reg-pass" placeholder="كلمة المرور" required />
-      <button type="submit" class="btn">تسجيل</button>
-    </form>
-  </div>
-</section>
-
-<!-- Profile -->
-<section id="profile">
-  <h2>صفحتي الشخصية</h2>
-  <p id="profile-greeting">مرحبا، ضيف!</p>
-  <button class="btn" id="logout">تسجيل خروج</button>
-</section>
-
-<!-- Chat -->
-<section id="chat">
-  <h2>دردشة مباشرة</h2>
-  <div id="chat-box"></div>
-  <textarea id="chat-input" rows="2" placeholder="اكتب رسالتك..."></textarea>
-  <button class="btn" id="send-msg">إرسال</button>
-</section>
-
-  </main>  <footer>
-    &copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》
-  </footer>  <script>
-    // State & Helpers
-    let currentUser = localStorage.getItem('user') || null;
-    const notify = (msg) => {
-      const n = document.createElement('div'); n.className='notification show'; n.textContent = msg;
-      document.body.append(n);
-      setTimeout(() => n.remove(), 3000);
-    };
-
+      <h2>مرحبا بك في بوابة الألعاب</h2>
+      <p>اختر اللعبة التي تريدها من القائمة أعلاه</p>
+    </section>
+    <section id="tic-tac-toe">
+      <h2>تيك تاك تو</h2>
+      <div id="ttt-board"></div>
+      <p id="ttt-status"></p>
+      <button id="ttt-reset">إعادة اللعب</button>
+    </section>
+    <section id="snake">
+      <h2>لعبة الثعبان</h2>
+      <canvas id="snake-canvas" width="400" height="400"></canvas>
+      <p id="snake-score">النتيجة: 0</p>
+      <button id="snake-reset">إعادة اللعب</button>
+    </section>
+  </main>
+  <footer>&copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》</footer>
+  <script>
     // Navigation
-    document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', e => {
+    document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',e=>{
       e.preventDefault();
+      document.querySelectorAll('nav a').forEach(x=>x.classList.remove('active'));
+      e.currentTarget.classList.add('active');
       const target = e.currentTarget.getAttribute('data-nav');
       document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
       document.getElementById(target).classList.add('active');
     }));
-
-    // Theme Toggle
-    const bodyEl = document.body;
-    const themeBtn = document.getElementById('theme-toggle');
-    themeBtn.addEventListener('click', () => {
-      bodyEl.classList.toggle('dark-theme');
-      themeBtn.textContent = bodyEl.classList.contains('dark-theme') ? '☀️' : '🌙';
+    // Tic-Tac-Toe Logic
+    const tttBoard = document.getElementById('ttt-board');
+    const tttStatus = document.getElementById('ttt-status');
+    const tttReset = document.getElementById('ttt-reset');
+    let tttCells, tttTurn, tttMoves;
+    function initTTT(){
+      tttBoard.innerHTML=''; tttTurn='X'; tttMoves=0; tttStatus.textContent='دور: ' + tttTurn;
+      for(let i=0;i<9;i++){
+        const cell=document.createElement('div'); cell.addEventListener('click', ()=>playTTT(i)); tttBoard.append(cell);
+      }
+      tttCells = Array(9).fill(null);
+    }
+    function playTTT(i){
+      if(tttCells[i]||checkWinner()) return;
+      tttCells[i]=tttTurn; tttBoard.children[i].textContent=tttTurn; tttMoves++;
+      if(checkWinner()){ tttStatus.textContent='فاز ' + tttTurn + '!'; }
+      else if(tttMoves===9){ tttStatus.textContent='تعادل!'; }
+      else{ tttTurn = tttTurn==='X'?'O':'X'; tttStatus.textContent='دور: ' + tttTurn; }
+    }
+    function checkWinner(){
+      const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      return wins.some(w=>{
+        const [a,b,c]=w; return tttCells[a]&&tttCells[a]===tttCells[b]&&tttCells[b]===tttCells[c];
+      });
+    }
+    tttReset.addEventListener('click', initTTT);
+    initTTT();
+    // Snake Logic
+    const canvas = document.getElementById('snake-canvas');
+    const ctx = canvas.getContext('2d');
+    const scale=20; const rows=canvas.height/scale; const cols=canvas.width/scale;
+    let snake, food, score, game;
+    function initSnake(){
+      snake=[{x:cols/2,y:rows/2}]; score=0; document.getElementById('snake-score').textContent='النتيجة: '+score;
+      spawnFood(); dir={x:0,y:0}; clearInterval(game); game=setInterval(run,100);
+    }
+    function spawnFood(){ food={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)}; }
+    let dir;
+    window.addEventListener('keydown',e=>{
+      switch(e.key){
+        case 'ArrowUp': if(dir.y!==1) dir={x:0,y:-1}; break;
+        case 'ArrowDown': if(dir.y!==-1) dir={x:0,y:1}; break;
+        case 'ArrowLeft': if(dir.x!==1) dir={x:-1,y:0}; break;
+        case 'ArrowRight': if(dir.x!==-1) dir={x:1,y:0}; break;
+      }
     });
-
-    // Auth Logic
-    document.getElementById('show-login').onclick = ()=>{
-      document.getElementById('form-login').style.display='block';
-      document.getElementById('form-register').style.display='none';
-    };
-    document.getElementById('show-register').onclick = ()=>{
-      document.getElementById('form-register').style.display='block';
-      document.getElementById('form-login').style.display='none';
-    };
-    document.getElementById('form-login').onsubmit = e => {
-      e.preventDefault();
-      const u = document.getElementById('login-user').value;
-      currentUser = u;
-      localStorage.setItem('user', u);
-      notify('تم تسجيل الدخول');
-      document.getElementById('profile-greeting').textContent = `مرحبا، ${u}`;
-    };
-    document.getElementById('form-register').onsubmit = e => {
-      e.preventDefault();
-      const u = document.getElementById('reg-user').value;
-      currentUser = u;
-      localStorage.setItem('user', u);
-      notify('تم إنشاء الحساب');
-      document.getElementById('profile-greeting').textContent = `مرحبا، ${u}`;
-    };
-    document.getElementById('logout').onclick = ()=>{
-      localStorage.removeItem('user'); currentUser=null;
-      notify('تم تسجيل الخروج');
-      document.getElementById('profile-greeting').textContent = 'مرحبا، ضيف!';
-    };
-
-    // Profile on load
-    if(currentUser) document.getElementById('profile-greeting').textContent=`مرحبا، ${currentUser}`;
-
-    // Chat Logic
-    const chatBox = document.getElementById('chat-box');
-    const chatInput = document.getElementById('chat-input');
-    document.getElementById('send-msg').onclick = ()=>{
-      if(!currentUser) return notify('سجل الدخول للدردشة');
-      const msg = chatInput.value.trim();
-      if(!msg) return;
-      const div = document.createElement('div'); div.className='message user'; div.textContent=`${currentUser}: ${msg}`;
-      chatBox.append(div); chatInput.value=''; chatBox.scrollTop=chatBox.scrollHeight;
-    };
-  </script></body>
+    function run(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // move snake
+      const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+      if(head.x<0||head.x>=cols||head.y<0||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y)){
+        clearInterval(game); alert('انتهت اللعبة! نتيجتك: '+score); return;
+      }
+      snake.unshift(head);
+      if(head.x===food.x&&head.y===food.y){ score++; document.getElementById('snake-score').textContent='النتيجة: '+score; spawnFood(); }
+      else snake.pop();
+      // draw food
+      ctx.fillStyle='#ff0066'; ctx.fillRect(food.x*scale,food.y*scale,scale,scale);
+      // draw snake
+      ctx.fillStyle='#00ffe7'; snake.forEach(s=>ctx.fillRect(s.x*scale,s.y*scale,scale,scale));
+    }
+    document.getElementById('snake-reset').addEventListener('click', initSnake);
+    initSnake();
+  </script>
+</body>
 </html>
