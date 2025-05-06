@@ -164,11 +164,11 @@
   <!-- Prayer Times Section -->
   <div id="prayer-times">
     <h2>مواقيت الصلاة</h2>
-    <span id="fajr">الفجر: --:--</span>
-    <span id="dhuhr">الظهر: --:--</span>
-    <span id="asr">العصر: --:--</span>
-    <span id="maghrib">المغرب: --:--</span>
-    <span id="isha">العشاء: --:--</span>
+    <span id="fajr">الفجر: --:-- AM</span>
+    <span id="dhuhr">الظهر: --:-- AM</span>
+    <span id="asr">العصر: --:-- AM</span>
+    <span id="maghrib">المغرب: --:-- AM</span>
+    <span id="isha">العشاء: --:-- AM</span>
   </div>
 
   <footer>
@@ -214,37 +214,41 @@
       });
     });
 
-    // Clock Update Function
+    // Clock Update Function with 12-hour format (AM/PM)
     function updateClock() {
       const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      document.getElementById("clock").textContent = `${hours}:${minutes}:${seconds}`;
+      let hours = now.getHours();
+      let minutes = now.getMinutes().toString().padStart(2, '0');
+      let seconds = now.getSeconds().toString().padStart(2, '0');
+      let ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      document.getElementById('clock').textContent = `الوقت الحالي: ${hours}:${minutes}:${seconds} ${ampm}`;
     }
 
-    setInterval(updateClock, 1000); // Update the clock every second
+    setInterval(updateClock, 1000);
 
-    // Prayer Times API Call
-    async function getPrayerTimes() {
-      const selectedCountry = document.getElementById("country-select").value;
-      const apiUrl = `http://api.aladhan.com/v1/timingsByCity?city=${selectedCountry}&country=${selectedCountry}&method=2`;
-
-      try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const timings = data.data.timings;
-
-        document.getElementById("fajr").textContent = `الفجر: ${timings.Fajr}`;
-        document.getElementById("dhuhr").textContent = `الظهر: ${timings.Dhuhr}`;
-        document.getElementById("asr").textContent = `العصر: ${timings.Asr}`;
-        document.getElementById("maghrib").textContent = `المغرب: ${timings.Maghrib}`;
-        document.getElementById("isha").textContent = `العشاء: ${timings.Isha}`;
-      } catch (error) {
-        console.error("Error fetching prayer times:", error);
-      }
+    // Function to get prayer times for selected country
+    function getPrayerTimes() {
+      const country = document.getElementById("country-select").value;
+      
+      // API URL for prayer times
+      const apiUrl = `https://api.aladhan.com/v1/timingsByCity?city=${country}&country=country&method=2`;
+      
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const timings = data.data.timings;
+          document.getElementById('fajr').textContent = `الفجر: ${timings.Fajr}`;
+          document.getElementById('dhuhr').textContent = `الظهر: ${timings.Dhuhr}`;
+          document.getElementById('asr').textContent = `العصر: ${timings.Asr}`;
+          document.getElementById('maghrib').textContent = `المغرب: ${timings.Maghrib}`;
+          document.getElementById('isha').textContent = `العشاء: ${timings.Isha}`;
+        })
+        .catch(error => console.error('Error fetching prayer times:', error));
     }
 
+    // Load prayer times when the page loads
     getPrayerTimes();
   </script>
 </body>
