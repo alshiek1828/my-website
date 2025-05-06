@@ -2,117 +2,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ALS​HIEK الشــيخ - اختبارات تفاعلية</title>
+  <title>ALS​HIEK الشــيخ - الألعاب والاختبارات</title>
   <style>
     /* Reset */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(120deg,#1c1c1c,#2b2b2b); color: #eee; display: flex; flex-direction: column; }
-    header, footer { background: rgba(0,0,0,0.6); padding: 10px; text-align: center; }
-    nav ul { list-style: none; display: flex; justify-content: center; gap: 20px; }
-    nav a { color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: background .3s; }
-    nav a:hover, nav a.active { background: rgba(255,255,255,0.1); }
-    main { flex: 1; padding: 20px; }
-    section { display: none; max-width: 800px; margin: 0 auto; background: rgba(10,10,10,0.9); padding: 20px; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
-    section.active { display: block; }
-    h2 { color: #00ffe7; margin-bottom: 15px; text-shadow:0 0 5px #00ffe7; }
-    button { padding: 10px 20px; margin: 5px; border:none; border-radius:20px; background:#ff0066; color:#fff; cursor:pointer; transition:transform .2s, background .3s; }
-    button:hover { transform:scale(1.05); background:#ff3388; }
-    #digital-clock { font-size:2rem; padding:10px 20px; background:rgba(0,0,0,0.7); border-radius:10px; display:inline-block; margin-bottom:20px; }
-    .option-btn { display:block; width:100%; max-width:600px; margin:10px auto; text-align:left; }
-    #score-display { margin-top:20px; font-size:1.2rem; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+           background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
+           color: #fff; text-align: center; padding: 20px; }
+    header, footer { margin: 20px 0; }
+    h1 { font-size: 3em; color: #00ffe7; text-shadow: 0 0 10px #00ffe7; }
+    p { font-size: 1.2em; color: #ccc; margin-bottom: 20px; }
+    button, .btn { background-color: #ff0066; color: white; border: none;
+             border-radius: 30px; padding: 10px 20px; font-size: 1.1em;
+             cursor: pointer; box-shadow: 0 0 20px #ff0066;
+             transition: background-color 0.3s ease, transform 0.2s ease; }
+    button:hover, .btn:hover { background-color: #ff3388; transform: scale(1.05); }
+    a { display: inline-block; margin: 10px; padding: 8px 16px;
+        background-color: #00aaff; color: white; text-decoration: none;
+        border-radius: 20px; box-shadow: 0 0 10px #00aaff;
+        transition: background-color 0.3s ease, transform 0.2s ease; }
+    a:hover { background-color: #33bbff; transform: scale(1.05); }
+    .rating { margin: 20px 0; }
+    .stars { display: flex; justify-content: center; }
+    .star { font-size: 2.5em; color: #ccc; cursor: pointer;
+             transition: color 0.3s ease; }
+    .star.selected { color: #ffcc00; }
+    .rating-result { margin-top: 10px; font-size: 1.2em; color: #fff; }/* Quiz */
+#quiz-container { margin-top: 30px; }
+#question-area { display: none; margin-top: 20px; }
+#question { font-size: 1.2em; margin-bottom: 15px; }
+.option-btn { display: block; width: 100%; max-width: 600px;
+              margin: 8px auto; text-align: left; background:#444; }
+.feedback { position: fixed; top: 20px; left:50%; transform:translateX(-50%);
+            background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px;
+            border-radius: 10px; font-size:1.2em; display:none; }
+#score-display { margin-top: 15px; font-size: 1.2em; }
+
   </style>
 </head>
 <body>
   <header>
-    <nav>
-      <ul>
-        <li><a href="#" data-nav="home" class="active">الرئيسية</a></li>
-        <li><a href="#" data-nav="quiz">اختبارات</a></li>
-      </ul>
-    </nav>
-  </header>
-  <main>
-    <section id="home" class="active">
-      <h2>مرحبا بك في بوابة الاختبارات</h2>
-      <div id="digital-clock"></div>
-      <p>اختر اختباراً من القائمة للبدء!</p>
-    </section>
-    <section id="quiz">
-      <h2>اختبارات متنوعة</h2>
-      <div id="quiz-container">
-        <div id="quiz-selection">
-          <button class="btn" id="start-science">اختبار علمي</button>
-          <button class="btn" id="start-religion">اختبار ديني</button>
-        </div>
-        <div id="question-area" style="display:none;">
-          <div id="question"></div>
-          <div id="options"></div>
-          <div id="score-display"></div>
-          <button class="btn" id="next-btn" style="display:none;">السؤال التالي</button>
-        </div>
+    <h1>Welcome to My Website!</h1>
+    <p>Created by alshiek</p>
+    <button onclick="toggleAudio()">تشغيل / إيقاف الأغنية</button>
+    <audio id="myAudio">
+      <source src="song.mp3" type="audio/mpeg">
+      متصفحك لا يدعم تشغيل الصوت.
+    </audio>
+    <div style="margin-top:20px;">
+      <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+      <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">رابط تحميل CarFury</a>
+      <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
+      <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة Car Fury</a>
+    </div>
+    <div class="rating">
+      <h2>قيم موقعي</h2>
+      <div class="stars">
+        <span class="star" data-value="1">★</span>
+        <span class="star" data-value="2">★</span>
+        <span class="star" data-value="3">★</span>
+        <span class="star" data-value="4">★</span>
+        <span class="star" data-value="5">★</span>
       </div>
-    </section>
-  </main>
-  <footer>&copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》</footer>
-  <script>
-    // Navigation
-    document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',e=>{
-      e.preventDefault(); document.querySelectorAll('nav a').forEach(x=>x.classList.remove('active'));
-      e.currentTarget.classList.add('active'); const target=e.currentTarget.dataset.nav;
-      document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
-      document.getElementById(target).classList.add('active');
-    }));
-    // Clock
-    function updateClock(){ const now=new Date(); let h=now.getHours(), m=now.getMinutes(), s=now.getSeconds(); const ampm = h>=12?'م':'ص'; h=h%12||12; const pad=n=>n<10?'0'+n:n;
-      document.getElementById('digital-clock').textContent=`${pad(h)}:${pad(m)}:${pad(s)} ${ampm}`; }
-    setInterval(updateClock,1000); updateClock();
-    // Quiz Data
-    const scienceQuestions = [
+      <div class="rating-result">التقييم: 0%</div>
+    </div>
+  </header>  <div class="feedback" id="feedback"></div>
+  <div id="quiz-container">
+    <button class="btn" id="start-science">اختبار علمي</button>
+    <button class="btn" id="start-religion">اختبار ديني</button>
+    <div id="question-area">
+      <div id="question"></div>
+      <div id="options"></div>
+      <button class="btn" id="next-btn" style="display:none;">السؤال التالي</button>
+      <div id="score-display"></div>
+    </div>
+  </div>  <footer>&copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》</footer>  <script>
+    // Audio toggle
+    const audio = document.getElementById('myAudio');
+    function toggleAudio(){ audio.paused? audio.play(): audio.pause(); }
+
+    // Rating
+    const stars = document.querySelectorAll('.star');
+    const ratingResult = document.querySelector('.rating-result');
+    const savedRating = localStorage.getItem('rating');
+    if(savedRating) setStars(parseInt(savedRating));
+    function setStars(val){ stars.forEach((s,i)=> s.classList.toggle('selected', i<val));
+      ratingResult.textContent = `التقييم: ${(val/5)*100}%`; }
+    stars.forEach(s=> s.addEventListener('click', ()=>{ const v=+s.dataset.value; setStars(v); localStorage.setItem('rating', v); }));
+
+    // Quiz setup
+    const feedbackEl = document.getElementById('feedback');
+    const scienceQ=[
       {q:'أقرب كوكب إلى الشمس هو؟', opts:['الزهرة','عطارد','المريخ','المشتري'], a:1},
       {q:'الوحدة الأساسية للمادة هي؟', opts:['البروتون','الجزيء','الذرة','الإلكترون'], a:2},
-      {q:'سرعة الضوء في الفراغ تقريباً؟', opts:['300,000 كم/ث','150,000 كم/ث','30,000 كم/ث','3,000 كم/ث'], a:0},
-      {q:'علم دراسة الحشرات يُسمى؟', opts:['علم النبات','علم الحياة','علم الحيوان','علم الحشرات'], a:3},
-      {q:'المادة التي توصل الكهرباء هي؟', opts:['خشب','زجاج','نحاس','مطاط'], a:2},
-      {q:'أكبر كوكب في المجموعة الشمسية هو؟', opts:['المشتري','المريخ','الأرض','زحل'], a:0},
-      {q:'أقوى قوة في الطبيعة هي؟', opts:['القوة النووية الضعيفة','القوة الكهرومغناطيسية','القوة النووية الشديدة','الجاذبية'], a:2},
-      {q:'العنصر الأكثر وفرة في الكون هو؟', opts:['الهيدروجين','الأكسجين','الكربون','الهيليوم'], a:0},
-      {q:'ما تعريف الطيف الكهرومغناطيسي؟', opts:['مجموعة الألوان المرئية فقط','مجموعة جميع الترددات','الأشعة السينية فقط','الأشعة تحت الحمراء فقط'], a:1},
-      {q:'الNewton هي وحدة قياس؟', opts:['القوة','الطاقة','الكتلة','الزمن'], a:0}
+      {q:'سرعة الضوء في الفراغ تقريباً؟', opts:['300,000 كم/ث','150,000 كم/ث','30,000 كم/ث','3,000 كم/ث'], a:0}
     ];
-    const religionQuestions = [
+    const religionQ=[
       {q:'عدد أركان الإسلام؟', opts:['3','4','5','6'], a:2},
       {q:'أول سورة نزلت؟', opts:['الفاتحة','العلق','الفرقان','الأنعام'], a:1},
-      {q:'ليلة القدر تكون في؟', opts:['شوال','رمضان','ذو الحجة','شعبان'], a:1},
-      {q:'عدد ركعات الفجر؟', opts:['1','2','3','4'], a:1},
-      {q:'بنى الكعبة؟', opts:['محمد','إبراهيم','نوح','إسماعيل'], a:1},
-      {q:'أول مسجد بُني؟', opts:['الحرام','النبوي','الأقصى','القبة الصخرية'], a:1},
-      {q:'كم عدد سور القرآن؟', opts:['114','113','115','110'], a:0},
-      {q:'مدة الصيام في رمضان؟', opts:['20 يوماً','28 يوماً','29-30 يوماً','31 يوماً'], a:2},
-      {q:'من جابر بن عبدالله؟', opts:['صحابي','تابعي','تابع التابعين','أحد الخلفاء'], a:0},
-      {q:'مصحف عثمان؟', opts:['1','2','3','4'], a:0}
+      {q:'ليلة القدر تكون في؟', opts:['شوال','رمضان','ذو الحجة','شعبان'], a:1}
     ];
-    let currentSet, indexQuiz, score;
-    const startSci=document.getElementById('start-science'), startRel=document.getElementById('start-religion');
-    const selDiv=document.getElementById('quiz-selection'), qa=document.getElementById('question-area');
-    const qEl=document.getElementById('question'), optsEl=document.getElementById('options'), scoreEl=document.getElementById('score-display');
-    const nextBtn=document.getElementById('next-btn');
-    startSci.onclick=()=>startQuiz(scienceQuestions);
-    startRel.onclick=()=>startQuiz(religionQuestions);
-    function startQuiz(set){ currentSet=set; indexQuiz=0; score=0; selDiv.style.display='none'; qa.style.display='block'; nextBtn.style.display='none'; showQuestion(); updateScore(); }
-    function showQuestion(){ const item=currentSet[indexQuiz]; qEl.textContent=item.q; optsEl.innerHTML=''; item.opts.forEach((opt,i)=>{
-      const b=document.createElement('button'); b.className='option-btn'; b.textContent=opt;
-      b.onclick=()=>selectOption(i); optsEl.append(b);
-    }); }
-    function selectOption(i){ // lock
-      Array.from(optsEl.children).forEach(btn=>btn.disabled=true);
-      if(i===currentSet[indexQuiz].a){ score++; }
-      nextBtn.style.display='inline-block'; }
-    nextBtn.onclick=()=>{
-      indexQuiz++; if(indexQuiz<currentSet.length){ showQuestion(); updateScore(); nextBtn.style.display='none'; }
-      else finishQuiz(); };
-    function updateScore(){ scoreEl.textContent=`النقاط: ${score}`; }
-    function finishQuiz(){ qEl.textContent='انتهى الاختبار'; optsEl.innerHTML=`<p>النقاط النهائية: ${score} / ${currentSet.length}</p>`; nextBtn.style.display='none'; }
-  </script>
-</body>
+    let currentSet, currentIndex=0, score=0;
+
+    document.getElementById('start-science').onclick = ()=> startQuiz(scienceQ);
+    document.getElementById('start-religion').onclick = ()=> startQuiz(religionQ);
+    const selBtn=document.querySelectorAll('#quiz-container .btn'), qa=document.getElementById('question-area');
+    const qEl=document.getElementById('question'), optsEl=document.getElementById('options');
+    const nextBtn=document.getElementById('next-btn'), scoreEl=document.getElementById('score-display');
+
+    function startQuiz(set){ currentSet=set; currentIndex=0; score=0;
+      selBtn.forEach(b=> b.style.display='none'); qa.style.display='block'; nextBtn.style.display='none'; updateScore(); showQuestion(); }
+    function showQuestion(){ const item=currentSet[currentIndex]; qEl.textContent=item.q; optsEl.innerHTML='';
+      item.opts.forEach((opt,i)=>{
+        const b=document.createElement('button'); b.className='option-btn'; b.textContent=opt;
+        b.onclick = ()=> handleAnswer(i); optsEl.append(b);
+      });
+    }
+    function handleAnswer(i){ const correct = currentSet[currentIndex].a;
+      showFeedback(i===correct ? 'جوابك صحيح' : 'جوابك خطأ');
+      if(i===correct) score++;
+      optsEl.querySelectorAll('button').forEach(b=> b.disabled=true);
+      nextBtn.style.display='inline-block'; updateScore();
+    }
+    function showFeedback(msg){ feedbackEl.textContent=msg; feedbackEl.style.display='block';
+      setTimeout(()=> feedbackEl.style.display='none', 2800);
+    }
+    nextBtn.onclick = ()=>{
+      currentIndex++;
+      if(currentIndex<currentSet.length){ showQuestion(); nextBtn.style.display='none'; }
+      else finishQuiz();
+    };
+    function updateScore(){ scoreEl.textContent = `النقاط: ${score}`; }
+    function finishQuiz(){ qEl.textContent='انتهى الاختبار'; optsEl.innerHTML=`<p>النقاط النهائية: ${score} / ${currentSet.length}</p>`;
+      nextBtn.style.display='none'; }
+  </script></body>
 </html>
