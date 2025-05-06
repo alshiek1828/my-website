@@ -46,6 +46,11 @@
       width: 100%; padding:8px; margin-bottom:10px; background:#333; border:1px solid #555; color:#fff;
     }
     #admin-panel button { margin:5px 0; padding:8px 16px; }
+    #settings-panel { display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.7); color:#fff; overflow:auto; padding:20px; z-index:9999;}
+    #settings-panel label {display:block;margin:10px 0 5px;}
+    #settings-panel input {width:100%;padding:8px;margin-bottom:10px;background:#222;border:1px solid #555;color:#fff;}
+    #settings-panel button {margin:5px 0;padding:8px 16px;}
   </style>
 </head>
 <body>
@@ -60,6 +65,7 @@
     <button data-tab="religion">اختبار ديني</button>
     <button data-tab="leaderboard">لوحة المتصدرين</button>
     <button id="open-admin">لوحة الأدمن</button>
+    <button id="open-settings">الإعدادات</button>
   </nav>
 
   <!-- Home -->
@@ -92,9 +98,9 @@
   <section id="leaderboard">
     <h2>لوحة المتصدرين</h2>
     <h3>علمي</h3>
-    <table><tr><th>اسم</th><th>نقاط</th></tr><tbody id="lb-sci"></tbody></table>
+    <table><tr><th>اسم</th><th>معرّف</th><th>نقاط</th><th>نسخ المعرف</th></tr><tbody id="lb-sci"></tbody></table>
     <h3>ديني</h3>
-    <table><tr><th>اسم</th><th>نقاط</th></tr><tbody id="lb-rel"></tbody></table>
+    <table><tr><th>اسم</th><th>معرّف</th><th>نقاط</th><th>نسخ المعرف</th></tr><tbody id="lb-rel"></tbody></table>
   </section>
 
   <!-- Admin Panel -->
@@ -139,16 +145,62 @@
     </div>
   </div>
 
+  <!-- Settings Panel -->
+  <div id="settings-panel">
+    <h2>الإعدادات</h2>
+    <label>اسمك:</label>
+    <input type="text" id="settings-name">
+    <label>معرّفك الشخصي:</label>
+    <input type="text" id="settings-id" readonly>
+    <button onclick="copyID()">نسخ المعرّف</button>
+    <button onclick="saveName()">حفظ الاسم</button>
+    <button onclick="closeSettings()">إغلاق</button>
+  </div>
+
   <footer>&copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》</footer>
 
 <script>
-  // Name prompt
-  let player = localStorage.getItem('playerName');
-  if(!player) {
-    player = prompt('أدخل اسمك للعبة الاختبارات:') || 'ضيف';
-    localStorage.setItem('playerName', player);
+  // Unique ID functions
+  function generateID() {
+    return 'ID-' + Math.random().toString(36).substr(2,8) + '-' + Date.now().toString(36).substr(-4);
   }
-  document.getElementById('greeting').textContent = `مرحباً ${player}!`;
+  let player = localStorage.getItem('playerName');
+  let playerID = localStorage.getItem('playerID');
+  if(!player || !playerID) {
+    do {
+      player = prompt('أدخل اسمك للعبة الاختبارات:') || '';
+    } while(!player.trim());
+    playerID = generateID();
+    localStorage.setItem('playerName', player);
+    localStorage.setItem('playerID', playerID);
+  }
+  document.getElementById('greeting').textContent = `مرحباً ${player}! معرّفك: ${playerID}`;
+
+  // Settings Panel logic
+  document.getElementById('open-settings').onclick = function() {
+    document.getElementById('settings-name').value = player;
+    document.getElementById('settings-id').value = playerID;
+    document.getElementById('settings-panel').style.display = 'block';
+  }
+  function closeSettings() {
+    document.getElementById('settings-panel').style.display = 'none';
+  }
+  function copyID() {
+    navigator.clipboard.writeText(playerID);
+    alert("تم نسخ المعرّف: " + playerID);
+  }
+  function saveName() {
+    let newName = document.getElementById('settings-name').value.trim();
+    if(newName) {
+      player = newName;
+      localStorage.setItem('playerName', player);
+      document.getElementById('greeting').textContent = `مرحباً ${player}! معرّفك: ${playerID}`;
+      alert('تم تغيير الاسم');
+    }
+    closeSettings();
+    renderLB('science', 'lb-sci');
+    renderLB('religion', 'lb-rel');
+  }
 
   // Tab switching
   document.querySelectorAll('nav button[data-tab]').forEach(btn=>{
@@ -161,16 +213,41 @@
     document.getElementById(tab).classList.add('active');
   }
 
-  // Quiz data
+  // Questions data (زيادة الأسئلة جداً)
   const sciQ = [
     {q:'أقرب كوكب للشمس؟', opts:['الزهرة','عطارد','المريخ','المشتري'], a:1},
     {q:'الوحدة الأساسية للمادة؟', opts:['بروتون','جزيء','ذرة','إلكترون'], a:2},
-    {q:'سرعة الضوء؟', opts:['300,000km/s','150,000km/s','30,000km/s','3,000km/s'], a:0}
+    {q:'سرعة الضوء؟', opts:['300,000km/s','150,000km/s','30,000km/s','3,000km/s'], a:0},
+    {q:'من هو أبو الكيمياء؟', opts:['جابر بن حيان','الخوارزمي','ابن سينا','نيوتن'], a:0},
+    {q:'العنصر الأكثر وفرة في الكون؟', opts:['الهيدروجين','الأكسجين','الذهب','الحديد'], a:0},
+    {q:'أكبر عضو في جسم الإنسان؟', opts:['القلب','الكبد','الجلد','الرئة'], a:2},
+    {q:'ما الغاز الضروري للتنفس؟', opts:['الهيدروجين','الأكسجين','ثاني أكسيد الكربون','نيتروجين'], a:1},
+    {q:'كم عدد كواكب المجموعة الشمسية؟', opts:['8','9','10','7'], a:0},
+    {q:'من مكتشف الجاذبية؟', opts:['أينشتاين','غاليلو','نيوتن','ابن الهيثم'], a:2},
+    {q:'أقوى عظم في جسم الإنسان؟', opts:['الفخذ','الجمجمة','الذراع','العمود الفقري'], a:0},
+    {q:'أقرب نجم إلى الأرض؟', opts:['الشعرى','الشمس','النجم القطبي','نون'], a:1},
+    {q:'ما الوحدة التي تقاس بها شدة التيار الكهربائي؟', opts:['فولت','أوم','أمبير','واط'], a:2},
+    {q:'أصغر وحدة في المادة؟', opts:['ذرة','جزيء','خلية','بروتون'], a:0},
+    {q:'أين تحدث عملية البناء الضوئي؟', opts:['الجذور','الأوراق','الجذع','الثمار'], a:1},
+    {q:'ما الحيوان الذي يُلقب بسفينة الصحراء؟', opts:['الحصان','الجمل','البقرة','الماعز'], a:1},
+    {q:'من أول من مشى على سطح القمر؟', opts:['نيل آرمسترونغ','يوري غاغارين','أوباما','أينشتاين'], a:0}
   ];
   const relQ = [
     {q:'عدد أركان الإسلام؟', opts:['3','4','5','6'], a:2},
     {q:'أول سورة نزلت؟', opts:['الفاتحة','العلق','الفرقان','الأنعام'], a:1},
-    {q:'ليلة القدر؟', opts:['شوال','رمضان','ذو الحجة','شعبان'], a:1}
+    {q:'ليلة القدر؟', opts:['شوال','رمضان','ذو الحجة','شعبان'], a:1},
+    {q:'كم عدد الصلوات المفروضة؟', opts:['3','4','5','6'], a:2},
+    {q:'شهر الصوم؟', opts:['رمضان','شعبان','محرم','شوال'], a:0},
+    {q:'قبلة المسلمين؟', opts:['القدس','الكعبة','المدينة','دمشق'], a:1},
+    {q:'من أول نبي؟', opts:['موسى','إبراهيم','آدم','نوح'], a:2},
+    {q:'كم عدد الكتب السماوية؟', opts:['3','4','5','6'], a:1},
+    {q:'من النبي الذي ابتلعه الحوت؟', opts:['يونس','موسى','عيسى','إبراهيم'], a:0},
+    {q:'ما اسم والدة النبي محمد؟', opts:['آمنة','خديجة','مريم','فاطمة'], a:0},
+    {q:'ما هي أطول سورة في القرآن؟', opts:['البقرة','آل عمران','النساء','الأنعام'], a:0},
+    {q:'من هو خاتم الأنبياء؟', opts:['عيسى','موسى','محمد','نوح'], a:2},
+    {q:'ما اسم الجبل الذي استقرت عليه سفينة نوح؟', opts:['الطور','الجودي','أحد','عرفات'], a:1},
+    {q:'كم مرة ورد اسم محمد في القرآن؟', opts:['2','3','4','5'], a:2},
+    {q:'كم عدد الحروف الأبجدية العربية؟', opts:['26','28','29','27'], a:1}
   ];
 
   // Generic quiz engine
@@ -211,19 +288,31 @@
   function saveScore(test, s){
     const key = `lb_${test}`;
     let lb = JSON.parse(localStorage.getItem(key)||'{}');
-    if(s > (lb[player]||0)) lb[player]=s;
+    let scores = lb[playerID] || {name: player, score: 0};
+    if(s > scores.score) lb[playerID] = {name: player, score: s};
+    else lb[playerID] = {name: player, score: scores.score};
     localStorage.setItem(key, JSON.stringify(lb));
+    renderLB('science','lb-sci');
+    renderLB('religion','lb-rel');
   }
   setupQuiz('science', sciQ);
   setupQuiz('religion', relQ);
 
   // Leaderboard
   function renderLB(key, tbodyId){
-    const lb = JSON.parse(localStorage.getItem(`lb_${key}`)||'{}'),
-          arr = Object.entries(lb).sort((a,b)=>b[1]-a[1]),
-          body= document.getElementById(tbodyId);
-    if(!arr.length) body.innerHTML=`<tr><td colspan="2">لا بيانات</td></tr>`;
-    else body.innerHTML = arr.map(([n,s])=>`<tr><td>${n}</td><td>${s}</td></tr>`).join('');
+    const lb = JSON.parse(localStorage.getItem(`lb_${key}`)||'{}');
+    let arr = Object.entries(lb).map(([id, obj])=>({id, name: obj.name, score: obj.score}));
+    arr.sort((a,b)=>b.score-a.score);
+    const body= document.getElementById(tbodyId);
+    if(!arr.length) body.innerHTML=`<tr><td colspan="4">لا بيانات</td></tr>`;
+    else body.innerHTML = arr.map(e=>
+      `<tr>
+        <td>${e.name}</td>
+        <td>${e.id}</td>
+        <td>${e.score}</td>
+        <td><button onclick="navigator.clipboard.writeText('${e.id}');alert('تم نسخ المعرف: ${e.id}')">نسخ</button></td>
+      </tr>`
+    ).join('');
   }
   renderLB('science','lb-sci');
   renderLB('religion','lb-rel');
@@ -274,11 +363,15 @@
   function updateScoreAdmin(){
     const id=document.getElementById('score-id').value,
           v=+document.getElementById('score-val').value;
-    let lb = JSON.parse(localStorage.getItem('lb_science')||'{}');
-    lb[id] = v; localStorage.setItem('lb_science', JSON.stringify(lb));
-    lb = JSON.parse(localStorage.getItem('lb_religion')||'{}');
-    lb[id] = v; localStorage.setItem('lb_religion', JSON.stringify(lb));
+    let lbi = JSON.parse(localStorage.getItem('lb_science')||'{}');
+    if(lbi[id]) lbi[id].score = v;
+    localStorage.setItem('lb_science', JSON.stringify(lbi));
+    lbi = JSON.parse(localStorage.getItem('lb_religion')||'{}');
+    if(lbi[id]) lbi[id].score = v;
+    localStorage.setItem('lb_religion', JSON.stringify(lbi));
     alert('تم تحديث النقاط');
+    renderLB('science','lb-sci');
+    renderLB('religion','lb-rel');
   }
   function closeAdmin(){ panel.style.display='none'; auth.style.display='block'; ctrls.style.display='none'; }
 </script>
