@@ -76,6 +76,24 @@
       font-size: 1.2em;
       color: #fff;
     }
+    #clock {
+      font-size: 1.5em;
+      margin-top: 20px;
+    }
+    #prayer-times {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #fff;
+    }
+    #prayer-times span {
+      display: block;
+      margin: 5px 0;
+    }
+    #countdown {
+      font-size: 1.5em;
+      margin-top: 30px;
+      color: #ffcc00;
+    }
   </style>
 </head>
 <body>
@@ -85,7 +103,7 @@
   <!-- زر تشغيل/إيقاف القرآن -->
   <button onclick="toggleAudio()">تشغيل / إيقاف القرآن</button>
   <audio id="myAudio">
-    <source src="https://archive.org/download/QuranAbdulBasitMujawwadSurah001AlFatihaTheOpening/Quran%20-%20Abdul%20Basit%20(Mujawwad)%20-%20Surah%20001%20Al-Fatiha%20(The%20Opening).mp3" type="audio/mpeg">
+    <source src="https://archive.org/download/QuranAbdulBasitMujawwadSurah001AlFatihaTheOpening/Quran%20-%20Abdul%20Basit%20(Mujawwad)%20-%20Surah%200001%20Al-Fatiha%20(The%20Opening).mp3" type="audio/mpeg">
     متصفحك لا يدعم تشغيل الصوت.
   </audio>
 
@@ -108,6 +126,26 @@
       <span class="star" data-value="5">★</span>
     </div>
     <div class="rating-result">التقييم: 0%</div>
+  </div>
+
+  <div id="clock"></div>
+
+  <!-- Prayer Times Section -->
+  <div id="prayer-times">
+    <h2>مواقيت الصلاة</h2>
+    <span id="fajr">الفجر: --:--</span>
+    <span id="dhuhr">الظهر: --:--</span>
+    <span id="asr">العصر: --:--</span>
+    <span id="maghrib">المغرب: --:--</span>
+    <span id="isha">العشاء: --:--</span>
+  </div>
+
+  <!-- Countdown Section -->
+  <div id="countdown">
+    <h2>التوقيت المتبقي للعيدين ورمضان</h2>
+    <p>الوقت المتبقي لعيد الفطر: <span id="eid-fitr-countdown">-- أيام -- ساعات -- دقائق -- ثواني</span></p>
+    <p>الوقت المتبقي لعيد الأضحى: <span id="eid-adha-countdown">-- أيام -- ساعات -- دقائق -- ثواني</span></p>
+    <p>الوقت المتبقي لرمضان: <span id="ramadan-countdown">-- أيام -- ساعات -- دقائق -- ثواني</span></p>
   </div>
 
   <footer>
@@ -152,6 +190,67 @@
         localStorage.setItem("rating", value);
       });
     });
+
+    // Clock Update Function
+    function updateClock() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      document.getElementById("clock").textContent = `${hours}:${minutes}:${seconds}`;
+    }
+
+    setInterval(updateClock, 1000); // Update the clock every second
+
+    // Prayer Times API Call
+    const apiUrl = "http://api.aladhan.com/v1/timingsByCity?city=Beirut&country=Lebanon&method=2";
+
+    async function getPrayerTimes() {
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        const timings = data.data.timings;
+
+        document.getElementById("fajr").textContent = `الفجر: ${timings.Fajr}`;
+        document.getElementById("dhuhr").textContent = `الظهر: ${timings.Dhuhr}`;
+        document.getElementById("asr").textContent = `العصر: ${timings.Asr}`;
+        document.getElementById("maghrib").textContent = `المغرب: ${timings.Maghrib}`;
+        document.getElementById("isha").textContent = `العشاء: ${timings.Isha}`;
+      } catch (error) {
+        console.error("Error fetching prayer times:", error);
+      }
+    }
+
+    getPrayerTimes();
+
+    // Function to calculate remaining time for Eid and Ramadan
+    function updateCountdowns() {
+      const now = new Date();
+
+      // Set the date for Eid al-Fitr (example: May 1, 2025)
+      const eidFitrDate = new Date("2025-05-01T00:00:00");
+      const eidAdhaDate = new Date("2025-07-28T00:00:00");
+      const ramadanStartDate = new Date("2025-03-23T00:00:00");
+
+      // Calculate the remaining time for each event
+      const timeRemainingEidFitr = eidFitrDate - now;
+      const timeRemainingEidAdha = eidAdhaDate - now;
+      const timeRemainingRamadan = ramadanStartDate - now;
+
+      function formatTime(ms) {
+        const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+        return `${days} أيام ${hours} ساعات ${minutes} دقائق ${seconds} ثواني`;
+      }
+
+      document.getElementById("eid-fitr-countdown").textContent = formatTime(timeRemainingEidFitr);
+      document.getElementById("eid-adha-countdown").textContent = formatTime(timeRemainingEidAdha);
+      document.getElementById("ramadan-countdown").textContent = formatTime(timeRemainingRamadan);
+    }
+
+    setInterval(updateCountdowns, 1000); // Update the countdown every second
   </script>
 </body>
 </html>
