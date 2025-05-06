@@ -1,163 +1,199 @@
 <!DOCTYPE html><html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ALSHIEK_الشـيــخ - الألعاب والاختبارات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>بوابة الألعاب والاختبارات الموسعة</title>
   <style>
     /* Reset */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-           background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
-           color: #fff; text-align: center; padding: 20px; }
-    header, footer { margin: 20px 0; }
-    h1 { font-size: 3em; color: #00ffe7; text-shadow: 0 0 10px #00ffe7; }
-    p { font-size: 1.2em; color: #ccc; margin-bottom: 20px; }
-    button, .btn { background-color: #ff0066; color: white; border: none;
-             border-radius: 30px; padding: 10px 20px; font-size: 1.1em;
-             cursor: pointer; box-shadow: 0 0 20px #ff0066;
-             transition: background-color 0.3s ease, transform 0.2s ease; }
-    button:hover, .btn:hover { background-color: #ff3388; transform: scale(1.05); }
-    a { display: inline-block; margin: 10px; padding: 8px 16px;
-        background-color: #00aaff; color: white; text-decoration: none;
-        border-radius: 20px; box-shadow: 0 0 10px #00aaff;
-        transition: background-color 0.3s ease, transform 0.2s ease; }
-    a:hover { background-color: #33bbff; transform: scale(1.05); }
-    .rating { margin: 20px 0; }
-    .stars { display: flex; justify-content: center; }
-    .star { font-size: 2.5em; color: #ccc; cursor: pointer;
-             transition: color 0.3s ease; }
-    .star.selected { color: #ffcc00; }
-    .rating-result { margin-top: 10px; font-size: 1.2em; color: #fff; }
-    /* Quiz */
-    #quiz-container { margin-top: 30px; }
-    #question-area { display: none; margin-top: 20px; }
-    #question { font-size: 1.2em; margin-bottom: 15px; }
-    .option-btn { display: block; width: 100%; max-width: 600px;
-                  margin: 8px auto; text-align: left; background:#444; }
-    .feedback { position: fixed; top: 20px; left:50%; transform:translateX(-50%);
-                background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px;
-                border-radius: 10px; font-size:1.2em; display:none; }
-    #score-display { margin-top: 15px; font-size: 1.2em; }
-    /* Admin */
-    #admin-panel { display: none; position: fixed; top:0; left:0; width:100%; height:100%;
-                   background: rgba(0,0,0,0.9); color:#fff; overflow:auto; padding:20px; }
-    #admin-panel h2 { margin-bottom:10px; }
-    #admin-panel .section { margin-bottom:20px; border-bottom:1px solid #555; padding-bottom:15px; }
-    #admin-panel label { display:block; text-align:left; margin:5px 0; }
-    #admin-panel input, #admin-panel textarea, #admin-panel select { width:100%; padding:8px; margin-bottom:10px; background:#333; border:1px solid #555; color:#fff; }
-    #admin-panel button { margin:5px 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
+      color: #fff; direction: rtl;
+      display: flex; flex-direction: column;
+    }
+    header, footer { text-align: center; padding: 20px; }
+    header h1 { font-size: 2.5em; color: #00ffe7; text-shadow: 0 0 10px #00ffe7; }
+    nav { display: flex; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
+    nav button {
+      background: #ff0066; color: #fff; border: none; padding: 10px 20px;
+      margin: 5px; border-radius: 20px; cursor: pointer;
+      box-shadow: 0 0 10px #ff0066; transition: .3s;
+    }
+    nav button.active, nav button:hover { background: #ff3388; transform: scale(1.05); }
+    .container { flex: 1; padding: 20px; overflow-y: auto; }
+    section { display: none; }
+    section.active { display: block; }
+    .btn { background: #00aaff; color: #fff; border: none; padding: 10px 20px;
+           border-radius: 20px; cursor: pointer; box-shadow: 0 0 10px #00aaff;
+           transition: .3s; margin: 5px; }
+    .btn:hover { background: #33bbff; transform: scale(1.05); }
+    .option { display: block; background: #444; color: #fff; border: none;
+              padding: 10px; margin: 8px auto; width: 80%; max-width: 400px;
+              border-radius: 10px; cursor: pointer; transition: .2s; text-align: left; }
+    .option:hover { background: rgba(255,255,255,0.1); }
+    #feedback { margin-top: 20px; font-size: 1.2em; }
+    #next { display: none; margin-top: 20px; }
+    table { width: 90%; margin: 10px auto; border-collapse: collapse; }
+    th, td { border: 1px solid #555; padding: 10px; text-align: center; }
+    th { background: #222; }
+    /* Progress and Timer */
+    .progress-container { width: 80%; max-width: 500px; margin: 20px auto; }
+    .progress-bar { width: 0%; height: 20px; background: #00ffe7; border-radius: 10px; }
+    .timer { text-align: center; font-size: 1.2em; margin-top: 10px; }
   </style>
 </head>
-<body>
-  <header>
-    <h1>Welcome to My Website!</h1>
-    <p>Created by alshiek</p>
-    <button onclick="toggleAudio()">تشغيل / إيقاف الأغنية</button>
-    <audio id="myAudio"><source src="song.mp3" type="audio/mpeg"></audio>
-    <div style="margin-top:20px;">
-      <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-      <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">رابط تحميل CarFury</a>
-      <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
-      <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة Car Fury</a>
-      <button class="btn" id="open-admin">لوحة الأدمن</button>
-    </div>
-    <div class="rating">
-      <h2>قيم موقعي</h2>
-      <div class="stars">
-        <span class="star" data-value="1">★</span>
-        <span class="star" data-value="2">★</span>
-        <span class="star" data-value="3">★</span>
-        <span class="star" data-value="4">★</span>
-        <span class="star" data-value="5">★</span>
-      </div>
-      <div class="rating-result">التقييم: 0%</div>
-    </div>
-  </header>  <div class="feedback" id="feedback"></div>
-  <div id="quiz-container">
-    <button class="btn" id="start-science">اختبار علمي</button>
-    <button class="btn" id="start-religion">اختبار ديني</button>
-    <div id="question-area">
-      <div id="question"></div>
-      <div id="options"></div>
-      <button class="btn" id="next-btn" style="display:none;">السؤال التالي</button>
-      <div id="score-display"></div>
-    </div>
-  </div>  <footer>&copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》</footer>  <div id="admin-panel">
-    <h2>لوحة الأدمن</h2>
-    <!-- Auth -->
-    <div class="section" id="admin-auth">
-      <label>كلمة سر الأدمن:</label>
-      <input type="password" id="admin-pass" />
-      <button onclick="loginAdmin()">دخول</button>
-    </div>
-    <!-- Controls -->
-    <div class="section" id="admin-controls" style="display:none;">
-      <h3>حظر مستخدم</h3>
-      <label>ID المستخدم:</label><input type="text" id="ban-id" />
-      <label>مدة الحظر (دقائق):</label><input type="number" id="ban-min" value="60" />
-      <button onclick="banUser()">حظر</button><h3>رفع حظر</h3>
-  <label>ID المستخدم:</label><input type="text" id="unban-id" />
-  <button onclick="unbanUser()">فك الحظر</button>
+<body>  <header>
+    <h1>بوابة الألعاب والاختبارات الموسعة</h1>
+  </header>  <nav>
+    <button data-tab="home" class="active">الرئيسية</button>
+    <button data-tab="science">اختبار علمي</button>
+    <button data-tab="religion">اختبار ديني (إسلامي)</button>
+    <button data-tab="leaderboard">لوحة المتصدرين</button>
+  </nav>  <div class="container">
+    <!-- Home -->
+    <section id="home" class="active">
+      <p id="greeting"></p>
+      <button class="btn" onclick="showTab('science')">ابدأ الاختبار العلمي</button>
+      <button class="btn" onclick="showTab('religion')">ابدأ الاختبار الديني</button>
+      <button class="btn" onclick="showTab('leaderboard')">عرض المتصدرين</button>
+    </section><!-- Science Quiz -->
+<section id="science">
+  <h2>اختبار علمي</h2>
+  <div class="progress-container"><div id="progress-sci" class="progress-bar"></div></div>
+  <div id="q-science"></div>
+  <div id="opts-science"></div>
+  <div id="feedback-science"></div>
+  <div class="timer" id="timer-sci"></div>
+  <button id="next-science" class="btn">التالي</button>
+</section>
 
-  <h3>إرسال رسالة</h3>
-  <label>ID المستخدم:</label><input type="text" id="msg-id" />
-  <label>المحتوى:</label><textarea id="msg-txt"></textarea>
-  <label>عدد المرات:</label><input type="number" id="msg-times" value="1" min="1" />
-  <button onclick="sendMessage()">إرسال</button>
+<!-- Religion Quiz -->
+<section id="religion">
+  <h2>اختبار ديني (إسلامي سنة)</h2>
+  <div class="progress-container"><div id="progress-rel" class="progress-bar"></div></div>
+  <div id="q-religion"></div>
+  <div id="opts-religion"></div>
+  <div id="feedback-religion"></div>
+  <div class="timer" id="timer-rel"></div>
+  <button id="next-religion" class="btn">التالي</button>
+</section>
 
-  <h3>وضع الصيانة</h3>
-  <label>تفعيل الصيانة؟</label><select id="maint-mode"><option value="off">إيقاف</option><option value="on">تشغيل</option></select>
-  <label>مدة الصيانة (دقائق):</label><input type="number" id="maint-min" value="30" />
-  <button onclick="applyMaintenance()">تطبيق</button>
+<!-- Leaderboard -->
+<section id="leaderboard">
+  <h2>لوحة المتصدرين</h2>
+  <h3>علمي</h3>
+  <table><tr><th>اسم</th><th>نقاط</th></tr><tbody id="lb-sci"></tbody></table>
+  <h3>ديني</h3>
+  <table><tr><th>اسم</th><th>نقاط</th></tr><tbody id="lb-rel"></tbody></table>
+</section>
 
-  <h3>منح صلاحية أدمن</h3>
-  <label>ID المستخدم:</label><input type="text" id="grant-id" />
-  <button onclick="grantAdmin()">منح</button>
+  </div>  <footer>&copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》</footer><script>
+  async function loadQuestions(file) {
+    const res = await fetch(file);
+    return res.ok ? res.json() : [];
+  }
 
-  <h3>تعديل نقاط</h3>
-  <label>ID المستخدم:</label><input type="text" id="score-id" />
-  <label>النقاط الجديدة:</label><input type="number" id="score-val" />
-  <button onclick="updateScoreAdmin()">تحديث</button>
-</div>
+  // Load question banks (add as many as you want in these JSONs)
+  let sciQ = [];
+  let relQ = [];
+  Promise.all([loadQuestions('science.json'), loadQuestions('religion.json')])
+    .then(([sci, rel]) => { sciQ = sci; relQ = rel; initAll(); });
 
-  </div>  <script>
-    // Audio toggle
-    const audio=document.getElementById('myAudio'); function toggleAudio(){ audio.paused?audio.play():audio.pause(); }
-    // Rating
-    const stars=document.querySelectorAll('.star'), ratingResult=document.querySelector('.rating-result');
-    const saved=localStorage.getItem('rating'); if(saved) setStars(+saved);
-    stars.forEach(s=>s.addEventListener('click', ()=>{const v=+s.dataset.value; setStars(v); localStorage.setItem('rating',v);}));
-    function setStars(v){ stars.forEach((s,i)=>s.classList.toggle('selected',i<v)); ratingResult.textContent=`التقييم: ${(v/5)*100}%`; }
+  // Initialize greeting and tabs
+  let player = localStorage.getItem('playerName') || prompt('أدخل اسمك:') || 'ضيف';
+  localStorage.setItem('playerName', player);
+  document.getElementById('greeting').textContent = `مرحباً ${player}!`;
 
-    // Quiz
-    const feedback=document.getElementById('feedback');
-    const scienceQ=[{q:'أقرب كوكب إلى الشمس هو؟',opts:['الزهرة','عطارد','المريخ','المشتري'],a:1},{q:'الوحدة الأساسية للمادة هي؟',opts:['البروتون','الجزيء','الذرة','الإلكترون'],a:2},{q:'سرعة الضوء في الفراغ تقريباً؟',opts:['300,000 كم/ث','150,000 كم/ث','30,000 كم/ث','3,000 كم/ث'],a:0}];
-    const religionQ=[{q:'عدد أركان الإسلام؟',opts:['3','4','5','6'],a:2},{q:'أول سورة نزلت؟',opts:['الفاتحة','العلق','الفرقان','الأنعام'],a:1},{q:'ليلة القدر تكون في؟',opts:['شوال','رمضان','ذو الحجة','شعبان'],a:1}];
-    let setCurr, idx=0, score=0;
-    document.getElementById('start-science').onclick=()=>startQuiz(scienceQ);
-    document.getElementById('start-religion').onclick=()=>startQuiz(religionQ);
-    const selBtns=document.querySelectorAll('#quiz-container .btn'), qArea=document.getElementById('question-area');
-    const qEl=document.getElementById('question'), optsEl=document.getElementById('options');
-    const nextBtn=document.getElementById('next-btn'), scoreEl=document.getElementById('score-display');
-    function startQuiz(set){ setCurr=set; idx=0; score=0; selBtns.forEach(b=>b.style.display='none'); qArea.style.display='block'; nextBtn.style.display='none'; showQ(); updateScore(); }
-    function showQ(){ const it=setCurr[idx]; qEl.textContent=it.q; optsEl.innerHTML=''; it.opts.forEach((o,i)=>{let b=document.createElement('button'); b.className='option-btn'; b.textContent=o; b.onclick=()=>ans(i); optsEl.append(b);}); }
-    function ans(i){const corr=setCurr[idx].a; showFeed(i===corr?'جوابك صحيح':'جوابك خطأ'); if(i===corr)score++; optsEl.querySelectorAll('button').forEach(b=>b.disabled=true); nextBtn.style.display='inline-block'; updateScore(); }
-    function showFeed(m){feedback.textContent=m;feedback.style.display='block';setTimeout(()=>feedback.style.display='none',2500);}    
-    nextBtn.onclick=()=>{idx++; if(idx<setCurr.length){showQ(); nextBtn.style.display='none';}else endQ();};
-    function updateScore(){scoreEl.textContent=`النقاط: ${score}`;}    
-    function endQ(){qEl.textContent='انتهى الاختبار';optsEl.innerHTML=`<p>النقاط: ${score}/${setCurr.length}</p>`;nextBtn.style.display='none';}
+  document.querySelectorAll('nav button[data-tab]').forEach(btn=> btn.onclick = ()=> showTab(btn.dataset.tab));
+  function showTab(tab) {
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+    document.querySelectorAll('section').forEach(sec=>sec.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    if(tab === 'leaderboard') renderLB();
+  }
 
-    // Admin Panel
-    const panel = document.getElementById('admin-panel');
-    document.getElementById('open-admin').onclick=()=>panel.style.display='block';
-    function loginAdmin(){ if(document.getElementById('admin-pass').value==='admin123'){ document.getElementById('admin-auth').style.display='none'; document.getElementById('admin-controls').style.display='block'; } else alert('كلمة السر خاطئة'); }
-    function banUser(){ let id=document.getElementById('ban-id').value; let mins=+document.getElementById('ban-min').value; localStorage.setItem('ban_'+id, Date.now()+mins*60000); alert('تم حظر'); }
-    function unbanUser(){ let id=document.getElementById('unban-id').value; localStorage.removeItem('ban_'+id); alert('فك الحظر'); }
-    function sendMessage(){ let id=document.getElementById('msg-id').value; let txt=document.getElementById('msg-txt').value; let times=+document.getElementById('msg-times').value; for(let i=0;i<times;i++) console.log(`إلى ${id}: ${txt}`); alert('تم الإرسال'); }
-    function applyMaintenance(){ let mode=document.getElementById('maint-mode').value; let mins=+document.getElementById('maint-min').value; localStorage.setItem('maint',mode); if(mode==='on')setTimeout(()=>localStorage.setItem('maint','off'),mins*60000); alert('تم'); }
-    if(localStorage.getItem('maint')==='on'){ document.body.innerHTML='<h1>الموقع تحت الصيانة</h1><p>رجاءً انتظر...</p>'; }
-    function grantAdmin(){ let id=document.getElementById('grant-id').value; localStorage.setItem('admin_'+id,'true'); alert('منح صلاحية'); }
-    function updateScoreAdmin(){ let id=document.getElementById('score-id').value; let v=+document.getElementById('score-val').value; let lb=JSON.parse(localStorage.getItem('leaderboard')||'{}'); lb[id]=v; localStorage.setItem('leaderboard',JSON.stringify(lb)); alert('تم التحديث'); }
-  </script></body>
-</html>
+  function initAll() {
+    setupQuiz('science', sciQ);
+    setupQuiz('religion', relQ);
+  }
+
+  function setupQuiz(prefix, questions) {
+    let idx=0, sc=0, timer;
+    const total = questions.length;
+    const qEl = document.getElementById(`q-${prefix}`),
+          oEl = document.getElementById(`opts-${prefix}`),
+          fEl = document.getElementById(`feedback-${prefix}`),
+          nBtn = document.getElementById(`next-${prefix}`),
+          prog = document.getElementById(`progress-${prefix}`),
+          timEl = document.getElementById(`timer-${prefix}`);
+
+    function updateProgress() {
+      prog.style.width = `${(idx/total)*100}%`;
+    }
+    function startTimer() {
+      let t=20;
+      timEl.textContent = `الوقت المتبقي: ${t} ثانية`;
+      timer = setInterval(()=>{
+        t--;
+        timEl.textContent = `الوقت المتبقي: ${t} ثانية`;
+        if(t<=0){ clearInterval(timer); showAnswer(-1); }
+      },1000);
+    }
+    function showQ() {
+      clearInterval(timer);
+      updateProgress();
+      startTimer();
+      const it = questions[idx];
+      qEl.textContent = `${idx+1}. ${it.q}`;
+      oEl.innerHTML = '';
+      it.opts.forEach((o,i)=>{
+        const b = document.createElement('button');
+        b.textContent = o; b.className = 'option';
+        b.onclick = ()=> showAnswer(i);
+        oEl.append(b);
+      });
+      fEl.textContent=''; nBtn.style.display='none';
+    }
+    function showAnswer(i) {
+      clearInterval(timer);
+      const it = questions[idx];
+      if(i===it.a) { sc++; fEl.textContent='جوابك صحيح!'; }
+      else fEl.textContent = `خاطئ، الإجابة الصحيحة: ${it.opts[it.a]}`;
+      oEl.querySelectorAll('button').forEach(x=>x.disabled=true);
+      nBtn.style.display = 'block';
+    }
+    nBtn.onclick = ()=> {
+      idx++;
+      if(idx<total) showQ();
+      else finish();
+    };
+    showQ();
+
+    function finish() {
+      prog.style.width = '100%';
+      qEl.textContent='انتهى الاختبار';
+      oEl.innerHTML = `<p>نقاطك: ${sc}/${total}</p>`;
+      fEl.textContent=''; nBtn.style.display='none'; timEl.textContent='';
+      saveScore(prefix, sc);
+    }
+  }
+
+  function saveScore(test, s) {
+    const key = `lb_${test}`;
+    let lb = JSON.parse(localStorage.getItem(key)||'{}');
+    if(s > (lb[player]||0)) lb[player]=s;
+    localStorage.setItem(key, JSON.stringify(lb));
+  }
+
+  function renderLB() {
+    ['science','religion'].forEach(test=>{
+      const key = `lb_${test}`, arr=Object.entries(JSON.parse(localStorage.getItem(key)||'{}')).sort((a,b)=>b[1]-a[1]);
+      const body = document.getElementById(test==='science' ? 'lb-sci' : 'lb-rel');
+      if(!arr.length) body.innerHTML = `<tr><td colspan="2">لا بيانات</td></tr>`;
+      else body.innerHTML = arr.map(([n,s])=>`<tr><td>${n}</td><td>${s}</td></tr>`).join('');
+    });
+  }
+</script></html>
