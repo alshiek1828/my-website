@@ -2,368 +2,156 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ALSHIEK_الشـيــخ - الألعاب والاختبارات</title>
+  <title>ALSHIEK_الشـيــخ</title>
   <style>
-    /* Reset */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
-      color: #fff; direction: rtl;
+      color: #fff;
+      text-align: center;
+      padding: 50px;
     }
-    header, footer { text-align: center; padding: 20px; }
-    header h1 { font-size: 2.5em; color: #00ffe7; text-shadow: 0 0 10px #00ffe7; }
-    nav { text-align: center; margin: 10px 0; }
-    nav button {
-      background: #ff0066; color: #fff; border: none; padding: 10px 20px;
-      margin: 0 5px; border-radius: 20px; cursor: pointer;
-      box-shadow: 0 0 10px #ff0066; transition: .3s;
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      color: #00ffe7;
+      text-shadow: 0 0 10px #00ffe7;
     }
-    nav button.active, nav button:hover { background: #ff3388; transform: scale(1.05); }
-    section { display: none; padding: 20px; }
-    section.active { display: block; }
-    .btn { background: #00aaff; color: #fff; border: none; padding: 10px 20px;
-           border-radius: 20px; cursor: pointer; box-shadow: 0 0 10px #00aaff;
-           transition: .3s; margin: 5px; }
-    .btn:hover { background: #33bbff; transform: scale(1.05); }
-    .option { display: block; background: #444; color: #fff; border: none;
-              padding: 10px; margin: 8px auto; width: 80%; max-width: 400px;
-              border-radius: 10px; cursor: pointer; transition: .2s; text-align: left; }
-    .option:hover { background: rgba(255,255,255,0.1); }
-    #feedback { margin-top: 20px; font-size: 1.2em; }
-    #next { display: none; margin-top: 20px; }
-    table { width: 90%; margin: 10px auto; border-collapse: collapse; }
-    th, td { border: 1px solid #555; padding: 10px; text-align: center; }
-    th { background: #222; }
-    #admin-panel { display: none; position: fixed; top:0; left:0; width:100%; height:100%;
-                   background: rgba(0,0,0,0.9); color:#fff; overflow:auto; padding:20px; z-index:10000; }
-    #admin-panel h2 { margin-bottom: 10px; }
-    #admin-panel .section { margin-bottom: 20px; border-bottom:1px solid #555; padding-bottom: 15px; }
-    #admin-panel label { display: block; margin: 5px 0; text-align: left; }
-    #admin-panel input, #admin-panel textarea, #admin-panel select {
-      width: 100%; padding:8px; margin-bottom:10px; background:#333; border:1px solid #555; color:#fff;
+    p {
+      font-size: 1.2em;
+      color: #ccc;
+      margin-bottom: 40px;
     }
-    #admin-panel button { margin:5px 0; padding:8px 16px; }
-    #settings-panel { display: none; position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.7); color:#fff; overflow:auto; padding:20px; z-index:9999;}
-    #settings-panel label {display:block;margin:10px 0 5px;}
-    #settings-panel input {width:100%;padding:8px;margin-bottom:10px;background:#222;border:1px solid #555;color:#fff;}
-    #settings-panel button {margin:5px 0;padding:8px 16px;}
+    button {
+      background-color: #ff0066;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+      box-shadow: 0 0 20px #ff0066;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    button:hover {
+      background-color: #ff3388;
+      transform: scale(1.05);
+    }
+    a {
+      display: inline-block;
+      margin: 20px 10px;
+      padding: 10px 20px;
+      background-color: #00aaff;
+      color: white;
+      text-decoration: none;
+      border-radius: 20px;
+      box-shadow: 0 0 10px #00aaff;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    a:hover {
+      background-color: #33bbff;
+      transform: scale(1.05);
+    }
+    footer {
+      margin-top: 60px;
+      font-size: 0.9em;
+      color: #999;
+    }
+    .stars {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .star {
+      font-size: 2.5em;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .star.selected {
+      color: #ffcc00;
+    }
+    .rating-result {
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
+  <h1>Welcome to My Website!</h1>
+  <p>Created by alshiek</p>
+  
+  <!-- زر تشغيل/إيقاف القرآن -->
+  <button onclick="toggleAudio()">تشغيل / إيقاف القرآن</button>
+  <audio id="myAudio">
+    <source src="https://archive.org/download/QuranAbdulBasitMujawwadSurah001AlFatihaTheOpening/Quran%20-%20Abdul%20Basit%20(Mujawwad)%20-%20Surah%20001%20Al-Fatiha%20(The%20Opening).mp3" type="audio/mpeg">
+    متصفحك لا يدعم تشغيل الصوت.
+  </audio>
 
-  <header>
-    <h1>بوابة الألعاب والاختبارات</h1>
-  </header>
-
-  <nav>
-    <button data-tab="home" class="active">الرئيسية</button>
-    <button data-tab="science">اختبار علمي</button>
-    <button data-tab="religion">اختبار ديني</button>
-    <button data-tab="leaderboard">لوحة المتصدرين</button>
-    <button id="open-admin">لوحة الأدمن</button>
-    <button id="open-settings">الإعدادات</button>
-  </nav>
-
-  <!-- Home -->
-  <section id="home" class="active">
-    <p id="greeting"></p>
-    <button class="btn" onclick="showTab('science')">ابدأ الاختبار العلمي</button>
-    <button class="btn" onclick="showTab('religion')">ابدأ الاختبار الديني</button>
-    <button class="btn" onclick="showTab('leaderboard')">عرض المتصدرين</button>
-  </section>
-
-  <!-- Science Quiz -->
-  <section id="science">
-    <h2>اختبار علمي</h2>
-    <div id="q-science"></div>
-    <div id="opts-science"></div>
-    <div id="fb-science"></div>
-    <button id="next-science" class="btn">السؤال التالي</button>
-  </section>
-
-  <!-- Religion Quiz -->
-  <section id="religion">
-    <h2>اختبار ديني</h2>
-    <div id="q-religion"></div>
-    <div id="opts-religion"></div>
-    <div id="fb-religion"></div>
-    <button id="next-religion" class="btn">السؤال التالي</button>
-  </section>
-
-  <!-- Leaderboard -->
-  <section id="leaderboard">
-    <h2>لوحة المتصدرين</h2>
-    <h3>علمي</h3>
-    <table><tr><th>اسم</th><th>معرّف</th><th>نقاط</th><th>نسخ المعرف</th></tr><tbody id="lb-sci"></tbody></table>
-    <h3>ديني</h3>
-    <table><tr><th>اسم</th><th>معرّف</th><th>نقاط</th><th>نسخ المعرف</th></tr><tbody id="lb-rel"></tbody></table>
-  </section>
-
-  <!-- Admin Panel -->
-  <div id="admin-panel">
-    <h2>لوحة الأدمن</h2>
-    <div class="section" id="admin-auth">
-      <label>كلمة سر الأدمن:</label>
-      <input type="password" id="admin-pass">
-      <button onclick="loginAdmin()">دخول</button>
-    </div>
-    <div class="section" id="admin-controls" style="display:none;">
-      <h3>حظر/فك حظر مستخدم</h3>
-      <label>ID المستخدم:</label><input type="text" id="ban-id">
-      <label>مدة الحظر (دقائق):</label><input type="number" id="ban-min" value="60">
-      <button onclick="banUser()">حظر</button>
-      <label>ID المستخدم:</label><input type="text" id="unban-id">
-      <button onclick="unbanUser()">فك الحظر</button>
-
-      <h3>إرسال رسالة</h3>
-      <label>ID المستخدم:</label><input type="text" id="msg-id">
-      <label>المحتوى:</label><textarea id="msg-txt"></textarea>
-      <label>عدد المرات:</label><input type="number" id="msg-times" value="1">
-      <button onclick="sendMessage()">إرسال</button>
-
-      <h3>وضع الصيانة</h3>
-      <label>الحالة:</label>
-      <select id="maint-mode"><option value="off">إيقاف</option><option value="on">تشغيل</option></select>
-      <label>المدة (دقائق):</label><input type="number" id="maint-min" value="30">
-      <button onclick="applyMaintenance()">تطبيق</button>
-
-      <h3>منح صلاحية أدمن</h3>
-      <label>ID المستخدم:</label><input type="text" id="grant-id">
-      <button onclick="grantAdmin()">منح</button>
-
-      <h3>تعديل نقاط</h3>
-      <label>ID المستخدم:</label><input type="text" id="score-id">
-      <label>النقاط الجديدة:</label><input type="number" id="score-val">
-      <button onclick="updateScoreAdmin()">تحديث</button>
-
-      <h3>تصفير المتصدرين</h3>
-      <label>اختر الاختبارات لتصفير قائمتها:</label>
-      <select id="reset-quiz">
-        <option value="science">علمي</option>
-        <option value="religion">ديني</option>
-        <option value="both">كليهما</option>
-      </select>
-      <button onclick="resetLeaderboard()">تصفير</button>
-
-      <button onclick="closeAdmin()">خروج</button>
-    </div>
+  <!-- روابط الأزرار الرئيسية -->
+  <div style="margin-top: 40px;">
+    <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+    <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">رابط تحميل لعبة CarFury</a>
+    <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
+    <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة Car Fury</a>
   </div>
 
-  <!-- Settings Panel -->
-  <div id="settings-panel">
-    <h2>الإعدادات</h2>
-    <label>اسمك:</label>
-    <input type="text" id="settings-name">
-    <label>معرّفك الشخصي:</label>
-    <input type="text" id="settings-id" readonly>
-    <button onclick="copyID()">نسخ المعرّف</button>
-    <button onclick="saveName()">حفظ الاسم</button>
-    <button onclick="closeSettings()">إغلاق</button>
+  <!-- Rating Section -->
+  <div class="rating">
+    <h2>قيم موقعي</h2>
+    <div class="stars">
+      <span class="star" data-value="1">★</span>
+      <span class="star" data-value="2">★</span>
+      <span class="star" data-value="3">★</span>
+      <span class="star" data-value="4">★</span>
+      <span class="star" data-value="5">★</span>
+    </div>
+    <div class="rating-result">التقييم: 0%</div>
   </div>
 
-  <footer>&copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》</footer>
+  <footer>
+    &copy; 2025 - Made with madness by ツ《👑》Ͳ３《شــيـخ》
+  </footer>
 
-<script>
-  // Unique ID functions
-  function generateID() {
-    return 'ID-' + Math.random().toString(36).substr(2,8) + '-' + Date.now().toString(36).substr(-4);
-  }
-  let player = localStorage.getItem('playerName');
-  let playerID = localStorage.getItem('playerID');
-  if(!player || !playerID) {
-    do {
-      player = prompt('أدخل اسمك للعبة الاختبارات:') || '';
-    } while(!player.trim());
-    playerID = generateID();
-    localStorage.setItem('playerName', player);
-    localStorage.setItem('playerID', playerID);
-  }
-  document.getElementById('greeting').textContent = `مرحباً ${player}! معرّفك: ${playerID}`;
+  <script>
+    const audio = document.getElementById("myAudio");
+    const stars = document.querySelectorAll(".star");
+    const ratingResult = document.querySelector(".rating-result");
 
-  // Settings Panel logic
-  document.getElementById('open-settings').onclick = function() {
-    document.getElementById('settings-name').value = player;
-    document.getElementById('settings-id').value = playerID;
-    document.getElementById('settings-panel').style.display = 'block';
-  }
-  function closeSettings() {
-    document.getElementById('settings-panel').style.display = 'none';
-  }
-  function copyID() {
-    navigator.clipboard.writeText(playerID);
-    alert("تم نسخ المعرّف: " + playerID);
-  }
-  function saveName() {
-    let newName = document.getElementById('settings-name').value.trim();
-    if(newName) {
-      player = newName;
-      localStorage.setItem('playerName', player);
-      document.getElementById('greeting').textContent = `مرحباً ${player}! معرّفك: ${playerID}`;
-      alert('تم تغيير الاسم');
+    const savedRating = localStorage.getItem("rating");
+    if (savedRating) {
+      setStars(parseInt(savedRating));
     }
-    closeSettings();
-    renderLB('science', 'lb-sci');
-    renderLB('religion', 'lb-rel');
-  }
 
-  // Tab switching
-  document.querySelectorAll('nav button[data-tab]').forEach(btn=>{
-    btn.onclick = ()=> showTab(btn.dataset.tab);
-  });
-  function showTab(tab) {
-    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-    document.querySelectorAll('section').forEach(sec=>sec.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
-  }
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }
 
-  // Quiz data (cisibility)
-  const sciQ = [ /* ...أسئلة العلم كما في السابق... */ ];
-  const relQ = [ /* ...أسئلة الدين كما في السابق... */ ];
-
-  // Quiz engine
-  function setupQuiz(prefix, questions) {
-    let idx=0, sc=0;
-    const qEl = document.getElementById(`q-${prefix}`),
-          oEl = document.getElementById(`opts-${prefix}`),
-          fEl = document.getElementById(`fb-${prefix}`),
-          nBtn= document.getElementById(`next-${prefix}`);
-    function showQ(){
-      const it = questions[idx];
-      qEl.textContent = it.q;
-      oEl.innerHTML = '';
-      it.opts.forEach((o,i)=>{
-        const b=document.createElement('button');
-        b.textContent=o; b.className='option';
-        b.onclick=()=>{
-          if(i===it.a) sc++;
-          fEl.textContent = i===it.a?'جوابك صحيح':'جوابك خطأ';
-          oEl.querySelectorAll('button').forEach(x=>x.disabled=true);
-          nBtn.style.display='inline-block';
-        };
-        oEl.append(b);
+    function setStars(value) {
+      stars.forEach((star, index) => {
+        if (index < value) {
+          star.classList.add("selected");
+        } else {
+          star.classList.remove("selected");
+        }
       });
-      fEl.textContent=''; nBtn.style.display='none';
-    }
-    nBtn.onclick=()=>{
-      idx++;
-      if(idx<questions.length) showQ();
-      else finish();
-    };
-    function finish(){
-      qEl.textContent='انتهى الاختبار';
-      oEl.innerHTML = `<p>نقاطك: ${sc}/${questions.length}</p>`;
-      nBtn.style.display='none';
-      saveScore(prefix, sc);
-    }
-    showQ();
-  }
-  function saveScore(test, s){
-    const key = `lb_${test}`;
-    let lb = JSON.parse(localStorage.getItem(key)||'{}');
-    let scores = lb[playerID] || {name: player, score: 0};
-    if(s > scores.score) lb[playerID] = {name: player, score: s};
-    else lb[playerID] = {name: player, score: scores.score};
-    localStorage.setItem(key, JSON.stringify(lb));
-    renderLB('science','lb-sci');
-    renderLB('religion','lb-rel');
-  }
-  setupQuiz('science', sciQ);
-  setupQuiz('religion', relQ);
 
-  // Leaderboard rendering
-  function renderLB(key, tbodyId){
-    const lb = JSON.parse(localStorage.getItem(`lb_${key}`)||'{}');
-    let arr = Object.entries(lb).map(([id, obj])=>({id, name: obj.name, score: obj.score}));
-    arr.sort((a,b)=>b.score-a.score);
-    const body= document.getElementById(tbodyId);
-    if(!arr.length) body.innerHTML=`<tr><td colspan="4">لا بيانات</td></tr>`;
-    else body.innerHTML = arr.map(e=>
-      `<tr>
-        <td>${e.name}</td>
-        <td>${e.id}</td>
-        <td>${e.score}</td>
-        <td><button onclick="navigator.clipboard.writeText('${e.id}');alert('تم نسخ المعرف: ${e.id}')">نسخ</button></td>
-      </tr>`
-    ).join('');
-  }
-  renderLB('science','lb-sci');
-  renderLB('religion','lb-rel');
+      const ratingPercentage = (value / 5) * 100;
+      ratingResult.textContent = `التقييم: ${ratingPercentage}%`;
+    }
 
-  // Admin panel logic
-  const panel = document.getElementById('admin-panel'),
-        auth = document.getElementById('admin-auth'),
-        ctrls = document.getElementById('admin-controls');
-  document.getElementById('open-admin').onclick = ()=> panel.style.display='block';
-  function loginAdmin(){
-    if(document.getElementById('admin-pass').value==='admin123'){
-      auth.style.display='none'; ctrls.style.display='block';
-    } else alert('كلمة السر خاطئة');
-  }
-  function banUser(){
-    const id=document.getElementById('ban-id').value,
-          m= +document.getElementById('ban-min').value;
-    localStorage.setItem(`ban_${id}`, Date.now()+m*60000);
-    alert('تم حظر '+id);
-  }
-  function unbanUser(){
-    const id=document.getElementById('unban-id').value;
-    localStorage.removeItem(`ban_${id}`);
-    alert('فك الحظر '+id);
-  }
-  function sendMessage(){
-    const id=document.getElementById('msg-id').value,
-          txt=document.getElementById('msg-txt').value,
-          t= +document.getElementById('msg-times').value;
-    for(let i=0;i<t;i++) console.log(`Message to ${id}: ${txt}`);
-    alert('تم الإرسال');
-  }
-  function applyMaintenance(){
-    const mode=document.getElementById('maint-mode').value,
-          m=+document.getElementById('maint-min').value;
-    localStorage.setItem('maint', mode);
-    if(mode==='on') setTimeout(()=> localStorage.setItem('maint','off'), m*60000);
-    alert('تم تطبيق الصيانة');
-  }
-  if(localStorage.getItem('maint')==='on'){
-    document.body.innerHTML='<h1 style="text-align:center;margin-top:50px;">الموقع تحت الصيانة</h1>';
-  }
-  function grantAdmin(){
-    const id=document.getElementById('grant-id').value;
-    localStorage.setItem(`admin_${id}`, 'true');
-    alert('منح صلاحية أدمن لـ '+id);
-  }
-  function updateScoreAdmin(){
-    const id=document.getElementById('score-id').value,
-          v=+document.getElementById('score-val').value;
-    ['science','religion'].forEach(test=>{
-      let lb = JSON.parse(localStorage.getItem(`lb_${test}`)||'{}');
-      if(lb[id]) lb[id].score = v;
-      localStorage.setItem(`lb_${test}`, JSON.stringify(lb));
+    stars.forEach(star => {
+      star.addEventListener("click", () => {
+        const value = parseInt(star.getAttribute("data-value"));
+        setStars(value);
+        localStorage.setItem("rating", value);
+      });
     });
-    alert('تم تحديث النقاط');
-    renderLB('science','lb-sci');
-    renderLB('religion','lb-rel');
-  }
-  function resetLeaderboard(){
-    const sel = document.getElementById('reset-quiz').value;
-    if(sel==='science' || sel==='both') localStorage.removeItem('lb_science');
-    if(sel==='religion' || sel==='both') localStorage.removeItem('lb_religion');
-    alert('تم تصفير المتصدرين: ' + (sel==='both'?'كليهما':sel==='science'?'العلمي':'الديني'));
-    renderLB('science','lb-sci');
-    renderLB('religion','lb-rel');
-  }
-  function closeAdmin(){
-    panel.style.display='none';
-    auth.style.display='block';
-    ctrls.style.display='none';
-    document.getElementById('admin-pass').value = '';
-  }
-</script>
-
+  </script>
 </body>
 </html>
