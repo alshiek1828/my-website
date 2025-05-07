@@ -141,14 +141,15 @@ footer {
     countrySelect.append(opt);
   });
 
-  // عند اختيار السورة: إعداد src ثم load ثم تشغيل فورًا
+  // عند اختيار السورة: إيقاف القديم، ضبط الtime، تغيير src ثم تحميل وتشغيل كامل
   function playSelectedSura() {
     const n = suraSelect.value;
+    audio.pause();
+    audio.currentTime = 0;
     audio.src = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${n}.mp3`;
     audio.load();
-    audio.play().then(() => {
-      playButton.textContent = '❚❚';
-    }).catch(err => console.error(err));
+    audio.play().then(() => playButton.textContent = '❚❚')
+      .catch(err => console.error('Play error', err));
   }
 
   function toggleAudio() {
@@ -157,10 +158,8 @@ footer {
     else { audio.pause(); playButton.textContent = '▶'; }
   }
 
-  // حدث عند جلب الميتاداتا لتحديث max
-  audio.addEventListener('loadedmetadata', () => {
-    progress.max = audio.duration;
-  });
+  // عند جلب الميتاداتا
+  audio.addEventListener('loadedmetadata', () => progress.max = audio.duration);
 
   // تحديث الشريط
   audio.addEventListener('timeupdate', () => progress.value = audio.currentTime);
@@ -173,7 +172,8 @@ footer {
   });
 
   function seek(sec) {
-    audio.currentTime = Math.min(audio.duration || 0, Math.max(0, audio.currentTime + sec));
+    if (!audio.duration) return;
+    audio.currentTime = Math.min(audio.duration, Math.max(0, audio.currentTime + sec));
   }
 
   // تقييم نجوم
