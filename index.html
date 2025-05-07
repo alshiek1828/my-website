@@ -141,16 +141,14 @@ footer {
     countrySelect.append(opt);
   });
 
-  // تشغيل السورة كاملة بدون مشاكل
+  // عند اختيار السورة: إعداد src ثم load ثم تشغيل فورًا
   function playSelectedSura() {
     const n = suraSelect.value;
-    audio.pause();
     audio.src = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${n}.mp3`;
-    audio.currentTime = 0;
-    audio.onloadedmetadata = () => {
-      progress.max = audio.duration;
-      audio.play().then(() => playButton.textContent = '❚❚');
-    };
+    audio.load();
+    audio.play().then(() => {
+      playButton.textContent = '❚❚';
+    }).catch(err => console.error(err));
   }
 
   function toggleAudio() {
@@ -159,20 +157,30 @@ footer {
     else { audio.pause(); playButton.textContent = '▶'; }
   }
 
+  // حدث عند جلب الميتاداتا لتحديث max
+  audio.addEventListener('loadedmetadata', () => {
+    progress.max = audio.duration;
+  });
+
+  // تحديث الشريط
   audio.addEventListener('timeupdate', () => progress.value = audio.currentTime);
   progress.addEventListener('input', () => audio.currentTime = progress.value);
-  audio.addEventListener('ended', () => { playButton.textContent = '▶'; progress.value = 0; });
+
+  // عند انتهاء السورة
+  audio.addEventListener('ended', () => {
+    playButton.textContent = '▶';
+    progress.value = 0;
+  });
 
   function seek(sec) {
-    audio.currentTime = Math.min(audio.duration, Math.max(0, audio.currentTime + sec));
+    audio.currentTime = Math.min(audio.duration || 0, Math.max(0, audio.currentTime + sec));
   }
 
   // تقييم نجوم
   if (localStorage.rating) setStars(+localStorage.rating);
   stars.forEach(s => s.addEventListener('click', e => {
     const v = +e.target.dataset.value;
-    setStars(v);
-    localStorage.rating = v;
+    setStars(v); localStorage.rating = v;
   }));
   function setStars(v) {
     stars.forEach((s, i) => s.classList.toggle('selected', i < v));
@@ -181,15 +189,13 @@ footer {
 
   // تحديث الساعة
   function updateClock() {
-    const d = new Date();
-    let h = d.getHours(), m = d.getMinutes();
+    const d = new Date(), h = d.getHours(), m = d.getMinutes();
     const ampm = h >= 12 ? 'م' : 'ص';
-    h = h % 12 || 12;
-    document.getElementById('clock').textContent =
-      `الوقت: ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')} ${ampm}`;
+    const hh = (h % 12 || 12).toString().padStart(2, '0');
+    const mm = m.toString().padStart(2, '0');
+    document.getElementById('clock').textContent = `الوقت: ${hh}:${mm} ${ampm}`;
   }
-  setInterval(updateClock, 1000);
-  updateClock();
+  setInterval(updateClock, 1000); updateClock();
 
   // جلب مواقيت الصلاة
   async function getPrayerTimes() {
