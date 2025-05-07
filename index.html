@@ -76,10 +76,9 @@
     <option value="Comoros">جزر القمر</option>
   </select>
 
-  <!-- Surah Selector -->
+  <!-- Surah Selector: جميع السور -->
   <label for="sura-select">اختر سورة للتشغيل:</label>
   <select id="sura-select" onchange="playSelectedSura()">
-    <!-- كامل الـ114 سورة -->
     <option value="1">1 - الفاتحة</option>
     <option value="2">2 - البقرة</option>
     <option value="3">3 - آل عمران</option>
@@ -204,7 +203,7 @@
   </div>
   <input type="range" id="progress" value="0" min="0" step="0.1">
 
-  <audio id="myAudio"></audio>
+  <audio id="myAudio" preload="auto"></audio>
 
   <!-- Links -->
   <div style="margin-top: 40px;">
@@ -246,17 +245,20 @@
     const stars = document.querySelectorAll(".star");
     const ratingResult = document.querySelector(".rating-result");
 
+    // تشغيل/إيقاف
     function toggleAudio() {
       if (!audio.src) playSelectedSura();
       audio.paused ? audio.play() : audio.pause();
     }
 
+    // تقديم/تأخير 10 ث
     function seek(sec) {
       if (audio.src && audio.duration) {
         audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + sec));
       }
     }
 
+    // تحديث شريط التقدم
     audio.addEventListener("timeupdate", () => {
       if (audio.duration) {
         progress.max = audio.duration;
@@ -264,17 +266,22 @@
       }
     });
 
-    progress.addEventListener("input", () => {
+    // تحكم بالشريط بدون إعادة تحميل
+    progress.addEventListener("change", () => {
       if (audio.duration) audio.currentTime = progress.value;
     });
 
+    // تشغيل السورة المحددة كاملة
     function playSelectedSura() {
       const n = suraSelect.value;
       audio.src = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${n}.mp3`;
       audio.load();
+      // ضمان عدم التوقف المبكر
+      audio.addEventListener('ended', () => {}, { once: true });
       audio.play();
     }
 
+    // تقييم النجوم
     if (localStorage.getItem("rating")) setStars(+localStorage.getItem("rating"));
     function setStars(v) {
       stars.forEach((s,i) => s.classList.toggle("selected", i < v));
@@ -286,6 +293,7 @@
       localStorage.setItem("rating", v);
     }));
 
+    // تحديث الساعة
     function updateClock() {
       const d = new Date(), H = d.getHours(), M = d.getMinutes();
       const p = H>=12?'PM':'AM', h12 = H%12||12;
@@ -295,27 +303,27 @@
     setInterval(updateClock,1000);
     updateClock();
 
+    // جلب مواقيت الصلاة
     async function getPrayerTimes() {
       const country = document.getElementById("country-select").value;
-      const d = new Date(), day = d.getDate(), mon = d.getMonth()+1, yr = d.getFullYear();
+      const d = new Date(), day=d.getDate(), mon=d.getMonth()+1, yr=d.getFullYear();
       const url = `https://api.aladhan.com/v1/timingsByAddress/${day}-${mon}-${yr}?address=${country}`;
       try {
         const t = (await fetch(url).then(r=>r.json())).data.timings;
         const fmt = tm => {
-          const [hh,mm] = tm.split(':').map(Number);
-          const p = hh>=12?'PM':'AM', h12 = hh%12||12;
+          const [hh, mm] = tm.split(':').map(Number);
+          const p = hh>=12?'PM':'AM', h12=hh%12||12;
           return `${h12}:${mm.toString().padStart(2,'0')} ${p}`;
         };
-        document.getElementById("fajr").textContent = `الفجر: ${fmt(t.Fajr)}`;
-        document.getElementById("dhuhr").textContent = `الظهر: ${fmt(t.Dhuhr)}`;
-        document.getElementById("asr").textContent = `العصر: ${fmt(t.Asr)}`;
-        document.getElementById("maghrib").textContent = `المغرب: ${fmt(t.Maghrib)}`;
-        document.getElementById("isha").textContent = `العشاء: ${fmt(t.Isha)}`;
+        document.getElementById("fajr").textContent   = `الفجر: ${fmt(t.Fajr)}`;
+        document.getElementById("dhuhr").textContent  = `الظهر: ${fmt(t.Dhuhr)}`;
+        document.getElementById("asr").textContent    = `العصر: ${fmt(t.Asr)}`;
+        document.getElementById("maghrib").textContent= `المغرب: ${fmt(t.Maghrib)}`;
+        document.getElementById("isha").textContent   = `العشاء: ${fmt(t.Isha)}`;
       } catch {
         document.getElementById("prayer-times").innerHTML = "<span>حدث خطأ أثناء جلب المواقيت.</span>";
       }
     }
-
     window.onload = getPrayerTimes;
   </script>
 </body>
