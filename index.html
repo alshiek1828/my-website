@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!DOCTYPE html><html lang="ar">
 <head>
   <meta charset="UTF-8">
   <title>موقع الشيخ</title>
@@ -24,53 +23,45 @@
     header h1 {
       font-size: 3em; color: #00ffe7; text-shadow: 0 0 10px #00ffe7; margin: 0;
     }
-    header p { margin: 5px 0 0; font-size: 1.2em; color: #ccc; }
+    header p { margin: 5px 0 0; font-size: 1.2em; color: #ccc; }.selectors, .controls, .rating { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0; }
+select, button, input[type="range"] {
+  background: #333; color: #fff; border: none; border-radius: 5px;
+  padding: 10px; font-size: 1em; cursor: pointer;
+}
+select { min-width: 200px; }
+button { min-width: 80px; }
+input[type="range"] {
+  -webkit-appearance: none; width: 100%; max-width: 600px; background: transparent;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+  background: #ff0066; cursor: pointer; margin-top: -6px;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; background: #555; border-radius: 2px;
+}
 
-    .selectors, .controls, .rating { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0; }
-    select, button, input[type="range"] {
-      background: #333; color: #fff; border: none; border-radius: 5px;
-      padding: 10px; font-size: 1em; cursor: pointer;
-    }
-    select { min-width: 200px; }
-    button { min-width: 80px; }
-    input[type="range"] {
-      -webkit-appearance: none; width: 100%; max-width: 600px; background: transparent;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
-      background: #ff0066; cursor: pointer; margin-top: -6px;
-    }
-    input[type="range"]::-webkit-slider-runnable-track {
-      height: 4px; background: #555; border-radius: 2px;
-    }
+.stars span {
+  font-size: 2em; cursor: pointer; color: #ccc; transition: color 0.3s;
+}
+.stars .selected { color: #ffcc00; }
+.rating-result { font-size: 1em; margin-left: 10px; }
 
-    .stars span {
-      font-size: 2em; cursor: pointer; color: #ccc; transition: color 0.3s;
-    }
-    .stars .selected { color: #ffcc00; }
-    .rating-result { font-size: 1em; margin-left: 10px; }
+.info { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; margin-bottom: 20px; }
+.info #clock { font-size: 1.1em; }
+.info #prayer-times h2 { margin: 10px 0 5px; font-size: 1.2em; }
+.info #prayer-times span { display: block; margin: 2px 0; }
 
-    .info {
-      display: flex; flex-direction: column; align-items: flex-start;
-      gap: 5px; margin-bottom: 20px;
-    }
-    .info #clock { font-size: 1.1em; }
-    .info #prayer-times h2 { margin: 10px 0 5px; font-size: 1.2em; }
-    .info #prayer-times span { display: block; margin: 2px 0; }
+footer {
+  text-align: center; font-size: 0.9em; color: #999; padding: 20px 0;
+}
 
-    footer {
-      text-align: center; font-size: 0.9em; color: #999; padding: 20px 0;
-    }
   </style>
 </head>
-<body>
-
-<header>
+<body><header>
   <h1>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</h1>
   <p>موقع الشيخ</p>
-</header>
-
-<main>
+</header><main>
   <div class="selectors">
     <label>&nbsp;اختر سورة:
       <select id="sura-select"></select>
@@ -78,34 +69,24 @@
     <label>&nbsp;اختر دولتك:
       <select id="country-select"></select>
     </label>
-  </div>
-
-  <div class="controls">
+  </div>  <div class="controls">
     <button onclick="seek(-10)">« 10 ث</button>
     <button id="playButton" onclick="toggleAudio()">▶</button>
     <button onclick="seek(10)">10 ث »</button>
-  </div>
-
-  <input type="range" id="progress" value="0" min="0" step="0.1">
-  <audio id="myAudio" preload="metadata"></audio>
-
-  <div class="controls">
+  </div>  <input type="range" id="progress" value="0" min="0" step="0.1">
+  <audio id="myAudio" preload="metadata"></audio>  <div class="controls">
     <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
     <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
     <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
     <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
-  </div>
-
-  <div class="rating">
+  </div>  <div class="rating">
     <div class="stars">
       <span data-value="1">★</span><span data-value="2">★</span>
       <span data-value="3">★</span><span data-value="4">★</span>
       <span data-value="5">★</span>
     </div>
     <div class="rating-result">0%</div>
-  </div>
-
-  <div class="info">
+  </div>  <div class="info">
     <div id="clock">الوقت: --:-- --</div>
     <div id="prayer-times">
       <h2>مواقيت الصلاة</h2>
@@ -116,13 +97,9 @@
       <span id="isha">العشاء: --:--</span>
     </div>
   </div>
-</main>
-
-<footer>
+</main><footer>
   &copy; 2025 - صنع بلمسة جنون بواسطة الشيخ
-</footer>
-
-<script>
+</footer><script>
   const suraSelect = document.getElementById('sura-select');
   const countrySelect = document.getElementById('country-select');
   const audio = document.getElementById('myAudio');
@@ -131,43 +108,60 @@
   const ratingResult = document.querySelector('.rating-result');
   const playButton = document.getElementById('playButton');
 
-  // ملء سور
-  const suras = [/* ...قائمة السور مثل السابق... */];
-  suras.forEach((name,i) => {
-    const o = document.createElement('option');
-    o.value = i+1; o.textContent = `${i+1} - ${name}`;
-    suraSelect.append(o);
+  // قائمة السور كاملة
+  const suras = [
+    "الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال",
+    "التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف",
+    "مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل",
+    "القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات",
+    "ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد",
+    "الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد",
+    "المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم",
+    "الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان",
+    "المرسلات","النبإ","النازعات","عبس","التكوير","الإنفطار","المطففين","الانشقاق","البروج",
+    "الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق",
+    "القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش",
+    "الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"
+  ];
+  suras.forEach((name, i) => {
+    const opt = document.createElement('option');
+    opt.value = i + 1;
+    opt.textContent = `${i + 1} - ${name}`;
+    suraSelect.append(opt);
   });
 
-  // ملء دول
+  // ملء الدول
   ['لبنان','مصر','السعودية','الأردن','الإمارات','الكويت','قطر','البحرين',
    'عمان','العراق','سوريا','فلسطين','الجزائر','المغرب','تونس','ليبيا',
    'موريتانيا','السودان','اليمن','الصومال','جيبوتي','جزر القمر'
   ].forEach(c => {
-    const o = document.createElement('option');
-    o.value = c; o.textContent = c;
-    countrySelect.append(o);
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    countrySelect.append(opt);
   });
 
+  // تشغيل السورة كاملة بدون مشاكل
   function playSelectedSura() {
     const n = suraSelect.value;
+    audio.pause();
     audio.src = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${n}.mp3`;
-    audio.load();
+    audio.currentTime = 0;
     audio.onloadedmetadata = () => {
       progress.max = audio.duration;
-      audio.play().then(() => playButton.textContent='❚❚');
+      audio.play().then(() => playButton.textContent = '❚❚');
     };
   }
 
   function toggleAudio() {
     if (!audio.src) return playSelectedSura();
-    if (audio.paused) audio.play().then(() => playButton.textContent='❚❚');
-    else audio.pause(), playButton.textContent='▶';
+    if (audio.paused) audio.play().then(() => playButton.textContent = '❚❚');
+    else { audio.pause(); playButton.textContent = '▶'; }
   }
 
-  audio.addEventListener('timeupdate', ()=> progress.value = audio.currentTime);
-  progress.addEventListener('input', ()=> audio.currentTime = progress.value);
-  audio.addEventListener('ended', ()=> playButton.textContent='▶');
+  audio.addEventListener('timeupdate', () => progress.value = audio.currentTime);
+  progress.addEventListener('input', () => audio.currentTime = progress.value);
+  audio.addEventListener('ended', () => { playButton.textContent = '▶'; progress.value = 0; });
 
   function seek(sec) {
     audio.currentTime = Math.min(audio.duration, Math.max(0, audio.currentTime + sec));
@@ -175,36 +169,38 @@
 
   // تقييم نجوم
   if (localStorage.rating) setStars(+localStorage.rating);
-  stars.forEach(s => s.addEventListener('click', e=>{
+  stars.forEach(s => s.addEventListener('click', e => {
     const v = +e.target.dataset.value;
-    setStars(v); localStorage.rating = v;
+    setStars(v);
+    localStorage.rating = v;
   }));
   function setStars(v) {
-    stars.forEach((s,i)=>s.classList.toggle('selected', i<v));
-    ratingResult.textContent = `${(v/5)*100}%`;
+    stars.forEach((s, i) => s.classList.toggle('selected', i < v));
+    ratingResult.textContent = `${(v / 5) * 100}%`;
   }
 
-  // الساعة
+  // تحديث الساعة
   function updateClock() {
-    const d=new Date(),
-          h=d.getHours(), m=d.getMinutes(),
-          ampm= h>=12?'م':'ص';
-    const hh=(h%12||12).toString().padStart(2,'0'),
-          mm=m.toString().padStart(2,'0');
-    document.getElementById('clock').textContent = `الوقت: ${hh}:${mm} ${ampm}`;
+    const d = new Date();
+    let h = d.getHours(), m = d.getMinutes();
+    const ampm = h >= 12 ? 'م' : 'ص';
+    h = h % 12 || 12;
+    document.getElementById('clock').textContent =
+      `الوقت: ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')} ${ampm}`;
   }
-  setInterval(updateClock,1000); updateClock();
+  setInterval(updateClock, 1000);
+  updateClock();
 
-  // مواقيت الصلاة
+  // جلب مواقيت الصلاة
   async function getPrayerTimes() {
-    const country = countrySelect.value;
-    const d=new Date(), day=d.getDate(), mon=d.getMonth()+1, yr=d.getFullYear();
-    const url = `https://api.aladhan.com/v1/timingsByAddress?address=${encodeURIComponent(country)}&date=${day}-${mon}-${yr}`;
+    const country = encodeURIComponent(countrySelect.value);
+    const d = new Date(), day = d.getDate(), mon = d.getMonth() + 1, yr = d.getFullYear();
+    const url = `https://api.aladhan.com/v1/timingsByAddress?address=${country}&date=${day}-${mon}-${yr}`;
     try {
       const res = await fetch(url);
       const json = await res.json();
-      if (json.code!==200) throw '';
-      const t=json.data.timings;
+      if (json.code !== 200) throw new Error();
+      const t = json.data.timings;
       document.getElementById('fajr').textContent    = `الفجر: ${t.Fajr}`;
       document.getElementById('dhuhr').textContent   = `الظهر: ${t.Dhuhr}`;
       document.getElementById('asr').textContent     = `العصر: ${t.Asr}`;
@@ -214,8 +210,8 @@
       console.error('فشل جلب مواقيت الصلاة');
     }
   }
-
   countrySelect.addEventListener('change', getPrayerTimes);
   suraSelect.addEventListener('change', playSelectedSura);
   getPrayerTimes();
-</script>
+</script></body>
+</html>
