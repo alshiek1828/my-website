@@ -113,7 +113,7 @@
 
   <div class="controls">
     <button onclick="seek(-10)">« 10 ث</button>
-    <button onclick="toggleAudio()">▶/❚❚</button>
+    <button id="playButton" onclick="toggleAudio()">▶</button>
     <button onclick="seek(10)">10 ث »</button>
   </div>
 
@@ -163,6 +163,7 @@
   const progress = document.getElementById('progress');
   const stars = document.querySelectorAll('.stars span');
   const ratingResult = document.querySelector('.rating-result');
+  const playButton = document.getElementById('playButton');
 
   // ملء سور القرآن
   const suras = [
@@ -202,32 +203,45 @@
   function playSelectedSura() {
     const n = suraSelect.value;
     audio.src = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${n}.mp3`;
-    audio.load();
-    audio.play();
+    audio.onloadedmetadata = function() {
+      progress.max = audio.duration;
+      audio.play().then(() => {
+        playButton.textContent = '❚❚';
+      }).catch(error => {
+        console.error('Error playing audio:', error);
+      });
+    };
+    audio.onerror = function() {
+      console.error('Error loading audio');
+    };
   }
 
   // تشغيل/إيقاف
   function toggleAudio() {
-    if (!audio.src) playSelectedSura();
-    audio.paused ? audio.play() : audio.pause();
+    if (!audio.src) {
+      playSelectedSura();
+      return;
+    }
+    if (audio.paused) {
+      audio.play().then(() => {
+        playButton.textContent = '❚❚';
+      }).catch(error => {
+        console.error('Error playing audio:', error);
+      });
+    } else {
+      audio.pause();
+      playButton.textContent = '▶';
+    }
   }
 
-  // تحويل الوقت شريط
-  audio.addEventListener('loadedmetadata', () => {
-    progress.max = audio.duration;
-  });
-  audio.addEventListener('timeupdate', () => {
-    progress.value = audio.currentTime;
-  });
-  progress.addEventListener('input', () => {
-    if (audio.duration) audio.currentTime = progress.value;
-  });
+  audio.addEventListener('play', () => playButton.textContent = '❚❚');
+  audio.addEventListener('pause', () => playButton.textContent = '▶');
+  audio.addEventListener('loadedmetadata', () => progress.max = audio.duration);
+  audio.addEventListener('timeupdate', () => progress.value = audio.currentTime);
+  progress.addEventListener('input', () => audio.currentTime = progress.value);
 
-  // تقديم/تأخير 10 ث
   function seek(sec) {
-    if (audio.duration) {
-      audio.currentTime = Math.min(audio.duration, Math.max(0, audio.currentTime + sec));
-    }
+    audio.currentTime = Math.min(audio.duration, Math.max(0, audio.currentTime + sec));
   }
 
   // تقييم نجوم
@@ -258,33 +272,24 @@
   async function getPrayerTimes() {
     const country = countrySelect.value;
     const d = new Date(), day = d.getDate(), mon = d.getMonth()+1, yr = d.getFullYear();
-    const url = `https://api.aladhan.com/v1/timingsByAddress/${day}-${mon}-${yr}?address=${country}`;
+    const url = `https://api.aladhan.com/v1/timingsByAddress/${day}-${mon}-${yr}/${country}`;
     try {
-      const data = (await fetch(url).then(r => r.json())).data.timings;
-      ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(key => {
-        document.getElementById(key.toLowerCase()).textContent =
-          `${translate(key)}: ${formatTime(data[key])}`;
-      });
-    } catch {
-      document.getElementById('prayer-times').innerHTML = '<span>خطأ في جلب المواقيت.</span>';
+      const res = await fetch(url);
+      const json = await res.json();
+      if (json.code !== 200) throw new Error('فشل جلب المواقيت');
+      const t = json.data.timings;
+      document.getElementById('fajr').textContent    = `الفجر: ${t.Fajr}`;
+      document.getElementById('dhuhr').textContent   = `الظهر: ${t.Dhuhr}`;
+      document.getElementById('asr').textContent     = `العصر: ${t.Asr}`;
+      document.getElementById('maghrib').textContent = `المغرب: ${t.Maghrib}`;
+      document.getElementById('isha').textContent    = `العشاء: ${t.Isha}`;
+    } catch (err) {
+      console.error('Error fetching prayer times:', err);
     }
   }
-  function translate(key) {
-    return ({
-      Fajr: 'الفجر',
-      Dhuhr: 'الظهر',
-      Asr: 'العصر',
-      Maghrib: 'المغرب',
-      Isha: 'العشاء'
-    })[key];
-  }
-  function formatTime(tm) {
-    let [h,m] = tm.split(':').map(Number);
-    const ampm = h >= 12 ? 'م' : 'ص';
-    h = h % 12 || 12;
-    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')} ${ampm}`;
-  }
-  window.onload = getPrayerTimes;
+  countrySelect.addEventListener('change', getPrayerTimes);
+  suraSelect.addEventListener('change', playSelectedSura);
+  getPrayerTimes();
 </script>
 
 </body>
