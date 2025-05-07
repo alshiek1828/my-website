@@ -22,21 +22,41 @@
       color: #ccc;
       margin-bottom: 40px;
     }
-    button, select {
+    button, select, input[type="range"] {
       background-color: #ff0066;
       color: white;
       border: none;
       border-radius: 30px;
-      padding: 15px 30px;
-      font-size: 1.2em;
+      padding: 10px 20px;
+      font-size: 1.1em;
       cursor: pointer;
       box-shadow: 0 0 20px #ff0066;
       transition: background-color 0.3s ease, transform 0.2s ease;
       margin: 10px;
     }
-    button:hover, select:hover {
+    button:hover, select:hover, input[type="range"]:hover {
       background-color: #ff3388;
       transform: scale(1.05);
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 60%;
+      background: transparent;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #ff0066;
+      cursor: pointer;
+      margin-top: -6px;
+      box-shadow: 0 0 10px #ff0066;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 4px;
+      background: #555;
+      border-radius: 2px;
     }
     a {
       display: inline-block;
@@ -58,47 +78,17 @@
       font-size: 0.9em;
       color: #999;
     }
-    .stars {
-      display: flex;
-      justify-content: center;
-      margin: 20px 0;
-    }
-    .star {
-      font-size: 2.5em;
-      color: #ccc;
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-    .star.selected {
-      color: #ffcc00;
-    }
-    .rating-result {
-      margin-top: 10px;
-      font-size: 1.2em;
-      color: #fff;
-    }
-    #clock {
-      font-size: 1.5em;
-      margin-top: 20px;
-    }
-    #prayer-times {
-      margin-top: 20px;
-      font-size: 1.2em;
-      color: #fff;
-    }
-    #prayer-times span {
-      display: block;
-      margin: 5px 0;
-    }
+    .stars { display: flex; justify-content: center; margin: 20px 0; }
+    .star { font-size: 2.5em; color: #ccc; cursor: pointer; transition: color 0.3s; }
+    .star.selected { color: #ffcc00; }
+    .rating-result { margin-top: 10px; font-size: 1.2em; color: #fff; }
+    #clock { font-size: 1.5em; margin-top: 20px; }
+    #prayer-times { margin-top: 20px; font-size: 1.2em; color: #fff; }
+    #prayer-times span { display: block; margin: 5px 0; }
     #country-select, #sura-select {
-      margin-top: 20px;
-      padding: 10px;
-      font-size: 1.2em;
-      background-color: #333;
-      color: #fff;
-      border-radius: 5px;
-      border: none;
-      width: 300px;
+      margin-top: 20px; padding: 10px; font-size: 1.2em;
+      background-color: #333; color: #fff; border-radius: 5px;
+      border: none; width: 300px;
     }
   </style>
 </head>
@@ -106,8 +96,8 @@
   <h1>Welcome to My Website!</h1>
   <p>Created by alshiek</p>
 
-  <!-- Country Selector for prayer times -->
-  <label for="country-select" style="font-size: 1.2em; color: #fff;">اختر دولتك:</label>
+  <!-- Country Selector -->
+  <label for="country-select">اختر دولتك:</label>
   <select id="country-select" onchange="getPrayerTimes()">
     <option value="Lebanon">لبنان</option>
     <option value="Egypt">مصر</option>
@@ -134,39 +124,154 @@
   </select>
 
   <!-- Surah Selector -->
-  <label for="sura-select" style="font-size: 1.2em; color: #fff;">اختر سورة للتشغيل:</label>
+  <label for="sura-select">اختر سورة للتشغيل:</label>
   <select id="sura-select" onchange="playSelectedSura()">
     <option value="1">1 - الفاتحة</option>
     <option value="2">2 - البقرة</option>
     <option value="3">3 - آل عمران</option>
-    <!-- ... -->
+    <option value="4">4 - النساء</option>
+    <option value="5">5 - المائدة</option>
+    <option value="6">6 - الأنعام</option>
+    <option value="7">7 - الأعراف</option>
+    <option value="8">8 - الأنفال</option>
+    <option value="9">9 - التوبة</option>
+    <option value="10">10 - يونس</option>
+    <option value="11">11 - هود</option>
+    <option value="12">12 - يوسف</option>
+    <option value="13">13 - الرعد</option>
+    <option value="14">14 - إبراهيم</option>
+    <option value="15">15 - الحجر</option>
+    <option value="16">16 - النحل</option>
+    <option value="17">17 - الإسراء</option>
+    <option value="18">18 - الكهف</option>
+    <option value="19">19 - مريم</option>
+    <option value="20">20 - طه</option>
+    <option value="21">21 - الأنبياء</option>
+    <option value="22">22 - الحج</option>
+    <option value="23">23 - المؤمنون</option>
+    <option value="24">24 - النور</option>
+    <option value="25">25 - الفرقان</option>
+    <option value="26">26 - الشعراء</option>
+    <option value="27">27 - النمل</option>
+    <option value="28">28 - القصص</option>
+    <option value="29">29 - العنكبوت</option>
+    <option value="30">30 - الروم</option>
+    <option value="31">31 - لقمان</option>
+    <option value="32">32 - السجدة</option>
+    <option value="33">33 - الأحزاب</option>
+    <option value="34">34 - سبأ</option>
+    <option value="35">35 - فاطر</option>
+    <option value="36">36 - يس</option>
+    <option value="37">37 - الصافات</option>
+    <option value="38">38 - ص</option>
+    <option value="39">39 - الزمر</option>
+    <option value="40">40 - غافر</option>
+    <option value="41">41 - فصلت</option>
+    <option value="42">42 - الشورى</option>
+    <option value="43">43 - الزخرف</option>
+    <option value="44">44 - الدخان</option>
+    <option value="45">45 - الجاثية</option>
+    <option value="46">46 - الأحقاف</option>
+    <option value="47">47 - محمد</option>
+    <option value="48">48 - الفتح</option>
+    <option value="49">49 - الحجرات</option>
+    <option value="50">50 - ق</option>
+    <option value="51">51 - الذاريات</option>
+    <option value="52">52 - الطور</option>
+    <option value="53">53 - النجم</option>
+    <option value="54">54 - القمر</option>
+    <option value="55">55 - الرحمن</option>
+    <option value="56">56 - الواقعة</option>
+    <option value="57">57 - الحديد</option>
+    <option value="58">58 - المجادلة</option>
+    <option value="59">59 - الحشر</option>
+    <option value="60">60 - الممتحنة</option>
+    <option value="61">61 - الصف</option>
+    <option value="62">62 - الجمعة</option>
+    <option value="63">63 - المنافقون</option>
+    <option value="64">64 - التغابن</option>
+    <option value="65">65 - الطلاق</option>
+    <option value="66">66 - التحريم</option>
+    <option value="67">67 - الملك</option>
+    <option value="68">68 - القلم</option>
+    <option value="69">69 - الحاقة</option>
+    <option value="70">70 - المعارج</option>
+    <option value="71">71 - نوح</option>
+    <option value="72">72 - الجن</option>
+    <option value="73">73 - المزمل</option>
+    <option value="74">74 - المدثر</option>
+    <option value="75">75 - القيامة</option>
+    <option value="76">76 - الإنسان</option>
+    <option value="77">77 - المرسلات</option>
+    <option value="78">78 - النبإ</option>
+    <option value="79">79 - النازعات</option>
+    <option value="80">80 - عبس</option>
+    <option value="81">81 - التكوير</option>
+    <option value="82">82 - الإنفطار</option>
+    <option value="83">83 - المطففين</option>
+    <option value="84">84 - الانشقاق</option>
+    <option value="85">85 - البروج</option>
+    <option value="86">86 - الطارق</option>
+    <option value="87">87 - الأعلى</option>
+    <option value="88">88 - الغاشية</option>
+    <option value="89">89 - الفجر</option>
+    <option value="90">90 - البلد</option>
+    <option value="91">91 - الشمس</option>
+    <option value="92">92 - الليل</option>
+    <option value="93">93 - الضحى</option>
+    <option value="94">94 - الشرح</option>
+    <option value="95">95 - التين</option>
+    <option value="96">96 - العلق</option>
+    <option value="97">97 - القدر</option>
+    <option value="98">98 - البينة</option>
+    <option value="99">99 - الزلزلة</option>
+    <option value="100">100 - العاديات</option>
+    <option value="101">101 - القارعة</option>
+    <option value="102">102 - التكاثر</option>
+    <option value="103">103 - العصر</option>
+    <option value="104">104 - الهمزة</option>
+    <option value="105">105 - الفيل</option>
+    <option value="106">106 - قريش</option>
+    <option value="107">107 - الماعون</option>
+    <option value="108">108 - الكوثر</option>
+    <option value="109">109 - الكافرون</option>
+    <option value="110">110 - النصر</option>
+    <option value="111">111 - المسد</option>
+    <option value="112">112 - الإخلاص</option>
+    <option value="113">113 - الفلق</option>
     <option value="114">114 - الناس</option>
   </select>
 
-  <button onclick="toggleAudio()">تشغيل / إيقاف القرآن</button>
+  <!-- Audio Controls -->
+  <div>
+    <button onclick="seek(-10)">« 10s</button>
+    <button onclick="toggleAudio()">تشغيل/إيقاف</button>
+    <button onclick="seek(10)">10s »</button>
+  </div>
+  <input type="range" id="progress" value="0" min="0" step="0.1">
+
   <audio id="myAudio"></audio>
 
+  <!-- Links -->
   <div style="margin-top: 40px;">
     <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-    <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF/ref=sr_1_36?crid=KIL5LBA8DWYU&amp;dib=eyJ2IjoiMSJ9.HihHINveM9i29_j13LPa9E08JIn8cZMlW0XwuJ81qA80nv2iKP2dN6G3STtQ6fC32KCt7Ifmf6bPiGIU-pfYOiNhJHa3HlUzSLAWJMzA-cloCYWVajQOISHowQ4XiN6sJSPgmnpm4DdVK0BgH_8BS2Ibn3nHIE-_4jWi-2kDqw4_wOm1EosmBN7ntncBH9iIN3GSBul5YjlhxaZAH_kKN_NCwojo2Iuz7OKzcljZJRLJQNfA5BQ56NWj5Fi8yCy4vi3_hvLCwq3Fu68iXYMyA9cGqX9rc_0hKU1eWVn8n54.DNaaf1VNh5UTljQykQ9C56R3lFnSZzZc6Z00I5moQPg&amp;dib_tag=se&amp;keywords=Car+Fury&amp;qid=1746635324&amp;sprefix=car+fury%2Caps%2C295&amp;sr=8-36" target="_blank">تحميل CarFury</a>
+    <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
     <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
     <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة Car Fury</a>
   </div>
 
-  <div class="rating">
-    <h2>قيم موقعي</h2>
-    <div class="stars">
-      <span class="star" data-value="1">★</span>
-      <span class="star" data-value="2">★</span>
-      <span class="star" data-value="3">★</span>
-      <span class="star" data-value="4">★</span>
-      <span class="star" data-value="5">★</span>
-    </div>
-    <div class="rating-result">التقييم: 0%</div>
+  <!-- Rating -->
+  <div class="stars">
+    <span class="star" data-value="1">★</span>
+    <span class="star" data-value="2">★</span>
+    <span class="star" data-value="3">★</span>
+    <span class="star" data-value="4">★</span>
+    <span class="star" data-value="5">★</span>
   </div>
+  <div class="rating-result">التقييم: 0%</div>
 
+  <!-- Clock & Prayer Times -->
   <div id="clock"></div>
-
   <div id="prayer-times">
     <h2>مواقيت الصلاة</h2>
     <span id="fajr">الفجر: --:--</span>
@@ -183,13 +288,30 @@
   <script>
     const audio = document.getElementById("myAudio");
     const suraSelect = document.getElementById("sura-select");
-    const stars = document.querySelectorAll(".star");
+    const progress = document.getElementById("progress");
+    const starsEls = document.querySelectorAll(".star");
     const ratingResult = document.querySelector(".rating-result");
 
     function toggleAudio() {
       if (!audio.src) playSelectedSura();
       audio.paused ? audio.play() : audio.pause();
     }
+
+    function seek(sec) {
+      if (audio.src) {
+        audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + sec));
+      }
+    }
+
+    audio.addEventListener("timeupdate", () => {
+      if (audio.duration) {
+        progress.max = audio.duration;
+        progress.value = audio.currentTime;
+      }
+    });
+    progress.addEventListener("input", () => {
+      if (audio.duration) audio.currentTime = progress.value;
+    });
 
     function playSelectedSura() {
       const n = suraSelect.value;
@@ -200,45 +322,40 @@
 
     if (localStorage.getItem("rating")) setStars(+localStorage.getItem("rating"));
     function setStars(v) {
-      stars.forEach((s,i) => s.classList.toggle("selected", i < v));
+      starsEls.forEach((s,i) => s.classList.toggle("selected", i < v));
       ratingResult.textContent = `التقييم: ${(v/5)*100}%`;
     }
-    stars.forEach(s =>
-      s.addEventListener("click", e => {
-        const v = +e.target.dataset.value;
-        setStars(v);
-        localStorage.setItem("rating", v);
-      })
-    );
+    starsEls.forEach(s => s.addEventListener("click", e => {
+      const v = +e.target.dataset.value;
+      setStars(v);
+      localStorage.setItem("rating", v);
+    }));
 
     function updateClock() {
       const d = new Date(), H = d.getHours(), M = d.getMinutes();
-      const p = H >= 12 ? 'PM' : 'AM', h12 = H % 12 || 12;
+      const p = H>=12?'PM':'AM', h12=H%12||12;
       document.getElementById("clock").textContent =
         `الوقت الآن: ${h12}:${M.toString().padStart(2,'0')} ${p}`;
     }
-    setInterval(updateClock, 1000);
+    setInterval(updateClock,1000);
     updateClock();
 
     async function getPrayerTimes() {
       const country = document.getElementById("country-select").value;
-      const d = new Date(), day = d.getDate(), mon = d.getMonth()+1, yr = d.getFullYear();
+      const d = new Date(), day=d.getDate(), mon=d.getMonth()+1, yr=d.getFullYear();
       const url = `https://api.aladhan.com/v1/timingsByAddress/${day}-${mon}-${yr}?address=${country}`;
       try {
-        const res = await fetch(url);
-        const data = await res.json();
-        const t = data.data.timings;
+        const data = (await fetch(url).then(r=>r.json())).data.timings;
         const fmt = tm => {
-          const [hh,mm] = tm.split(':').map(Number);
-          const p = hh >= 12 ? 'PM' : 'AM';
-          const h12 = hh % 12 || 12;
+          const [hh,mm]=tm.split(':').map(Number);
+          const p = hh>=12?'PM':'AM', h12=hh%12||12;
           return `${h12}:${mm.toString().padStart(2,'0')} ${p}`;
         };
-        document.getElementById("fajr").textContent = `الفجر: ${fmt(t.Fajr)}`;
-        document.getElementById("dhuhr").textContent = `الظهر: ${fmt(t.Dhuhr)}`;
-        document.getElementById("asr").textContent = `العصر: ${fmt(t.Asr)}`;
-        document.getElementById("maghrib").textContent = `المغرب: ${fmt(t.Maghrib)}`;
-        document.getElementById("isha").textContent = `العشاء: ${fmt(t.Isha)}`;
+        document.getElementById("fajr").textContent = `الفجر: ${fmt(data.Fajr)}`;
+        document.getElementById("dhuhr").textContent = `الظهر: ${fmt(data.Dhuhr)}`;
+        document.getElementById("asr").textContent = `العصر: ${fmt(data.Asr)}`;
+        document.getElementById("maghrib").textContent = `المغرب: ${fmt(data.Maghrib)}`;
+        document.getElementById("isha").textContent = `العشاء: ${fmt(data.Isha)}`;
       } catch {
         document.getElementById("prayer-times").innerHTML = "<span>حدث خطأ أثناء جلب المواقيت.</span>";
       }
