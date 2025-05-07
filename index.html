@@ -11,73 +11,27 @@
       text-align: center;
       padding: 50px;
     }
-    h1 {
-      font-size: 3em;
-      margin-bottom: 10px;
-      color: #00ffe7;
-      text-shadow: 0 0 10px #00ffe7;
-    }
-    p {
-      font-size: 1.2em;
-      color: #ccc;
-      margin-bottom: 40px;
-    }
+    h1 { font-size: 3em; margin-bottom: 10px; color: #00ffe7; text-shadow: 0 0 10px #00ffe7; }
+    p { font-size: 1.2em; color: #ccc; margin-bottom: 40px; }
     button, select, input[type="range"] {
-      background-color: #ff0066;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      padding: 10px 20px;
-      font-size: 1.1em;
-      cursor: pointer;
-      box-shadow: 0 0 20px #ff0066;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      margin: 10px;
+      background-color: #ff0066; color: white; border: none; border-radius: 30px;
+      padding: 10px 20px; font-size: 1.1em; cursor: pointer;
+      box-shadow: 0 0 20px #ff0066; transition: background-color 0.3s, transform 0.2s; margin: 10px;
     }
-    button:hover, select:hover, input[type="range"]:hover {
-      background-color: #ff3388;
-      transform: scale(1.05);
-    }
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 60%;
-      background: transparent;
-    }
+    button:hover, select:hover, input[type="range"]:hover { background-color: #ff3388; transform: scale(1.05); }
+    input[type="range"] { -webkit-appearance: none; width: 60%; background: transparent; }
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      height: 16px;
-      width: 16px;
-      border-radius: 50%;
-      background: #ff0066;
-      cursor: pointer;
-      margin-top: -6px;
-      box-shadow: 0 0 10px #ff0066;
+      -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+      background: #ff0066; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px #ff0066;
     }
-    input[type="range"]::-webkit-slider-runnable-track {
-      height: 4px;
-      background: #555;
-      border-radius: 2px;
-    }
+    input[type="range"]::-webkit-slider-runnable-track { height: 4px; background: #555; border-radius: 2px; }
     a {
-      display: inline-block;
-      margin: 20px 10px;
-      padding: 10px 20px;
-      background-color: #00aaff;
-      color: white;
-      text-decoration: none;
-      border-radius: 20px;
-      box-shadow: 0 0 10px #00aaff;
-      transition: background-color 0.3s ease, transform 0.2s ease;
+      display: inline-block; margin: 20px 10px; padding: 10px 20px; background-color: #00aaff;
+      color: white; text-decoration: none; border-radius: 20px; box-shadow: 0 0 10px #00aaff;
+      transition: background-color 0.3s, transform 0.2s;
     }
-    a:hover {
-      background-color: #33bbff;
-      transform: scale(1.05);
-    }
-    footer {
-      margin-top: 60px;
-      font-size: 0.9em;
-      color: #999;
-    }
+    a:hover { background-color: #33bbff; transform: scale(1.05); }
+    footer { margin-top: 60px; font-size: 0.9em; color: #999; }
     .stars { display: flex; justify-content: center; margin: 20px 0; }
     .star { font-size: 2.5em; color: #ccc; cursor: pointer; transition: color 0.3s; }
     .star.selected { color: #ffcc00; }
@@ -86,9 +40,8 @@
     #prayer-times { margin-top: 20px; font-size: 1.2em; color: #fff; }
     #prayer-times span { display: block; margin: 5px 0; }
     #country-select, #sura-select {
-      margin-top: 20px; padding: 10px; font-size: 1.2em;
-      background-color: #333; color: #fff; border-radius: 5px;
-      border: none; width: 300px;
+      margin-top: 20px; padding: 10px; font-size: 1.2em; background-color: #333; color: #fff;
+      border-radius: 5px; border: none; width: 300px;
     }
   </style>
 </head>
@@ -126,6 +79,7 @@
   <!-- Surah Selector -->
   <label for="sura-select">اختر سورة للتشغيل:</label>
   <select id="sura-select" onchange="playSelectedSura()">
+    <!-- كامل الـ114 سورة -->
     <option value="1">1 - الفاتحة</option>
     <option value="2">2 - البقرة</option>
     <option value="3">3 - آل عمران</option>
@@ -289,7 +243,7 @@
     const audio = document.getElementById("myAudio");
     const suraSelect = document.getElementById("sura-select");
     const progress = document.getElementById("progress");
-    const starsEls = document.querySelectorAll(".star");
+    const stars = document.querySelectorAll(".star");
     const ratingResult = document.querySelector(".rating-result");
 
     function toggleAudio() {
@@ -298,7 +252,7 @@
     }
 
     function seek(sec) {
-      if (audio.src) {
+      if (audio.src && audio.duration) {
         audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + sec));
       }
     }
@@ -309,6 +263,7 @@
         progress.value = audio.currentTime;
       }
     });
+
     progress.addEventListener("input", () => {
       if (audio.duration) audio.currentTime = progress.value;
     });
@@ -322,10 +277,10 @@
 
     if (localStorage.getItem("rating")) setStars(+localStorage.getItem("rating"));
     function setStars(v) {
-      starsEls.forEach((s,i) => s.classList.toggle("selected", i < v));
+      stars.forEach((s,i) => s.classList.toggle("selected", i < v));
       ratingResult.textContent = `التقييم: ${(v/5)*100}%`;
     }
-    starsEls.forEach(s => s.addEventListener("click", e => {
+    stars.forEach(s => s.addEventListener("click", e => {
       const v = +e.target.dataset.value;
       setStars(v);
       localStorage.setItem("rating", v);
@@ -333,7 +288,7 @@
 
     function updateClock() {
       const d = new Date(), H = d.getHours(), M = d.getMinutes();
-      const p = H>=12?'PM':'AM', h12=H%12||12;
+      const p = H>=12?'PM':'AM', h12 = H%12||12;
       document.getElementById("clock").textContent =
         `الوقت الآن: ${h12}:${M.toString().padStart(2,'0')} ${p}`;
     }
@@ -342,24 +297,25 @@
 
     async function getPrayerTimes() {
       const country = document.getElementById("country-select").value;
-      const d = new Date(), day=d.getDate(), mon=d.getMonth()+1, yr=d.getFullYear();
+      const d = new Date(), day = d.getDate(), mon = d.getMonth()+1, yr = d.getFullYear();
       const url = `https://api.aladhan.com/v1/timingsByAddress/${day}-${mon}-${yr}?address=${country}`;
       try {
-        const data = (await fetch(url).then(r=>r.json())).data.timings;
+        const t = (await fetch(url).then(r=>r.json())).data.timings;
         const fmt = tm => {
-          const [hh,mm]=tm.split(':').map(Number);
-          const p = hh>=12?'PM':'AM', h12=hh%12||12;
+          const [hh,mm] = tm.split(':').map(Number);
+          const p = hh>=12?'PM':'AM', h12 = hh%12||12;
           return `${h12}:${mm.toString().padStart(2,'0')} ${p}`;
         };
-        document.getElementById("fajr").textContent = `الفجر: ${fmt(data.Fajr)}`;
-        document.getElementById("dhuhr").textContent = `الظهر: ${fmt(data.Dhuhr)}`;
-        document.getElementById("asr").textContent = `العصر: ${fmt(data.Asr)}`;
-        document.getElementById("maghrib").textContent = `المغرب: ${fmt(data.Maghrib)}`;
-        document.getElementById("isha").textContent = `العشاء: ${fmt(data.Isha)}`;
+        document.getElementById("fajr").textContent = `الفجر: ${fmt(t.Fajr)}`;
+        document.getElementById("dhuhr").textContent = `الظهر: ${fmt(t.Dhuhr)}`;
+        document.getElementById("asr").textContent = `العصر: ${fmt(t.Asr)}`;
+        document.getElementById("maghrib").textContent = `المغرب: ${fmt(t.Maghrib)}`;
+        document.getElementById("isha").textContent = `العشاء: ${fmt(t.Isha)}`;
       } catch {
         document.getElementById("prayer-times").innerHTML = "<span>حدث خطأ أثناء جلب المواقيت.</span>";
       }
     }
+
     window.onload = getPrayerTimes;
   </script>
 </body>
