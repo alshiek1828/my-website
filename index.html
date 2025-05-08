@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <title>موقع الشيخ</title>
   <style>
-    body { margin:0; padding:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background:linear-gradient(to bottom,#1c1c1c,#2b2b2b); color:#fff;
+    body { margin:0; padding:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana,sans-serif;
+      background: linear-gradient(to bottom,#1c1c1c,#2b2b2b); color:#fff;
       display:flex; flex-direction:column; align-items:center;
     }
     header, main, footer { width:100%; max-width:800px; padding:20px; box-sizing:border-box; }
     header { text-align:center; padding-top:40px; }
     header h1 { font-size:3em; color:#00ffe7; text-shadow:0 0 10px #00ffe7; margin:0; }
     header p { margin:5px 0 0; font-size:1.2em; color:#ccc; }
-    .selectors, .controls, .rating { display:flex; flex-wrap:wrap; justify-content:center;
-      gap:10px; margin:20px 0;
+    .selectors, .controls, .rating {
+      display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:20px 0;
     }
     select, button, input[type="range"] {
       background:#333; color:#fff; border:none; border-radius:5px;
@@ -31,84 +31,87 @@
     input[type="range"]::-webkit-slider-runnable-track {
       height:4px; background:#555; border-radius:2px;
     }
-    .error-message { color:#f66; font-size:1em; text-align:center; margin:10px 0; }
+    .error-message { color:#f66; text-align:center; margin:10px 0; }
     .stars span { font-size:2em; cursor:pointer; color:#ccc; transition:color .3s; }
     .stars .selected { color:#ffcc00; }
     .rating-result { font-size:1em; margin-left:10px; }
-    .info { display:flex; flex-direction:column; align-items:flex-start;
-      gap:5px; margin-bottom:20px;
-    }
+    .info { display:flex; flex-direction:column; align-items:flex-start; gap:5px; margin-bottom:20px; }
     .info #clock { font-size:1.1em; }
     .info #prayer-times h2 { margin:10px 0 5px; font-size:1.2em; }
     .info #prayer-times span, .info #prayer-error { display:block; margin:2px 0; }
-    .info #prayer-error { color:#f66; margin-top:5px; }
+    .info #prayer-error { color:#f66; }
     footer { text-align:center; font-size:.9em; color:#999; padding:20px 0; }
   </style>
 </head>
 <body>
-<header>
-  <h1>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</h1>
-  <p>موقع الشيخ</p>
-</header>
-<main>
-  <div class="selectors">
-    <label>اختر سورة:
-      <select id="sura-select"><option value="" disabled selected>-- السورة --</option></select>
-    </label>
-    <label>اختر دولتك:
-      <select id="country-select"><option value="" disabled selected>-- الدولة --</option></select>
-    </label>
-  </div>
-  <div class="controls">
-    <button onclick="seek(-10)">« 10 ث</button>
-    <button id="playButton" onclick="toggleAudio()" disabled>▶</button>
-    <button onclick="seek(10)">10 ث »</button>
-  </div>
-  <div class="error-message" id="audio-error"></div>
-  <input type="range" id="progress" value="0" min="0" step="0.1">
-  <audio id="myAudio" preload="metadata" crossorigin="anonymous"></audio>
-  <div class="controls">
-    <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-    <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
-    <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
-    <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
-  </div>
-  <div class="rating">
-    <div class="stars">
-      <span data-value="1">★</span><span data-value="2">★</span>
-      <span data-value="3">★</span><span data-value="4">★</span>
-      <span data-value="5">★</span>
+  <header>
+    <h1>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</h1>
+    <p>موقع الشيخ</p>
+  </header>
+  <main>
+    <div class="selectors">
+      <label>اختر سورة:
+        <select id="sura-select"><option value="" disabled>-- السورة --</option></select>
+      </label>
+      <label>اختر دولتك:
+        <select id="country-select"><option value="" disabled>-- الدولة --</option></select>
+      </label>
     </div>
-    <div class="rating-result">0%</div>
-  </div>
-  <div class="info">
-    <div id="clock">الوقت: --:-- --</div>
-    <div id="prayer-times">
-      <h2>مواقيت الصلاة</h2>
-      <span id="fajr">الفجر: --:--</span>
-      <span id="dhuhr">الظهر: --:--</span>
-      <span id="asr">العصر: --:--</span>
-      <span id="maghrib">المغرب: --:--</span>
-      <span id="isha">العشاء: --:--</span>
-      <div id="prayer-error"></div>
-    </div>
-  </div>
-</main>
-<footer>&copy; 2025 – made by alshiek</footer>
 
-<script>
+    <div class="controls">
+      <button onclick="seek(-10)">« 10 ث</button>
+      <button id="playButton" onclick="toggleAudio()" disabled>▶</button>
+      <button onclick="seek(10)">10 ث »</button>
+    </div>
+    <div class="error-message" id="audio-error"></div>
+
+    <input type="range" id="progress" value="0" min="0" step="0.1">
+    <audio id="myAudio" preload="metadata" crossorigin="anonymous"></audio>
+
+    <div class="controls">
+      <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+      <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
+      <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
+      <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
+    </div>
+
+    <div class="rating">
+      <div class="stars">
+        <span data-value="1">★</span><span data-value="2">★</span>
+        <span data-value="3">★</span><span data-value="4">★</span>
+        <span data-value="5">★</span>
+      </div>
+      <div class="rating-result">0%</div>
+    </div>
+
+    <div class="info">
+      <div id="clock">الوقت: --:-- --</div>
+      <div id="prayer-times">
+        <h2>مواقيت الصلاة</h2>
+        <span id="fajr">الفجر: --:--</span>
+        <span id="dhuhr">الظهر: --:--</span>
+        <span id="asr">العصر: --:--</span>
+        <span id="maghrib">المغرب: --:--</span>
+        <span id="isha">العشاء: --:--</span>
+        <div id="prayer-error"></div>
+      </div>
+    </div>
+  </main>
+  <footer>&copy; 2025 – made by alshiek</footer>
+
+  <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const suraSelect = document.getElementById('sura-select'),
-          countrySelect = document.getElementById('country-select'),
-          audio = document.getElementById('myAudio'),
-          progress = document.getElementById('progress'),
-          stars = document.querySelectorAll('.stars span'),
-          ratingResult = document.querySelector('.rating-result'),
-          playButton = document.getElementById('playButton'),
-          audioError = document.getElementById('audio-error'),
-          prayerError = document.getElementById('prayer-error');
+    const suraSelect = document.getElementById('sura-select');
+    const countrySelect = document.getElementById('country-select');
+    const audio        = document.getElementById('myAudio');
+    const progress     = document.getElementById('progress');
+    const playButton   = document.getElementById('playButton');
+    const audioError   = document.getElementById('audio-error');
+    const prayerError  = document.getElementById('prayer-error');
+    const stars        = document.querySelectorAll('.stars span');
+    const ratingResult = document.querySelector('.rating-result');
 
-    // كل السور
+    // 1) تحضير قائمة السور
     const suras = [
       "الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال",
       "التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف",
@@ -123,34 +126,49 @@
       "القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش",
       "الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"
     ];
-    suras.forEach((name, i) => {
-      const opt = document.createElement('option');
-      opt.value = i+1;
-      opt.textContent = `${i+1} - ${name}`;
-      suraSelect.append(opt);
+    suras.forEach((name,i) => {
+      const o = document.createElement('option');
+      o.value = i+1;
+      o.textContent = `${i+1} - ${name}`;
+      suraSelect.appendChild(o);
     });
 
-    // الدول
-    ['لبنان','مصر','السعودية','الأردن','الإمارات','الكويت','قطر','البحرين','عمان',
-     'العراق','سوريا','فلسطين','الجزائر','المغرب','تونس','ليبيا','موريتانيا',
-     'السودان','اليمن','الصومال','جيبوتي','جزر القمر'
-    ].forEach(c => {
+    // 2) تحضير قائمة الدول
+    const countries = ['لبنان','مصر','السعودية','الأردن','الإمارات','الكويت','قطر','البحرين','عمان',
+       'العراق','سوريا','فلسطين','الجزائر','المغرب','تونس','ليبيا','موريتانيا',
+       'السودان','اليمن','الصومال','جيبوتي','جزر القمر'];
+    countries.forEach(c => {
       const o = document.createElement('option');
       o.value = c; o.textContent = c;
-      countrySelect.append(o);
+      countrySelect.appendChild(o);
     });
 
+    // 3) استرجاع آخر اختيار من localStorage
+    const lastCountry = localStorage.getItem('country');
+    if(lastCountry) { countrySelect.value = lastCountry; getPrayerTimes(); }
+    countrySelect.addEventListener('change', () => {
+      localStorage.setItem('country', countrySelect.value);
+      getPrayerTimes();
+    });
+
+    const lastSura = localStorage.getItem('sura');
+    if(lastSura) { suraSelect.value = lastSura; }
+    suraSelect.addEventListener('change', () => {
+      localStorage.setItem('sura', suraSelect.value);
+      playSelectedSura();
+    });
+
+    // دالة ملء الصفر
     function pad(n){ return n.toString().padStart(3,'0'); }
 
-    // تشغيل باستخدام سيرفر Quran.com
+    // 4) تشغيل الصوت من CDN رسمي (ar.alafasy)
     async function playSelectedSura(){
       audioError.textContent = '';
-      const idx = suraSelect.value;
-      if(!idx) return;
-      const num = pad(idx);
-      // استخدام CDN قرآني مضمون
-      audio.src = `https://cdn.islamic.network/quran/audio/64/ar.alafasy/${num}.mp3`;
       playButton.disabled = true;
+      const idx = suraSelect.value;
+      if(!idx) { playButton.disabled=false; return; }
+      const url = `https://cdn.islamic.network/quran/audio/64/ar.alafasy/${pad(idx)}.mp3`;
+      audio.src = url;
       try {
         await audio.play();
         playButton.textContent = '❚❚';
@@ -161,84 +179,80 @@
       }
     }
 
-    function toggleAudio(){
+    window.toggleAudio = () => {
       audioError.textContent = '';
       if(!audio.src) return playSelectedSura();
       if(audio.paused) {
-        audio.play().then(()=> playButton.textContent='❚❚')
-                    .catch(()=> audioError.textContent='تعذّر تحميل ملف الصوت');
+        audio.play().then(()=>playButton.textContent='❚❚')
+                   .catch(()=>audioError.textContent='تعذّر تحميل ملف الصوت');
       } else {
         audio.pause();
         playButton.textContent='▶';
       }
-    }
+    };
 
-    audio.addEventListener('loadedmetadata', ()=>{
+    // 5) شريط التقدم والتنقل
+    audio.addEventListener('loadedmetadata', () => {
       progress.max = audio.duration;
       playButton.disabled = false;
     });
-    audio.addEventListener('timeupdate', ()=> progress.value = audio.currentTime);
-    progress.addEventListener('input', ()=> audio.currentTime = progress.value);
-    audio.addEventListener('ended', ()=>{
+    audio.addEventListener('timeupdate', () => progress.value = audio.currentTime);
+    progress.addEventListener('input', () => audio.currentTime = progress.value);
+    audio.addEventListener('ended', () => {
       playButton.textContent='▶';
       progress.value = 0;
     });
-
-    window.toggleAudio = toggleAudio;
-
-    // أدوات تنقل الوقت
     window.seek = sec => {
       if(!audio.duration) return;
       audio.currentTime = Math.min(audio.duration, Math.max(0, audio.currentTime + sec));
     };
 
-    // تقييم بالنجوم
-    if(localStorage.rating) setStars(+localStorage.rating);
-    stars.forEach(s=> s.addEventListener('click', e=>{
-      const v=+e.target.dataset.value;
+    // 6) النجوم
+    if(localStorage.getItem('rating')) setStars(+localStorage.getItem('rating'));
+    stars.forEach(s => s.addEventListener('click', e => {
+      const v = +e.target.dataset.value;
       setStars(v);
-      localStorage.rating=v;
+      localStorage.setItem('rating', v);
     }));
     function setStars(v){
-      stars.forEach((s,i)=> s.classList.toggle('selected', i<v));
+      stars.forEach((s,i) => s.classList.toggle('selected', i<v));
       ratingResult.textContent = `${(v/5)*100}%`;
     }
 
-    // تحديث الساعة
+    // 7) الساعة
     function updateClock(){
       const d=new Date(),h=d.getHours(),m=d.getMinutes();
-      const ampm=h>=12?'م':'ص';
+      const ampm = h>=12? 'م':'ص';
       let hh=h%12||12; hh=hh.toString().padStart(2,'0');
       const mm=m.toString().padStart(2,'0');
-      document.getElementById('clock').textContent=`الوقت: ${hh}:${mm} ${ampm}`;
+      document.getElementById('clock').textContent = `الوقت: ${hh}:${mm} ${ampm}`;
     }
-    setInterval(updateClock,1000); updateClock();
+    setInterval(updateClock,1000);
+    updateClock();
 
-    // مواقيت الصلاة
+    // 8) مواقيت الصلاة
     async function getPrayerTimes(){
-      prayerError.textContent='';
-      const addr=encodeURIComponent(countrySelect.value);
+      prayerError.textContent = '';
+      const addr = encodeURIComponent(countrySelect.value);
       if(!addr) return;
-      const d=new Date(), day=d.getDate(), mon=d.getMonth()+1, yr=d.getFullYear();
-      const url=`https://api.aladhan.com/v1/timingsByAddress?address=${addr}&date=${day}-${mon}-${yr}`;
+      const d=new Date(),day=d.getDate(),mon=d.getMonth()+1,yr=d.getFullYear();
+      const url = `https://api.aladhan.com/v1/timingsByAddress?address=${addr}&date=${day}-${mon}-${yr}`;
       try {
-        const res=await fetch(url);
-        const json=await res.json();
+        const res = await fetch(url);
+        const json = await res.json();
         if(json.code!==200) throw '';
         ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(key=>{
-          let [H,MM]=json.data.timings[key].split(':').map(Number);
-          const ampm=H>=12?'م':'ص'; H=H%12||12;
-          document.getElementById(key.toLowerCase()).textContent=
-            `${key==='Dhuhr'?'الظهر':key==='Maghrib'?'المغرب':key==='Isha'?'العشاء':key==='Fajr'?'الفجر':'العصر'}: ${H.toString().padStart(2,'0')}:${MM.toString().padStart(2,'0')} ${ampm}`;
+          let [H,MM] = json.data.timings[key].split(':').map(Number);
+          const ampm = H>=12?'م':'ص'; H=H%12||12;
+          document.getElementById(key.toLowerCase()).textContent =
+            `${{Fajr:'الفجر',Dhuhr:'الظهر',Asr:'العصر',Maghrib:'المغرب',Isha:'العشاء'}[key]}: ${H.toString().padStart(2,'0')}:${MM.toString().padStart(2,'0')} ${ampm}`;
         });
       } catch {
-        prayerError.textContent='تعذّر جلب مواقيت الصلاة';
+        prayerError.textContent = 'تعذّر جلب مواقيت الصلاة';
       }
     }
-    countrySelect.addEventListener('change',getPrayerTimes);
-    suraSelect.addEventListener('change',playSelectedSura);
-    getPrayerTimes();
-  });
-</script>
+
+  }); // end DOMContentLoaded
+  </script>
 </body>
 </html>
