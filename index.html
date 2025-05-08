@@ -9,29 +9,31 @@
       display:flex; flex-direction:column; align-items:center; min-height:100vh;
     }
     header, main, footer { width:100%; max-width:800px; padding:20px; box-sizing:border-box }
-    header { text-align:center; }
+    header { text-align:center }
     header h1 { font-size:3em; color:#00ffe7; text-shadow:0 0 10px #00ffe7; margin:0 }
     header p  { margin:5px 0 0; font-size:1.2em; color:#ccc }
 
     .selectors, .controls, .rating {
-      display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:20px 0
+      display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:20px 0;
     }
     select, button, input[type="range"] {
       background:#333; color:#fff; border:none; border-radius:5px;
-      padding:10px; font-size:1em; cursor:pointer
+      padding:10px; font-size:1em; cursor:pointer;
     }
-    select { min-width:200px }
+    select { min-width:180px }
     button { min-width:80px }
     input[type="range"] {
-      -webkit-appearance:none; width:100%; max-width:600px; background:transparent; margin:10px 0
+      -webkit-appearance:none; width:100%; max-width:600px; background:transparent; 
+      margin:10px 0;
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance:none; height:16px; width:16px; border-radius:50%;
-      background:#ff0066; cursor:pointer; margin-top:-6px
+      background:#ff0066; cursor:pointer; margin-top:-6px;
     }
     input[type="range"]::-webkit-slider-runnable-track {
-      height:4px; background:#555; border-radius:2px
+      height:4px; background:#555; border-radius:2px;
     }
+
     .error-message { color:#f66; text-align:center; margin:5px 0 }
     .stars span { font-size:2em; cursor:pointer; color:#ccc; transition:color .3s }
     .stars .selected { color:#ffcc00 }
@@ -43,6 +45,7 @@
     .info #prayer-times span, .info #prayer-error { display:block; margin:2px 0 }
     .info #prayer-error { color:#f66 }
 
+    #player { width:100%; max-width:800px; height:360px; background:#000 }
     footer { text-align:center; font-size:.9em; color:#999; padding:20px 0; margin-top:auto }
   </style>
 </head>
@@ -63,13 +66,15 @@
 
     <div class="controls">
       <button onclick="seek(-10)">« 10 ث</button>
-      <button id="playButton" onclick="toggleAudio()" disabled>▶ تشغيل</button>
+      <button id="playButton" onclick="togglePlay()" disabled>▶ تشغيل</button>
       <button onclick="seek(10)">10 ث »</button>
     </div>
     <div class="error-message" id="audio-error"></div>
 
     <input type="range" id="progress" value="0" min="0" step="0.1">
-    <audio id="myAudio" preload="metadata" crossorigin="anonymous"></audio>
+
+    <!-- مشغل YouTube -->
+    <div id="player"></div>
 
     <div class="controls">
       <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
@@ -102,156 +107,180 @@
   </main>
   <footer>&copy; 2025 – made by alshiek</footer>
 
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const suraSelect    = document.getElementById('sura-select');
-    const countrySelect = document.getElementById('country-select');
-    const audio         = document.getElementById('myAudio');
-    const progress      = document.getElementById('progress');
-    const playButton    = document.getElementById('playButton');
-    const audioError    = document.getElementById('audio-error');
-    const prayerError   = document.getElementById('prayer-error');
-    const stars         = document.querySelectorAll('.stars span');
-    const ratingResult  = document.querySelector('.rating-result');
+  let player, progressInterval;
 
-    // أسماء السور
-    const suras = [/* جميع أسماء السور من الفاتحة حتى الناس */ 
-      "الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس",
-      /* ... */ "الناس"
-    ];
-    suras.forEach((name,i) => {
-      const o = document.createElement('option');
-      o.value = i+1;
-      o.textContent = `${i+1} - ${name}`;
-      suraSelect.append(o);
-    });
+  // قائمة السور
+  const suras = [
+    "الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود",
+    "يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون",
+    "النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب",
+    "سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف",
+    "محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة",
+    "الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة",
+    "المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبإ","النازعات","عبس",
+    "التكوير","الإنفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس",
+    "الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر",
+    "الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"
+  ];
+  // بدّل المعرف بقائمة تشغيل سليمة تحتوي الـ114 فيديو (مثال)
+  const PLAYLIST_ID = 'PLmYBuwzH1Pq9nGV_zIytx-3Fns4X9T5gk';
 
-    // قائمة الدول
-    ['لبنان','مصر','السعودية','الأردن','الإمارات','الكويت','قطر','البحرين','عمان',
-     'العراق','سوريا','فلسطين','الجزائر','المغرب','تونس','ليبيا','موريتانيا',
-     'السودان','اليمن','الصومال','جيبوتي','جزر القمر'
-    ].forEach(c => {
-      const o = document.createElement('option');
-      o.value = c;
-      o.textContent = c;
-      countrySelect.append(o);
-    });
+  const sel = document.getElementById('sura-select'),
+        btn = document.getElementById('playButton'),
+        err = document.getElementById('audio-error'),
+        progress = document.getElementById('progress');
 
-    // استرجاع/حفظ
-    if(localStorage.sura) suraSelect.value = localStorage.sura;
-    suraSelect.addEventListener('change', () => {
-      localStorage.sura = suraSelect.value;
-      initPlaylist();
-    });
-    if(localStorage.country) {
-      countrySelect.value = localStorage.country;
-      fetchPrayerTimes();
-    }
-    countrySelect.addEventListener('change', () => {
-      localStorage.country = countrySelect.value;
-      fetchPrayerTimes();
-    });
-
-    // playlist وتحكم
-    let playlist = [], idx = 0;
-    function pad(n){ return n.toString().padStart(3,'0'); }
-
-    async function initPlaylist(){
-      audio.pause(); idx = 0; playlist = [];
-      audioError.textContent = '';
-      playButton.disabled = true;
-      try {
-        const res = await fetch(`https://api.alquran.cloud/v1/surah/${suraSelect.value}/ar.alafasy`);
-        const json = await res.json();
-        if(json.code !== 200) throw '';
-        playlist = json.data.ayahs.map(a => a.audioSecondary[0]);
-        playNext();
-        playButton.disabled = false;
-      } catch {
-        audioError.textContent = 'تعذّر تحميل السورة';
-        playButton.disabled = false;
-      }
-    }
-    async function playNext(){
-      if(idx >= playlist.length) {
-        playButton.textContent = '▶ تشغيل'; 
-        return;
-      }
-      audio.src = playlist[idx++];
-      try {
-        await audio.play();
-        playButton.textContent = '❚❚ إيقاف';
-      } catch {
-        audioError.textContent = 'تعذّر تشغيل الصوت';
-      }
-    }
-
-    // زر التشغيل
-    window.toggleAudio = () => {
-      audioError.textContent = '';
-      if(!audio.src) return initPlaylist();
-      if(audio.paused) audio.play().then(()=>playButton.textContent='❚❚ إيقاف')
-                                .catch(()=>audioError.textContent='تعذّر تشغيل الصوت');
-      else { audio.pause(); playButton.textContent='▶ تشغيل'; }
-    };
-
-    // تتابع نهاية الآية
-    audio.addEventListener('ended', playNext);
-
-    // شريط التنقل
-    audio.addEventListener('loadedmetadata', () => progress.max = audio.duration);
-    audio.addEventListener('timeupdate', () => progress.value = audio.currentTime);
-    progress.addEventListener('input', () => audio.currentTime = progress.value);
-    window.seek = sec => {
-      if(!audio.duration) return;
-      audio.currentTime = Math.min(audio.duration, Math.max(0, audio.currentTime + sec));
-    };
-
-    // تقييم بالنجوم
-    if(localStorage.rating) setStars(+localStorage.rating);
-    stars.forEach(s => s.addEventListener('click', e => {
-      const v = +e.target.dataset.value; setStars(v);
-      localStorage.rating = v;
-    }));
-    function setStars(v){
-      stars.forEach((s,i)=> s.classList.toggle('selected', i < v));
-      ratingResult.textContent = `${(v/5)*100}%`;
-    }
-
-    // الساعة
-    function updateClock(){
-      const d=new Date(), h=d.getHours(), m=d.getMinutes();
-      const ampm = h>=12?'م':'ص';
-      let hh = h%12||12; hh = hh.toString().padStart(2,'0');
-      const mm = m.toString().padStart(2,'0');
-      document.getElementById('clock').textContent = `الوقت: ${hh}:${mm} ${ampm}`;
-    }
-    setInterval(updateClock,1000); updateClock();
-
-    // مواقيت الصلاة
-    async function fetchPrayerTimes(){
-      prayerError.textContent = '';
-      const addr = encodeURIComponent(countrySelect.value);
-      const d=new Date(),day=d.getDate(),mon=d.getMonth()+1,yr=d.getFullYear();
-      try {
-        const res = await fetch(`https://api.aladhan.com/v1/timingsByAddress?address=${addr}&date=${day}-${mon}-${yr}`);
-        const json = await res.json();
-        if(json.code!==200) throw '';
-        ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(key=>{
-          let [H,MM]=json.data.timings[key].split(':').map(Number);
-          const ampm=H>=12?'م':'ص'; H=H%12||12;
-          document.getElementById(key.toLowerCase()).textContent =
-            `${{Fajr:'الفجر',Dhuhr:'الظهر',Asr:'العصر',Maghrib:'المغرب',Isha:'العشاء'}[key]}: ${H.toString().padStart(2,'0')}:${MM.toString().padStart(2,'0')} ${ampm}`;
-        });
-      } catch {
-        prayerError.textContent = 'تعذّر جلب مواقيت الصلاة';
-      }
-    }
-
-    // تشغيل عند التحميل إن كان مخزّن
-    if(suraSelect.value) initPlaylist();
-    if(countrySelect.value) fetchPrayerTimes();
+  // ملء القوائم
+  suras.forEach((s, i) => {
+    const o = document.createElement('option');
+    o.value = i; // يبدأ من 0
+    o.textContent = `${i+1} - ${s}`;
+    sel.append(o);
   });
+  // الدول
+  ['لبنان','مصر','السعودية','الأردن','الإمارات','الكويت','قطر','البحرين','عمان','العراق','سوريا',
+   'فلسطين','الجزائر','المغرب','تونس','ليبيا','موريتانيا','السودان','اليمن','الصومال','جيبوتي','جزر القمر'
+  ].forEach(c=>{
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    document.getElementById('country-select').append(o);
+  });
+
+  // حفظ/استرجاع
+  if(localStorage.sura) sel.value = localStorage.sura;
+  sel.addEventListener('change', ()=>{
+    localStorage.sura = sel.value;
+    loadSura(+sel.value);
+  });
+  if(localStorage.country){
+    const cs = document.getElementById('country-select');
+    cs.value = localStorage.country;
+    fetchPrayerTimes();
+  }
+  document.getElementById('country-select')
+    .addEventListener('change', e=>{
+      localStorage.country = e.target.value;
+      fetchPrayerTimes();
+    });
+
+  // إنشاء المشغل YouTube
+  function onYouTubeIframeAPIReady(){
+    player = new YT.Player('player', {
+      height: '360', width: '640',
+      playerVars:{
+        listType: 'playlist',
+        list: PLAYLIST_ID,
+        index: sel.value||0,
+        origin: window.location.origin
+      },
+      events:{
+        onError:()=> err.textContent='تعذّر تشغيل الفيديو'
+      }
+    });
+    btn.disabled = false;
+  }
+
+  // تحميل السورة عند الاختيار
+  function loadSura(index){
+    err.textContent = '';
+    if(player && player.loadPlaylist){
+      player.loadPlaylist({
+        listType:'playlist',
+        list:PLAYLIST_ID,
+        index:index,
+        suggestedQuality:'small'
+      });
+      btn.textContent = '❚❚ إيقاف';
+      player.playVideo();
+      startProgress();
+    } else {
+      err.textContent = 'المشغل غير جاهز';
+    }
+  }
+
+  // زرّ تشغيل/إيقاف
+  function togglePlay(){
+    err.textContent = '';
+    if(player.getPlayerState()===YT.PlayerState.PLAYING){
+      player.pauseVideo();
+      btn.textContent='▶ تشغيل';
+    } else {
+      player.playVideo();
+      btn.textContent='❚❚ إيقاف';
+    }
+  }
+  window.togglePlay = togglePlay;
+
+  // seek بالعشر ثواني
+  function seek(sec){
+    const t = player.getCurrentTime() + sec;
+    player.seekTo(Math.max(0,t), true);
+  }
+  window.seek = seek;
+
+  // شريط التقدّم
+  function startProgress(){
+    clearInterval(progressInterval);
+    progress.max = player.getDuration();
+    progressInterval = setInterval(()=>{
+      const t = player.getCurrentTime();
+      progress.value = t;
+    }, 500);
+  }
+  progress.addEventListener('input', ()=>{
+    player.seekTo(progress.value, true);
+  });
+
+  // تقييم النجوم
+  const stars = document.querySelectorAll('.stars span'),
+        ratingResult = document.querySelector('.rating-result');
+  if(localStorage.rating) setStars(+localStorage.rating);
+  stars.forEach(s=>s.addEventListener('click', e=>{
+    setStars(+e.target.dataset.value);
+    localStorage.rating = +e.target.dataset.value;
+  }));
+  function setStars(v){
+    stars.forEach((s,i)=> s.classList.toggle('selected', i< v));
+    ratingResult.textContent = `${(v/5)*100}%`;
+  }
+
+  // الساعة
+  function updateClock(){
+    const d=new Date(), h=d.getHours(), m=d.getMinutes();
+    const ampm=h>=12?'م':'ص';
+    let hh=h%12||12; hh=hh.toString().padStart(2,'0');
+    const mm=m.toString().padStart(2,'0');
+    document.getElementById('clock').textContent=`الوقت: ${hh}:${mm} ${ampm}`;
+  }
+  setInterval(updateClock,1000); updateClock();
+
+  // مواقيت الصلاة
+  async function fetchPrayerTimes(){
+    const pErr = document.getElementById('prayer-error');
+    pErr.textContent='';
+    const addr=encodeURIComponent(localStorage.country);
+    const d=new Date(), day=d.getDate(), mon=d.getMonth()+1, yr=d.getFullYear();
+    try{
+      const res=await fetch(`https://api.aladhan.com/v1/timingsByAddress?address=${addr}&date=${day}-${mon}-${yr}`);
+      const json=await res.json();
+      if(json.code!==200) throw '';
+      ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(key=>{
+        let [H,MM]=json.data.timings[key].split(':').map(Number);
+        const ampm=H>=12?'م':'ص'; H=H%12||12;
+        document.getElementById(key.toLowerCase()).textContent=
+          `${{Fajr:'الفجر',Dhuhr:'الظهر',Asr:'العصر',Maghrib:'المغرب',Isha:'العشاء'}[key]}: ${H.toString().padStart(2,'0')}:${MM.toString().padStart(2,'0')} ${ampm}`;
+      });
+    }catch{
+      pErr.textContent='تعذّر جلب مواقيت الصلاة';
+    }
+  }
+
+  // ابدأ لو كان محدد
+  if(sel.value!=='') loadSura(+sel.value);
+  if(localStorage.country) fetchPrayerTimes();
   </script>
 </body>
 </html>
