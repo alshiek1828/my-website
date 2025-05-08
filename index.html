@@ -1,28 +1,65 @@
-<!DOCTYPE html><html lang="ar">
+<!DOCTYPE html>
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
   <title>موقع الشيخ</title>
   <style>
-    body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(to bottom, #1c1c1c, #2b2b2b); color: #fff; display: flex; flex-direction: column; align-items: center; }
-    header, main, footer { width: 100%; max-width: 800px; padding: 20px; box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header, main, footer {
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
     header { text-align: center; padding-top: 40px; }
-    header h1 { font-size: 3em; color: #00ffe7; text-shadow: 0 0 10px #00ffe7; margin: 0; }
+    header h1 {
+      font-size: 3em; color: #00ffe7; text-shadow: 0 0 10px #00ffe7; margin: 0;
+    }
     header p { margin: 5px 0 0; font-size: 1.2em; color: #ccc; }
-    .selectors, .controls, .rating { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0; }
-    select, button, input[type="range"] { background: #333; color: #fff; border: none; border-radius: 5px; padding: 10px; font-size: 1em; cursor: pointer; }
+    .selectors, .controls, .rating {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0;
+    }
+    select, button, input[type="range"] {
+      background: #333; color: #fff; border: none; border-radius: 5px;
+      padding: 10px; font-size: 1em; cursor: pointer;
+    }
     select { min-width: 200px; }
     button { min-width: 80px; }
-    input[type="range"] { -webkit-appearance: none; width: 100%; max-width: 600px; background: transparent; }
-    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #ff0066; cursor: pointer; margin-top: -6px; }
-    input[type="range"]::-webkit-slider-runnable-track { height: 4px; background: #555; border-radius: 2px; }
-    .stars span { font-size: 2em; cursor: pointer; color: #ccc; transition: color 0.3s; }
+    input[type="range"] {
+      -webkit-appearance: none; width: 100%; max-width: 600px; background: transparent;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+      background: #ff0066; cursor: pointer; margin-top: -6px;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 4px; background: #555; border-radius: 2px;
+    }
+    .stars span {
+      font-size: 2em; cursor: pointer; color: #ccc; transition: color 0.3s;
+    }
     .stars .selected { color: #ffcc00; }
     .rating-result { font-size: 1em; margin-left: 10px; }
-    .info { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; margin-bottom: 20px; }
+    .info {
+      display: flex; flex-direction: column; align-items: flex-start;
+      gap: 5px; margin-bottom: 20px;
+    }
     .info #clock { font-size: 1.1em; }
     .info #prayer-times h2 { margin: 10px 0 5px; font-size: 1.2em; }
     .info #prayer-times span { display: block; margin: 2px 0; }
-    footer { text-align: center; font-size: 0.9em; color: #999; padding: 20px 0; }
+    .info #prayer-error { color: #f00; margin-top: 5px; }
+    footer {
+      text-align: center; font-size: 0.9em; color: #999; padding: 20px 0;
+    }
   </style>
 </head>
 <body>
@@ -33,15 +70,19 @@
 <main>
   <div class="selectors">
     <label>&nbsp;اختر سورة:
-      <select id="sura-select"></select>
+      <select id="sura-select">
+        <option value="" disabled selected>-- السورة --</option>
+      </select>
     </label>
     <label>&nbsp;اختر دولتك:
-      <select id="country-select"></select>
+      <select id="country-select">
+        <option value="" disabled selected>-- الدولة --</option>
+      </select>
     </label>
   </div>
   <div class="controls">
     <button onclick="seek(-10)">« 10 ث</button>
-    <button id="playButton" onclick="toggleAudio()">▶</button>
+    <button id="playButton" onclick="toggleAudio()" disabled>▶</button>
     <button onclick="seek(10)">10 ث »</button>
   </div>
   <input type="range" id="progress" value="0" min="0" step="0.1">
@@ -54,7 +95,9 @@
   </div>
   <div class="rating">
     <div class="stars">
-      <span data-value="1">★</span><span data-value="2">★</span><span data-value="3">★</span><span data-value="4">★</span><span data-value="5">★</span>
+      <span data-value="1">★</span><span data-value="2">★</span>
+      <span data-value="3">★</span><span data-value="4">★</span>
+      <span data-value="5">★</span>
     </div>
     <div class="rating-result">0%</div>
   </div>
@@ -67,6 +110,7 @@
       <span id="asr">العصر: --:--</span>
       <span id="maghrib">المغرب: --:--</span>
       <span id="isha">العشاء: --:--</span>
+      <div id="prayer-error"></div>
     </div>
   </div>
 </main>
@@ -80,23 +124,146 @@
   const progress = document.getElementById('progress');
   const stars = document.querySelectorAll('.stars span');
   const ratingResult = document.querySelector('.rating-result');
-  const playButton = document.getElementById('playButton');const suras = [ "الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال", "التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف", "مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل", "القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات", "ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد", "الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد", "المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم", "الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان", "المرسلات","النبإ","النازعات","عبس","التكوير","الإنفطار","المطففين","الانشقاق","البروج", "الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق", "القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش", "الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس" ]; suras.forEach((name, i) => { const opt = document.createElement('option'); opt.value = i+1; opt.textContent = ${i+1} - ${name}; suraSelect.append(opt); });
+  const playButton = document.getElementById('playButton');
+  const prayerError = document.getElementById('prayer-error');
 
-['لبنان','مصر','السعودية','الأردن','الإمارات','الكويت','قطر','البحرين','عمان','العراق','سوريا','فلسطين','الجزائر','المغرب','تونس','ليبيا','موريتانيا','السودان','اليمن','الصومال','جيبوتي','جزر القمر'] .forEach(c => { const opt=document.createElement('option'); opt.value=c; opt.textContent=c; countrySelect.append(opt); });
+  // قائمة السور
+  const suras = [ 
+    "الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال",
+    "التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف",
+    "مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل",
+    "القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات",
+    "ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد",
+    "الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد",
+    "المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم",
+    "الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان",
+    "المرسلات","النبإ","النازعات","عبس","التكوير","الإنفطار","المطففين","الانشقاق","البروج",
+    "الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق",
+    "القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش",
+    "الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"
+  ];
+  suras.forEach((name,i)=>{
+    const opt = document.createElement('option');
+    opt.value = i+1;
+    opt.textContent = `${i+1} - ${name}`;
+    suraSelect.append(opt);
+  });
 
-function pad(n) { return n.toString().padStart(3,'0'); }
+  // قائمة الدول
+  ['لبنان','مصر','السعودية','الأردن','الإمارات','الكويت','قطر','البحرين','عمان',
+   'العراق','سوريا','فلسطين','الجزائر','المغرب','تونس','ليبيا','موريتانيا',
+   'السودان','اليمن','الصومال','جيبوتي','جزر القمر'
+  ].forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    countrySelect.append(opt);
+  });
 
-// عم تسبب مشاكل بلكود function playSelectedSura() { const num=pad(suraSelect.value); audio.pause(); audio.currentTime=0; audio.src=https://download.quranicaudio.com/quran/mishari_raashid_al_afasy/64kbps/${num}.mp3; audio.load(); audio.play().then(()=>playButton.textContent='❚❚').catch(err=>console.error(err)); }
+  // تنسيق رقم السورة بثلاث خانات
+  function pad(n) { return n.toString().padStart(3,'0'); }
 
-function toggleAudio() { if(!audio.src) return playSelectedSura(); if(audio.paused) audio.play().then(()=>playButton.textContent='❚❚'); else { audio.pause(); playButton.textContent='▶'; }}
+  // تشغيل السورة كاملة من Quranicaudio.com
+  async function playSelectedSura() {
+    const num = pad(suraSelect.value);
+    if (!num) return;
+    playButton.disabled = true;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.src = `https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/64kbps/${num}.mp3`;
+    try {
+      await audio.play();
+      playButton.textContent = '❚❚';
+    } catch (err) {
+      console.error('Play error', err);
+      alert('تعذّر تشغيل الصوت، تحقق من اتصالك بالإنترنت أو السورة المختارة.');
+    } finally {
+      playButton.disabled = false;
+    }
+  }
 
-audio.addEventListener('loadedmetadata',()=>progress.max=audio.duration); audio.addEventListener('timeupdate',()=>progress.value=audio.currentTime); progress.addEventListener('input',()=>audio.currentTime=progress.value); audio.addEventListener('ended',()=>{ playButton.textContent='▶'; progress.value=0; }); function seek(sec){ if(!audio.duration)return; audio.currentTime=Math.min(audio.duration,Math.max(0,audio.currentTime+sec)); }
+  function toggleAudio() {
+    if (!audio.src) return playSelectedSura();
+    if (audio.paused) {
+      audio.play().then(()=> playButton.textContent='❚❚')
+                 .catch(()=> playButton.textContent='▶');
+    } else {
+      audio.pause();
+      playButton.textContent = '▶';
+    }
+  }
 
-if(localStorage.rating) setStars(+localStorage.rating); stars.forEach(s=>s.addEventListener('click',e=>{ const v=+e.target.dataset.value; setStars(v); localStorage.rating=v; })); function setStars(v){ stars.forEach((s,i)=>s.classList.toggle('selected',i<v)); ratingResult.textContent=${(v/5)*100}%; }
+  // تحكم بالشريط
+  audio.addEventListener('loadedmetadata', ()=>{
+    progress.max = audio.duration;
+    playButton.disabled = false;
+  });
+  audio.addEventListener('timeupdate', ()=> progress.value = audio.currentTime);
+  progress.addEventListener('input', ()=> audio.currentTime = progress.value);
+  audio.addEventListener('ended', ()=>{
+    playButton.textContent = '▶';
+    progress.value = 0;
+  });
+  audio.addEventListener('error', ()=>{
+    console.error('Audio error!');
+    alert('حدث خطأ أثناء تحميل ملف الصوت.');
+  });
+  function seek(sec){
+    if (!audio.duration) return;
+    audio.currentTime = Math.min(audio.duration, Math.max(0, audio.currentTime + sec));
+  }
 
-function updateClock(){ const d=new Date(),h=d.getHours(),m=d.getMinutes();const ampm=h>=12?'م':'ص';let hh=h%12||12;hh=hh.toString().padStart(2,'0');const mm=m.toString().padStart(2,'0');document.getElementById('clock').textContent=الوقت: ${hh}:${mm} ${ampm}; } setInterval(updateClock,1000); updateClock();
+  // تقييم بالنجوم
+  if (localStorage.rating) setStars(+localStorage.rating);
+  stars.forEach(s=> s.addEventListener('click', e=>{
+    const v = +e.target.dataset.value;
+    setStars(v);
+    localStorage.rating = v;
+  }));
+  function setStars(v){
+    stars.forEach((s,i)=> s.classList.toggle('selected', i < v));
+    ratingResult.textContent = `${(v/5)*100}%`;
+  }
 
-async function getPrayerTimes(){ const addr=encodeURIComponent(countrySelect.value);const d=new Date(),day=d.getDate(),mon=d.getMonth()+1,yr=d.getFullYear();const url=https://api.aladhan.com/v1/timingsByAddress?address=${addr}&date=${day}-${mon}-${yr};try{const res=await fetch(url);const json=await res.json();if(json.code!==200)throw new Error();const t=json.data.timings;['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(key=>{let[H,MM]=t[key].split(':').map(Number);const ampm=H>=12?'م':'ص';H=H%12||12;const timeStr=${H.toString().padStart(2,'0')}:${MM.toString().padStart(2,'0')} ${ampm};document.getElementById(key.toLowerCase()).textContent=${key==='Dhuhr'?'الظهر':key==='Maghrib'?'المغرب':key==='Isha'?'العشاء':key==='Fajr'?'الفجر':'العصر'}: ${timeStr};});}catch{console.error('فشل جلب مواقيت الصلاة');}}; countrySelect.addEventListener('change',getPrayerTimes); suraSelect.addEventListener('change',playSelectedSura); getPrayerTimes(); </script>
+  // تحديث الساعة بصيغة 12 ساعة
+  function updateClock(){
+    const d = new Date(), h = d.getHours(), m = d.getMinutes();
+    const ampm = h >= 12 ? 'م' : 'ص';
+    let hh = h % 12 || 12; hh = hh.toString().padStart(2,'0');
+    const mm = m.toString().padStart(2,'0');
+    document.getElementById('clock').textContent = `الوقت: ${hh}:${mm} ${ampm}`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
 
+  // جلب مواقيت الصلاة وتحويلها لصيغة 12 ساعة مع معالجة الأخطاء
+  async function getPrayerTimes(){
+    const addr = encodeURIComponent(countrySelect.value);
+    if (!addr) return;
+    prayerError.textContent = '';
+    const d = new Date(), day = d.getDate(), mon = d.getMonth()+1, yr = d.getFullYear();
+    const url = `https://api.aladhan.com/v1/timingsByAddress?address=${addr}&date=${day}-${mon}-${yr}`;
+    try {
+      const res = await fetch(url);
+      const json = await res.json();
+      if (json.code !== 200) throw new Error('API code ' + json.code);
+      const t = json.data.timings;
+      ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(key => {
+        let [H, MM] = t[key].split(':').map(Number);
+        const ampm = H >= 12 ? 'م' : 'ص';
+        H = H % 12 || 12;
+        const timeStr = `${H.toString().padStart(2,'0')}:${MM.toString().padStart(2,'0')} ${ampm}`;
+        document.getElementById(key.toLowerCase()).textContent =
+          `${key==='Dhuhr'?'الظهر': key==='Maghrib'?'المغرب': key==='Isha'?'العشاء': key==='Fajr'?'الفجر':'العصر'}: ${timeStr}`;
+      });
+    } catch (err) {
+      console.error('فشل جلب مواقيت الصلاة', err);
+      prayerError.textContent = 'خطأ في جلب مواقيت الصلاة. حاول مرة أخرى.';
+    }
+  }
+
+  countrySelect.addEventListener('change', getPrayerTimes);
+  suraSelect.addEventListener('change', playSelectedSura);
+  getPrayerTimes();
+</script>
 </body>
 </html>
