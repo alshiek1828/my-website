@@ -1,61 +1,96 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>موقع القرآن التفاعلي</title>
+  <title>القرآن الكريم</title>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: #333; }
-    header, footer { background: #004d40; color: white; padding: 1rem; text-align: center; }
-    main { padding: 1rem; max-width: 800px; margin: auto; }
-    .controls a { margin: 0 .5rem; color: #004d40; text-decoration: none; }
-    select, .clock { width: 100%; margin: .5rem 0; padding: .5rem; font-size: 1rem; }
-    .verses { margin-top: 1rem; }
-    .verse { padding: .5rem; border-bottom: 1px solid #ddd; }
-    .rating { display: flex; gap: .2rem; }
-    .star { font-size: 1.5rem; cursor: pointer; }
-    .active { color: gold; }
-    .audio-controls { display: flex; align-items: center; gap: .5rem; margin-top: .5rem; }
-    .progress-bar { flex: 1; height: 5px; background: #ddd; border-radius: 2px; overflow: hidden; cursor: pointer; }
-    .progress { height: 100%; background: #004d40; width: 0%; }
-    .btn-open-prayer { width: 100%; padding: .7rem; background: #004d40; color: white; border: none; cursor: pointer; font-size: 1rem; margin-top: 1rem; }
-    @media (max-width: 600px) { main { padding: .5rem; } }
+    /* Reset & Base */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #fdfcf0; color: #333; line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }/* Layout */
+header, footer { text-align: center; padding: 2rem 1rem; background: linear-gradient(135deg, #00695c, #00897b); color: #fff; }
+main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+
+/* Header */
+header h1 { font-size: 3rem; letter-spacing: 2px; margin-bottom: .5rem; font-weight: bold; }
+header h2 { font-size: 1.2rem; font-style: italic; opacity: .85; margin-bottom: 1.5rem; }
+.clock { font-size: 1.2rem; opacity: .85; }
+
+/* Surah Selection */
+.surah-container { margin: 2rem 0; display: flex; flex-direction: column; gap: .5rem; }
+.surah-container label { font-weight: bold; font-size: 1.1rem; }
+select { padding: .7rem; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; }
+
+/* Audio Controls */
+.audio-controls { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem; }
+.audio-controls button { background: #00897b; border: none; color: #fff; padding: .8rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: background .3s; }
+.audio-controls button:hover { background: #00695c; }
+.progress-bar { flex: 1; height: 6px; background: #e0e0e0; border-radius: 4px; overflow: hidden; cursor: pointer; }
+.progress { height: 100%; background: #00897b; width: 0%; }
+#timeDisplay { font-size: .9rem; min-width: 80px; text-align: right; }
+
+/* Verses */
+.verses { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.verse { background: #fff; border-radius: 8px; padding: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.05); font-size: .95rem; }
+
+/* Rating */
+.rating { display: flex; justify-content: center; gap: .3rem; margin-top: .5rem; }
+.star { font-size: 1.8rem; cursor: pointer; transition: transform .2s; }
+.star:hover { transform: scale(1.2); }
+.active { color: gold; }
+
+/* Prayer Button */
+.btn-open-prayer { display: block; width: 100%; padding: 1rem; margin-bottom: 2rem; background: #ff6f00; color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: background .3s; }
+.btn-open-prayer:hover { background: #e65100; }
+
+/* Controls Links */
+.controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+.controls a { background: #fff; padding: .7rem 1.2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform .2s; }
+.controls a:hover { transform: translateY(-3px); }
+
+/* Footer */
+footer { font-size: .9rem; position: relative; }
+footer .maker { margin-top: .5rem; font-style: italic; opacity: .8; }
+
   </style>
 </head>
 <body>
   <header>
-    <h1>موقع القرآن التفاعلي</h1>
+    <h1>بسم الله الرحمن الرحيم</h1>
+    <h2>مرحباً بك في بوابتك التفاعلية لقراءة القرآن الكريم والاستماع إليه بأصوات الشيوخ بجودة عالية</h2>
     <div class="clock" id="clock"></div>
   </header>
   <main>
-    <label for="surahSelect">اختر السورة:</label>
-    <select id="surahSelect"></select>
-    <div class="rating" id="rating"></div>
+    <div class="surah-container">
+      <label for="surahSelect">اختر السورة:</label>
+      <select id="surahSelect"></select>
+      <div class="rating" id="rating"></div>
+    </div><div class="audio-controls">
+  <button id="backward">⏪</button>
+  <button id="playPause">▶️</button>
+  <button id="forward">⏩</button>
+  <div class="progress-bar" id="progressBar"><div class="progress" id="progress"></div></div>
+  <span id="timeDisplay">00:00 / 00:00</span>
+</div>
 
-    <div class="audio-controls">
-      <button id="backward">⏪</button>
-      <button id="playPause">▶️</button>
-      <button id="forward">⏩</button>
-      <div class="progress-bar" id="progressBar"><div class="progress" id="progress"></div></div>
-      <span id="timeDisplay">00:00 / 00:00</span>
-    </div>
+<div class="verses" id="verses"></div>
 
-    <div class="verses" id="verses"></div>
+<button class="btn-open-prayer" onclick="window.open('https://timesprayer.today/', '_blank')">
+  عرض مواقيت الصلاة مباشرة
+</button>
 
-    <button class="btn-open-prayer" onclick="window.open('https://timesprayer.today/', '_blank')">
-      عرض مواقيت الصلاة مباشرة
-    </button>
+<div class="controls">
+  <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+  <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
+  <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
+  <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
+</div>
 
-    <div class="controls">
-      <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-      <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
-      <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
-      <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
-    </div>
   </main>
-  <footer>&copy; 2025 موقع القرآن التفاعلي</footer>
-
-  <script>
+  <footer>
+    &copy; 2025 القرآن الكريم
+    <div class="maker">Made by AlShiek</div>
+  </footer>  <script>
     const surahSelect = document.getElementById('surahSelect');
     const versesDiv = document.getElementById('verses');
     const ratingDiv = document.getElementById('rating');
@@ -82,7 +117,7 @@
     }
     setInterval(updateClock, 1000); updateClock();
 
-    // Surah list
+    // Load Surah List
     async function loadSurahList() {
       const res = await fetch('https://api.alquran.cloud/v1/surah');
       const data = await res.json();
@@ -105,10 +140,7 @@
         const star = document.createElement('span');
         star.className = 'star' + (i <= saved ? ' active' : '');
         star.textContent = '★';
-        star.addEventListener('click', () => {
-          localStorage.setItem('rating_' + surah, i);
-          renderRating(surah);
-        });
+        star.addEventListener('click', () => { localStorage.setItem('rating_' + surah, i); renderRating(surah);} );
         ratingDiv.appendChild(star);
       }
     }
@@ -141,11 +173,8 @@
     }
 
     audio.onended = () => {
-      if (currentAyah + 1 < ayahAudios.length) {
-        playAyah(currentAyah + 1);
-      } else {
-        playPauseBtn.textContent = '▶️';
-      }
+      if (currentAyah + 1 < ayahAudios.length) playAyah(currentAyah + 1);
+      else playPauseBtn.textContent = '▶️';
     };
 
     function setupAudio() {
@@ -166,31 +195,11 @@
     }
 
     playPauseBtn.addEventListener('click', () => {
-      if (audio.paused) {
-        audio.play();
-        playPauseBtn.textContent = '⏸️';
-      } else {
-        audio.pause();
-        playPauseBtn.textContent = '▶️';
-      }
+      if (audio.paused) { audio.play(); playPauseBtn.textContent = '⏸️'; }
+      else { audio.pause(); playPauseBtn.textContent = '▶️'; }
     });
 
-    backwardBtn.addEventListener('click', () => {
-      audio.currentTime = Math.max(0, audio.currentTime - 5);
-    });
+    backwardBtn.addEventListener('click', () => audio.currentTime = Math.max(0, audio.currentTime - 5));
+    forwardBtn.addEventListener('click', () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 5));
 
-    forwardBtn.addEventListener('click', () => {
-      audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
-    });
-
-    progressBar.addEventListener('click', e => {
-      const rect = progressBar.getBoundingClientRect();
-      const pct = (e.clientX - rect.left) / rect.width;
-      audio.currentTime = pct * audio.duration;
-    });
-
-    // Init
-    loadSurahList();
-  </script>
-</body>
-</html>
+    progressBar.addEventListener
