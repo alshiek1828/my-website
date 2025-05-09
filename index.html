@@ -49,9 +49,9 @@
   <select id="citySelect">
     <option value="">اختر المدينة</option>
   </select>
-  <button id="getTimes">جلب المواقيت</button>
+  <button id="showEmbeddedTimes">عرض مواقيت الصلاة</button>
 </div>
-<div class="prayer-times" id="prayerTimes"></div>
+<div id="prayerTimesEmbed" class="prayer-times"></div>
 
 <div class="controls">
   <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
@@ -66,7 +66,6 @@
     const versesDiv = document.getElementById('verses');
     const ratingDiv = document.getElementById('rating');
     const clockEl = document.getElementById('clock');
-    const prayerTimesDiv = document.getElementById('prayerTimes');
     const playPauseBtn = document.getElementById('playPause');
     const backwardBtn = document.getElementById('backward');
     const forwardBtn = document.getElementById('forward');
@@ -75,6 +74,8 @@
     const timeDisplay = document.getElementById('timeDisplay');
     const countrySelect = document.getElementById('countrySelect');
     const citySelect = document.getElementById('citySelect');
+    const showEmbeddedTimesBtn = document.getElementById('showEmbeddedTimes');
+    const prayerTimesEmbed = document.getElementById('prayerTimesEmbed');
 
     let audio = new Audio();
     let ayahAudios = [];
@@ -198,7 +199,7 @@
       audio.currentTime = pct * audio.duration;
     });
 
-    // Prayer times selects
+    // Prayer times using iframe embed
     const citiesByCountry = {
       "لبنان": ["بيروت", "طرابلس", "صيدا", "صور", "زحلة", "بعلبك", "مجدل عنجر", "الضنية"],
       "مصر": ["القاهرة", "الإسكندرية", "الجيزة", "أسوان", "الأقصر", "المنصورة"],
@@ -218,36 +219,20 @@
       }
     });
 
-    function formatTo12Hour(timeStr) {
-      const [hour, minute] = timeStr.split(':').map(Number);
-      const period = hour >= 12 ? 'م' : 'ص';
-      const h12 = hour % 12 || 12;
-      return `${h12}:${minute.toString().padStart(2, '0')} ${period}`;
-    }
-
-    async function fetchPrayerTimes() {
-      const city = citySelect.value;
-      const country = countrySelect.value;
-      if (!city || !country) return;
-      localStorage.setItem('city', city);
-      localStorage.setItem('country', country);
-      const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=2`);
-      const data = await res.json();
-      const t = data.data.timings;
-      prayerTimesDiv.innerHTML = `
-        <p>الفجر: ${formatTo12Hour(t.Fajr)}</p>
-        <p>الظهر: ${formatTo12Hour(t.Dhuhr)}</p>
-        <p>العصر: ${formatTo12Hour(t.Asr)}</p>
-        <p>المغرب: ${formatTo12Hour(t.Maghrib)}</p>
-        <p>العشاء: ${formatTo12Hour(t.Isha)}</p>
-      `;
-    }
-
-    document.getElementById('getTimes').addEventListener('click', fetchPrayerTimes);
+    showEmbeddedTimesBtn.addEventListener('click', () => {
+      const country = encodeURIComponent(countrySelect.value);
+      const city = encodeURIComponent(citySelect.value);
+      if (!countrySelect.value || !citySelect.value) {
+        alert('يرجى اختيار الدولة والمدينة');
+        return;
+      }
+      prayerTimesEmbed.innerHTML = `<iframe src="https://timesprayer.today/?country=${country}&city=${city}" style="width:100%;height:400px;border:none;" loading="lazy"></iframe>`;
+      localStorage.setItem('country', countrySelect.value);
+      localStorage.setItem('city', citySelect.value);
+    });
 
     // Init
     loadSurahList();
-    // Load saved prayer defaults
     const savedCountry = localStorage.getItem('country');
     const savedCity = localStorage.getItem('city');
     if (savedCountry) {
@@ -255,7 +240,7 @@
       countrySelect.dispatchEvent(new Event('change'));
       setTimeout(() => {
         citySelect.value = savedCity;
-        fetchPrayerTimes();
+        showEmbeddedTimesBtn.click();
       }, 300);
     }
   </script></body>
