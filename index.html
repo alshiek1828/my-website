@@ -28,43 +28,44 @@
   <main>
     <label for="surahSelect">اختر السورة:</label>
     <select id="surahSelect"></select>
-    <div class="rating" id="rating"></div>
+    <div class="rating" id="rating"></div><div class="audio-controls">
+  <button id="backward">⏪</button>
+  <button id="playPause">▶️</button>
+  <button id="forward">⏩</button>
+  <div class="progress-bar" id="progressBar"><div class="progress" id="progress"></div></div>
+  <span id="timeDisplay">00:00 / 00:00</span>
+</div>
 
-    <div class="audio-controls">
-      <button id="backward">⏪</button>
-      <button id="playPause">▶️</button>
-      <button id="forward">⏩</button>
-      <div class="progress-bar" id="progressBar"><div class="progress" id="progress"></div></div>
-      <span id="timeDisplay">00:00 / 00:00</span>
-    </div>
+<div class="verses" id="verses"></div>
 
-    <div class="verses" id="verses"></div>
+<h2>مواقيت الصلاة</h2>
+<div>
+  <select id="countrySelect">
+    <option value="">اختر الدولة</option>
+    <option value="لبنان">لبنان</option>
+    <option value="مصر">مصر</option>
+    <option value="السعودية">السعودية</option>
+  </select>
+  <select id="citySelect">
+    <option value="">اختر المدينة</option>
+  </select>
+  <button id="getTimes">جلب المواقيت</button>
+</div>
+<div class="prayer-times" id="prayerTimes"></div>
 
-    <h2>مواقيت الصلاة</h2>
-    <div>
-      <input type="text" id="city" placeholder="المدينة" />
-      <input type="text" id="country" placeholder="الدولة" />
-      <button id="getTimes">جلب المواقيت</button>
-    </div>
-    <div class="prayer-times" id="prayerTimes"></div>
+<div class="controls">
+  <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+  <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
+  <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
+  <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
+</div>
 
-    <div class="controls">
-      <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-      <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
-      <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
-      <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
-    </div>
   </main>
-  <footer>&copy; 2025 موقع القرآن التفاعلي</footer>
-
-  <script>
+  <footer>&copy; 2025 موقع القرآن التفاعلي</footer>  <script>
     const surahSelect = document.getElementById('surahSelect');
     const versesDiv = document.getElementById('verses');
     const ratingDiv = document.getElementById('rating');
     const clockEl = document.getElementById('clock');
-    const cityInput = document.getElementById('city');
-    const countryInput = document.getElementById('country');
-    const getTimesBtn = document.getElementById('getTimes');
     const prayerTimesDiv = document.getElementById('prayerTimes');
     const playPauseBtn = document.getElementById('playPause');
     const backwardBtn = document.getElementById('backward');
@@ -72,6 +73,8 @@
     const progressBar = document.getElementById('progressBar');
     const progress = document.getElementById('progress');
     const timeDisplay = document.getElementById('timeDisplay');
+    const countrySelect = document.getElementById('countrySelect');
+    const citySelect = document.getElementById('citySelect');
 
     let audio = new Audio();
     let ayahAudios = [];
@@ -195,12 +198,25 @@
       audio.currentTime = pct * audio.duration;
     });
 
-    // Prayer times
-    function loadPrayerDefaults() {
-      cityInput.value = localStorage.getItem('city') || '';
-      countryInput.value = localStorage.getItem('country') || '';
-      if (cityInput.value && countryInput.value) fetchPrayerTimes();
-    }
+    // Prayer times selects
+    const citiesByCountry = {
+      "لبنان": ["بيروت", "طرابلس", "صيدا", "صور", "زحلة", "بعلبك", "مجدل عنجر", "الضنية"],
+      "مصر": ["القاهرة", "الإسكندرية", "الجيزة", "أسوان", "الأقصر", "المنصورة"],
+      "السعودية": ["الرياض", "جدة", "مكة", "المدينة", "الدمام", "الطائف"]
+    };
+
+    countrySelect.addEventListener('change', () => {
+      const country = countrySelect.value;
+      citySelect.innerHTML = '<option value="">اختر المدينة</option>';
+      if (citiesByCountry[country]) {
+        citiesByCountry[country].forEach(city => {
+          const opt = document.createElement('option');
+          opt.value = city;
+          opt.textContent = city;
+          citySelect.appendChild(opt);
+        });
+      }
+    });
 
     function formatTo12Hour(timeStr) {
       const [hour, minute] = timeStr.split(':').map(Number);
@@ -210,12 +226,12 @@
     }
 
     async function fetchPrayerTimes() {
-      const city = cityInput.value.trim();
-      const country = countryInput.value.trim();
+      const city = citySelect.value;
+      const country = countrySelect.value;
       if (!city || !country) return;
       localStorage.setItem('city', city);
       localStorage.setItem('country', country);
-      const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=2`);
+      const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=2`);
       const data = await res.json();
       const t = data.data.timings;
       prayerTimesDiv.innerHTML = `
@@ -227,13 +243,20 @@
       `;
     }
 
-    // Events
-    surahSelect.addEventListener('change', () => loadSurah(surahSelect.value));
-    getTimesBtn.addEventListener('click', fetchPrayerTimes);
+    document.getElementById('getTimes').addEventListener('click', fetchPrayerTimes);
 
     // Init
     loadSurahList();
-    loadPrayerDefaults();
-  </script>
-</body>
+    // Load saved prayer defaults
+    const savedCountry = localStorage.getItem('country');
+    const savedCity = localStorage.getItem('city');
+    if (savedCountry) {
+      countrySelect.value = savedCountry;
+      countrySelect.dispatchEvent(new Event('change'));
+      setTimeout(() => {
+        citySelect.value = savedCity;
+        fetchPrayerTimes();
+      }, 300);
+    }
+  </script></body>
 </html>
