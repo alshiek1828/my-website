@@ -6,76 +6,87 @@
   <style>
     /* Reset & Base */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #fdfcf0; color: #333; line-height: 1.6; }
-    a { color: inherit; text-decoration: none; }/* Layout */
-header, footer { text-align: center; padding: 2rem 1rem; background: linear-gradient(135deg, #00695c, #00897b); color: #fff; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #111; color: #eee; line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }/* Flame Text Animation */
+@keyframes flame {
+  0%,100% { text-shadow: 
+    0 0 2px #ff6,
+    0 0 10px #f80,
+    0 0 20px #f40;
+  }
+  50% { text-shadow:
+    0 0 5px #ff6,
+    0 0 15px #f80,
+    0 0 30px #f40;
+  }
+}
+
+/* Layout */
+header, footer { text-align: center; padding: 2rem 1rem; background: #000; color: #fff; }
 main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
 
 /* Header */
-header h1 { font-size: 3rem; letter-spacing: 2px; margin-bottom: .5rem; font-weight: bold; }
-header h2 { font-size: 1.2rem; font-style: italic; opacity: .85; margin-bottom: 1.5rem; }
-.clock { font-size: 1.2rem; opacity: .85; }
+header h1 { font-size: 3rem; letter-spacing: 2px; margin-bottom: .5rem; font-weight: bold;
+  background: linear-gradient(45deg, #ff4500, #ff8c00, #ffd700);
+  -webkit-background-clip: text; color: transparent;
+  animation: flame 1.5s infinite alternate;
+}
+header h2 { font-size: 1.2rem; font-style: italic; opacity: .9; margin-bottom: 1.5rem;
+  color: #ffde7d;
+  text-shadow: 0 0 6px #ff8c00;
+}
+.clock { font-size: 1.2rem; opacity: .9;
+  font-weight: bold; color: #f8f871;
+  text-shadow: 0 0 4px #f80;
+}
 
 /* Surah Selection */
 .surah-container { margin: 2rem 0; display: flex; flex-direction: column; gap: .5rem; }
-.surah-container label { font-weight: bold; font-size: 1.1rem; }
-select { padding: .7rem; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; }
+.surah-container label { font-weight: bold; font-size: 1.1rem;
+  background: linear-gradient(45deg, #ff8c00, #ffa500);
+  -webkit-background-clip: text; color: transparent;
+  text-shadow: 0 0 4px #f40;
+  animation: flame 2s infinite alternate-reverse;
+}
+select { padding: .7rem; border-radius: 8px; border: none; font-size: 1rem; background: #222; color: #fff;
+  box-shadow: 0 0 8px rgba(255,140,0,0.5);
+}
 
 /* Audio Controls */
 .audio-controls { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem; }
-.audio-controls button { background: #00897b; border: none; color: #fff; padding: .8rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: background .3s; }
-.audio-controls button:hover { background: #00695c; }
-.progress-bar { flex: 1; height: 6px; background: #e0e0e0; border-radius: 4px; overflow: hidden; cursor: pointer; }
-.progress { height: 100%; background: #00897b; width: 0%; }
+.audio-controls button { background: #333; border: none; color: #fff; padding: .8rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: background .3s; }
+.audio-controls button:hover { background: #444; }
+.progress-bar { flex: 1; height: 6px; background: #222; border-radius: 4px; overflow: hidden; cursor: pointer; }
+.progress { height: 100%; background: #ff8c00; width: 0%; }
 #timeDisplay { font-size: .9rem; min-width: 80px; text-align: right; }
 
 /* Verses */
 .verses { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-.verse { background: #fff; border-radius: 8px; padding: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.05); font-size: .95rem; }
+.verse { background: #222; border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(255,140,0,0.3); font-size: .95rem; }
 
 /* Rating */
 .rating { display: flex; justify-content: center; gap: .3rem; margin-top: .5rem; }
-.star { font-size: 1.8rem; cursor: pointer; transition: transform .2s; }
+.star { font-size: 1.8rem; cursor: pointer; transition: transform .2s; color: #888; }
 .star:hover { transform: scale(1.2); }
 .active { color: gold; }
 
 /* Prayer Button */
-.btn-open-prayer { display: block; width: 100%; padding: 1rem; margin-bottom: 2rem; background: #ff6f00; color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: background .3s; }
-.btn-open-prayer:hover { background: #e65100; }
+.btn-open-prayer { display: block; width: 100%; padding: 1rem; margin-bottom: 2rem; background: #ff4500; color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: background .3s; }
+.btn-open-prayer:hover { background: #e63e00; }
 
 /* Controls Links */
 .controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
-.controls a {
-  position: relative;
-  padding: .7rem 1.2rem;
-  border-radius: 8px;
-  font-weight: bold;
-  background: linear-gradient(45deg, #ff8a00, #e52e71);
-  color: transparent;
-  background-clip: text;
-  -webkit-background-clip: text;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-  transition: transform .2s;
-}
-.controls a::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.1);
-  border-radius: 8px;
-  opacity: 0;
-  transition: opacity .3s;
-}
-.controls a:hover {
-  transform: translateY(-3px);
-}
-.controls a:hover::before {
-  opacity: 1;
+.controls a { position: relative; padding: .7rem 1.2rem; border-radius: 8px; font-weight: bold;
+  background: linear-gradient(45deg, #ff0080, #ff8c00);
+  -webkit-background-clip: text; color: transparent;
+  text-shadow: 0 0 6px rgba(255,140,0,0.7);
 }
 
 /* Footer */
 footer { font-size: .9rem; position: relative; }
-footer .maker { margin-top: .5rem; font-style: italic; opacity: .8; }
+footer .maker { margin-top: .5rem; font-style: italic;
+  color: #ffde7d; text-shadow: 0 0 4px #f80;
+}
 
   </style>
 </head>
@@ -162,7 +173,7 @@ footer .maker { margin-top: .5rem; font-style: italic; opacity: .8; }
     // Rating
     function renderRating(surah) {
       ratingDiv.innerHTML = '';
-      const saved = localStorage.getItem('rating_' + surah) || 0;
+      const(saved) = localStorage.getItem('rating_' + surah) || 0;
       for (let i = 1; i <= 5; i++) {
         const star = document.createElement('span');
         star.className = 'star' + (i <= saved ? ' active' : '');
