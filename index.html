@@ -28,157 +28,212 @@
   <main>
     <label for="surahSelect">اختر السورة:</label>
     <select id="surahSelect"></select>
-    <div class="rating" id="rating"></div><div class="audio-controls">
-  <button id="backward">⏪</button>
-  <button id="playPause">▶️</button>
-  <button id="forward">⏩</button>
-  <div class="progress-bar" id="progressBar"><div class="progress" id="progress"></div></div>
-  <span id="timeDisplay">00:00 / 00:00</span>
-</div>
-<div class="verses" id="verses"></div>
+    <div class="rating" id="rating"></div>
 
-<h2>مواقيت الصلاة</h2>
-<div>
-  <input type="text" id="city" placeholder="المدينة" />
-  <input type="text" id="country" placeholder="الدولة" />
-  <button id="getTimes">جلب المواقيت</button>
-</div>
-<div class="prayer-times" id="prayerTimes"></div>
+    <div class="audio-controls">
+      <button id="backward">⏪</button>
+      <button id="playPause">▶️</button>
+      <button id="forward">⏩</button>
+      <div class="progress-bar" id="progressBar"><div class="progress" id="progress"></div></div>
+      <span id="timeDisplay">00:00 / 00:00</span>
+    </div>
 
-<div class="controls">
-  <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-  <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
-  <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
-  <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
-</div>
+    <div class="verses" id="verses"></div>
 
+    <h2>مواقيت الصلاة</h2>
+    <div>
+      <input type="text" id="city" placeholder="المدينة" />
+      <input type="text" id="country" placeholder="الدولة" />
+      <button id="getTimes">جلب المواقيت</button>
+    </div>
+    <div class="prayer-times" id="prayerTimes"></div>
+
+    <div class="controls">
+      <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+      <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
+      <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
+      <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
+    </div>
   </main>
-  <footer>&copy; 2025 موقع القرآن التفاعلي</footer>  <script>
-  const surahSelect = document.getElementById('surahSelect');
-  const versesDiv = document.getElementById('verses');
-  const ratingDiv = document.getElementById('rating');
-  const clockEl = document.getElementById('clock');
-  const cityInput = document.getElementById('city');
-  const countryInput = document.getElementById('country');
-  const getTimesBtn = document.getElementById('getTimes');
-  const prayerTimesDiv = document.getElementById('prayerTimes');
-  const playPauseBtn = document.getElementById('playPause');
-  const backwardBtn = document.getElementById('backward');
-  const forwardBtn = document.getElementById('forward');
-  const progressBar = document.getElementById('progressBar');
-  const progress = document.getElementById('progress');
-  const timeDisplay = document.getElementById('timeDisplay');
-  let audio = new Audio();
+  <footer>&copy; 2025 موقع القرآن التفاعلي</footer>
 
-  // Clock
-  function updateClock() {
-    const now = new Date();
-    let h = now.getHours();
-    const m = now.getMinutes().toString().padStart(2, '0');
-    const ampm = h >= 12 ? 'م' : 'ص';
-    h = h % 12 || 12;
-    clockEl.textContent = `${h}:${m} ${ampm}`;
-  }
-  setInterval(updateClock, 1000); updateClock();
+  <script>
+    const surahSelect = document.getElementById('surahSelect');
+    const versesDiv = document.getElementById('verses');
+    const ratingDiv = document.getElementById('rating');
+    const clockEl = document.getElementById('clock');
+    const cityInput = document.getElementById('city');
+    const countryInput = document.getElementById('country');
+    const getTimesBtn = document.getElementById('getTimes');
+    const prayerTimesDiv = document.getElementById('prayerTimes');
+    const playPauseBtn = document.getElementById('playPause');
+    const backwardBtn = document.getElementById('backward');
+    const forwardBtn = document.getElementById('forward');
+    const progressBar = document.getElementById('progressBar');
+    const progress = document.getElementById('progress');
+    const timeDisplay = document.getElementById('timeDisplay');
 
-  // Surah list
-  async function loadSurahList() {
-    const res = await fetch('https://api.alquran.cloud/v1/surah');
-    const data = await res.json();
-    data.data.forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s.number; opt.text = s.englishName + ' - ' + s.name;
-      surahSelect.add(opt);
-    });
-    const last = localStorage.getItem('lastSurah') || '1';
-    surahSelect.value = last;
-    loadSurah(last);
-  }
+    let audio = new Audio();
+    let ayahAudios = [];
+    let currentAyah = 0;
 
-  // Rating
-  function renderRating(surah) {
-    ratingDiv.innerHTML = '';
-    const saved = localStorage.getItem('rating_' + surah) || 0;
-    for (let i = 1; i <= 5; i++) {
-      const star = document.createElement('span');
-      star.className = 'star' + (i <= saved ? ' active' : '');
-      star.textContent = '★';
-      star.addEventListener('click', () => {
-        localStorage.setItem('rating_' + surah, i);
-        renderRating(surah);
-      });
-      ratingDiv.appendChild(star);
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      let h = now.getHours();
+      const m = now.getMinutes().toString().padStart(2, '0');
+      const ampm = h >= 12 ? 'م' : 'ص';
+      h = h % 12 || 12;
+      clockEl.textContent = `${h}:${m} ${ampm}`;
     }
-  }
+    setInterval(updateClock, 1000); updateClock();
 
-  // Load verses and audio
-  async function loadSurah(number) {
-    localStorage.setItem('lastSurah', number);
-    renderRating(number);
-    const res = await fetch(`https://api.alquran.cloud/v1/surah/${number}/ar.alafasy`);
-    const data = await res.json();
-    versesDiv.innerHTML = '';
-    data.data.ayahs.forEach(v => {
-      const div = document.createElement('div'); div.className = 'verse';
-      div.textContent = v.numberInSurah + '. ' + v.text;
-      versesDiv.appendChild(div);
+    // Surah list
+    async function loadSurahList() {
+      const res = await fetch('https://api.alquran.cloud/v1/surah');
+      const data = await res.json();
+      data.data.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.number;
+        opt.text = s.englishName + ' - ' + s.name;
+        surahSelect.add(opt);
+      });
+      const last = localStorage.getItem('lastSurah') || '1';
+      surahSelect.value = last;
+      loadSurah(last);
+    }
+
+    // Rating
+    function renderRating(surah) {
+      ratingDiv.innerHTML = '';
+      const saved = localStorage.getItem('rating_' + surah) || 0;
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.className = 'star' + (i <= saved ? ' active' : '');
+        star.textContent = '★';
+        star.addEventListener('click', () => {
+          localStorage.setItem('rating_' + surah, i);
+          renderRating(surah);
+        });
+        ratingDiv.appendChild(star);
+      }
+    }
+
+    // Load verses and audio
+    async function loadSurah(number) {
+      localStorage.setItem('lastSurah', number);
+      renderRating(number);
+      const res = await fetch(`https://api.alquran.cloud/v1/surah/${number}/ar.alafasy`);
+      const data = await res.json();
+      versesDiv.innerHTML = '';
+      ayahAudios = data.data.ayahs.map(v => v.audio);
+      currentAyah = 0;
+      data.data.ayahs.forEach(v => {
+        const div = document.createElement('div');
+        div.className = 'verse';
+        div.textContent = v.numberInSurah + '. ' + v.text;
+        versesDiv.appendChild(div);
+      });
+      setupAudio();
+      playAyah(currentAyah);
+    }
+
+    function playAyah(index) {
+      if (index >= ayahAudios.length) return;
+      audio.src = ayahAudios[index];
+      audio.play();
+      playPauseBtn.textContent = '⏸️';
+      currentAyah = index;
+    }
+
+    audio.onended = () => {
+      if (currentAyah + 1 < ayahAudios.length) {
+        playAyah(currentAyah + 1);
+      } else {
+        playPauseBtn.textContent = '▶️';
+      }
+    };
+
+    function setupAudio() {
+      playPauseBtn.textContent = '▶️';
+      audio.currentTime = 0;
+      audio.addEventListener('timeupdate', () => {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        progress.style.width = pct + '%';
+        timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+      });
+    }
+
+    function formatTime(sec) {
+      if (isNaN(sec)) return '00:00';
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = Math.floor(sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = '⏸️';
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = '▶️';
+      }
     });
-    audio.src = data.data.ayahs.map(v => v.audio).join(',');
-    setupAudio();
-  }
 
-  // Audio controls
-  function setupAudio() {
-    playPauseBtn.textContent = '▶️';
-    audio.currentTime = 0;
-    audio.addEventListener('timeupdate', () => {
-      const pct = (audio.currentTime / audio.duration) * 100;
-      progress.style.width = pct + '%';
-      timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    backwardBtn.addEventListener('click', () => {
+      audio.currentTime = Math.max(0, audio.currentTime - 5);
     });
-  }
-  function formatTime(sec) { if (isNaN(sec)) return '00:00'; const m = Math.floor(sec/60).toString().padStart(2,'0'); const s = Math.floor(sec%60).toString().padStart(2,'0'); return `${m}:${s}`; }
-  playPauseBtn.addEventListener('click', () => {
-    audio.paused ? audio.play() : audio.pause();
-    playPauseBtn.textContent = audio.paused ? '▶️' : '⏸️';
-  });
-  backwardBtn.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 5); });
-  forwardBtn.addEventListener('click', () => { audio.currentTime = Math.min(audio.duration, audio.currentTime + 5); });
-  progressBar.addEventListener('click', e => {
-    const rect = progressBar.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-  });
 
-  // Prayer times
-  function loadPrayerDefaults() {
-    cityInput.value = localStorage.getItem('city') || '';
-    countryInput.value = localStorage.getItem('country') || '';
-    if (cityInput.value && countryInput.value) fetchPrayerTimes();
-  }
-  async function fetchPrayerTimes() {
-    const city = cityInput.value.trim(); const country = countryInput.value.trim();
-    if (!city || !country) return;
-    localStorage.setItem('city', city);
-    localStorage.setItem('country', country);
-    const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=2`);
-    const data = await res.json();
-    const t = data.data.timings;
-    prayerTimesDiv.innerHTML = `
-      <p>الفجر: ${t.Fajr}</p>
-      <p>الظهر: ${t.Dhuhr}</p>
-      <p>العصر: ${t.Asr}</p>
-      <p>المغرب: ${t.Maghrib}</p>
-      <p>العشاء: ${t.Isha}</p>
-    `;
-  }
+    forwardBtn.addEventListener('click', () => {
+      audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+    });
 
-  // Events
-  surahSelect.addEventListener('change', () => loadSurah(surahSelect.value));
-  getTimesBtn.addEventListener('click', fetchPrayerTimes);
+    progressBar.addEventListener('click', e => {
+      const rect = progressBar.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pct * audio.duration;
+    });
 
-  // Init
-  loadSurahList();
-  loadPrayerDefaults();
-  </script></body>
+    // Prayer times
+    function loadPrayerDefaults() {
+      cityInput.value = localStorage.getItem('city') || '';
+      countryInput.value = localStorage.getItem('country') || '';
+      if (cityInput.value && countryInput.value) fetchPrayerTimes();
+    }
+
+    function formatTo12Hour(timeStr) {
+      const [hour, minute] = timeStr.split(':').map(Number);
+      const period = hour >= 12 ? 'م' : 'ص';
+      const h12 = hour % 12 || 12;
+      return `${h12}:${minute.toString().padStart(2, '0')} ${period}`;
+    }
+
+    async function fetchPrayerTimes() {
+      const city = cityInput.value.trim();
+      const country = countryInput.value.trim();
+      if (!city || !country) return;
+      localStorage.setItem('city', city);
+      localStorage.setItem('country', country);
+      const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=2`);
+      const data = await res.json();
+      const t = data.data.timings;
+      prayerTimesDiv.innerHTML = `
+        <p>الفجر: ${formatTo12Hour(t.Fajr)}</p>
+        <p>الظهر: ${formatTo12Hour(t.Dhuhr)}</p>
+        <p>العصر: ${formatTo12Hour(t.Asr)}</p>
+        <p>المغرب: ${formatTo12Hour(t.Maghrib)}</p>
+        <p>العشاء: ${formatTo12Hour(t.Isha)}</p>
+      `;
+    }
+
+    // Events
+    surahSelect.addEventListener('change', () => loadSurah(surahSelect.value));
+    getTimesBtn.addEventListener('click', fetchPrayerTimes);
+
+    // Init
+    loadSurahList();
+    loadPrayerDefaults();
+  </script>
+</body>
 </html>
