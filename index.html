@@ -9,7 +9,7 @@
     body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #111; color: #eee; line-height: 1.6; }
     a { color: inherit; text-decoration: none; }/* Flame Text Animation */
 @keyframes flame {
-  0%,100% { text-shadow: 
+  0%,100% { text-shadow:
     0 0 2px #ff6,
     0 0 10px #f80,
     0 0 20px #f40;
@@ -26,43 +26,62 @@ header, footer { text-align: center; padding: 2rem 1rem; background: #000; color
 main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
 
 /* Header */
-header h1 { font-size: 3rem; letter-spacing: 2px; margin-bottom: .5rem; font-weight: bold;
+header h1 {
+  font-size: 3rem; letter-spacing: 2px; margin-bottom: .5rem; font-weight: bold;
   background: linear-gradient(45deg, #ff4500, #ff8c00, #ffd700);
   -webkit-background-clip: text; color: transparent;
   animation: flame 1.5s infinite alternate;
 }
-header h2 { font-size: 1.2rem; font-style: italic; opacity: .9; margin-bottom: 1.5rem;
-  color: #ffde7d;
-  text-shadow: 0 0 6px #ff8c00;
+header h2 {
+  font-size: 1.2rem; font-style: italic; opacity: .9; margin-bottom: 1.5rem;
+  color: #ffde7d; text-shadow: 0 0 6px #ff8c00;
 }
-.clock { font-size: 1.2rem; opacity: .9;
-  font-weight: bold; color: #f8f871;
-  text-shadow: 0 0 4px #f80;
+.clock {
+  font-size: 1.2rem; opacity: .9; font-weight: bold;
+  color: #f8f871; text-shadow: 0 0 4px #f80;
 }
 
 /* Surah Selection */
 .surah-container { margin: 2rem 0; display: flex; flex-direction: column; gap: .5rem; }
-.surah-container label { font-weight: bold; font-size: 1.1rem;
+.surah-container label {
+  font-weight: bold; font-size: 1.1rem;
   background: linear-gradient(45deg, #ff8c00, #ffa500);
   -webkit-background-clip: text; color: transparent;
   text-shadow: 0 0 4px #f40;
   animation: flame 2s infinite alternate-reverse;
 }
-select { padding: .7rem; border-radius: 8px; border: none; font-size: 1rem; background: #222; color: #fff;
+select {
+  padding: .7rem; border-radius: 8px; border: none; font-size: 1rem;
+  background: #222; color: #fff;
   box-shadow: 0 0 8px rgba(255,140,0,0.5);
 }
 
 /* Audio Controls */
 .audio-controls { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem; }
-.audio-controls button { background: #333; border: none; color: #fff; padding: .8rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: background .3s; }
+.audio-controls button {
+  background: #333; border: none; color: #fff; padding: .8rem;
+  border-radius: 50%; font-size: 1.2rem; cursor: pointer;
+  transition: background .3s;
+}
 .audio-controls button:hover { background: #444; }
-.progress-bar { flex: 1; height: 6px; background: #222; border-radius: 4px; overflow: hidden; cursor: pointer; }
+.progress-bar {
+  flex: 1; height: 6px; background: #222;
+  border-radius: 4px; overflow: hidden; cursor: pointer;
+}
 .progress { height: 100%; background: #ff8c00; width: 0%; }
 #timeDisplay { font-size: .9rem; min-width: 80px; text-align: right; }
 
 /* Verses */
-.verses { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-.verse { background: #222; border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(255,140,0,0.3); font-size: .95rem; }
+.verses {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem; margin-bottom: 2rem;
+}
+.verse {
+  background: #222; border-radius: 8px; padding: 1rem;
+  box-shadow: 0 0 10px rgba(255,140,0,0.3);
+  font-size: .95rem;
+}
 
 /* Rating */
 .rating { display: flex; justify-content: center; gap: .3rem; margin-top: .5rem; }
@@ -71,12 +90,22 @@ select { padding: .7rem; border-radius: 8px; border: none; font-size: 1rem; back
 .active { color: gold; }
 
 /* Prayer Button */
-.btn-open-prayer { display: block; width: 100%; padding: 1rem; margin-bottom: 2rem; background: #ff4500; color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: background .3s; }
+.btn-open-prayer {
+  display: block; width: 100%; padding: 1rem; margin-bottom: 2rem;
+  background: #ff4500; color: #fff; border: none;
+  border-radius: 8px; font-size: 1.1rem; cursor: pointer;
+  transition: background .3s;
+}
 .btn-open-prayer:hover { background: #e63e00; }
 
 /* Controls Links */
-.controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
-.controls a { position: relative; padding: .7rem 1.2rem; border-radius: 8px; font-weight: bold;
+.controls {
+  display: flex; justify-content: center;
+  flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+}
+.controls a {
+  position: relative; padding: .7rem 1.2rem; border-radius: 8px;
+  font-weight: bold;
   background: linear-gradient(45deg, #ff0080, #ff8c00);
   -webkit-background-clip: text; color: transparent;
   text-shadow: 0 0 6px rgba(255,140,0,0.7);
@@ -84,7 +113,8 @@ select { padding: .7rem; border-radius: 8px; border: none; font-size: 1rem; back
 
 /* Footer */
 footer { font-size: .9rem; position: relative; }
-footer .maker { margin-top: .5rem; font-style: italic;
+footer .maker {
+  margin-top: .5rem; font-style: italic;
   color: #ffde7d; text-shadow: 0 0 4px #f80;
 }
 
@@ -127,124 +157,113 @@ footer .maker { margin-top: .5rem; font-style: italic;
     &copy; 2025 القرآن الكريم
     <div class="maker">Made by AlShiek</div>
   </footer>  <script>
+    // عنصر القائمة
     const surahSelect = document.getElementById('surahSelect');
-    const versesDiv = document.getElementById('verses');
-    const ratingDiv = document.getElementById('rating');
-    const clockEl = document.getElementById('clock');
-    const playPauseBtn = document.getElementById('playPause');
+    const versesDiv   = document.getElementById('verses');
+    const ratingDiv   = document.getElementById('rating');
+    const clockEl     = document.getElementById('clock');
+    const playPauseBtn= document.getElementById('playPause');
     const backwardBtn = document.getElementById('backward');
-    const forwardBtn = document.getElementById('forward');
+    const forwardBtn  = document.getElementById('forward');
     const progressBar = document.getElementById('progressBar');
-    const progress = document.getElementById('progress');
+    const progress    = document.getElementById('progress');
     const timeDisplay = document.getElementById('timeDisplay');
 
     let audio = new Audio();
     let ayahAudios = [];
     let currentAyah = 0;
 
-    // Clock
+    // دالة التوقيت
     function updateClock() {
       const now = new Date();
       let h = now.getHours();
-      const m = now.getMinutes().toString().padStart(2, '0');
-      const ampm = h >= 12 ? 'م' : 'ص';
-      h = h % 12 || 12;
+      const m = now.getMinutes().toString().padStart(2,'0');
+      const ampm = h>=12?'م':'ص';
+      h = h%12||12;
       clockEl.textContent = `${h}:${m} ${ampm}`;
     }
-    setInterval(updateClock, 1000); updateClock();
+    setInterval(updateClock,1000);
+    updateClock();
 
-    // Load Surah List
-    async function loadSurahList() {
+    // جلب قائمة السور
+    async function loadSurahList(){
       const res = await fetch('https://api.alquran.cloud/v1/surah');
       const data = await res.json();
-      data.data.forEach(s => {
+      data.data.forEach(s=>{
         const opt = document.createElement('option');
         opt.value = s.number;
-        opt.text = `${s.number}. ${s.englishName} - ${s.name}`;
-        surahSelect.add(opt);
+        opt.textContent = `${s.number}. ${s.englishName} - ${s.name}`;
+        surahSelect.appendChild(opt);
       });
-      const last = localStorage.getItem('lastSurah') || '1';
-      surahSelect.value = last;
+      const last = localStorage.getItem('lastSurah')||'1';
+      surahSelect.value=last;
       loadSurah(last);
     }
 
-    surahSelect.addEventListener('change', () => loadSurah(surahSelect.value));
+    // عند تغيير الاختيار
+    surahSelect.addEventListener('change',e=> loadSurah(e.target.value));
 
-    // Rating
-    function renderRating(surah) {
-      ratingDiv.innerHTML = '';
-      const(saved) = localStorage.getItem('rating_' + surah) || 0;
-      for (let i = 1; i <= 5; i++) {
-        const star = document.createElement('span');
-        star.className = 'star' + (i <= saved ? ' active' : '');
-        star.textContent = '★';
-        star.addEventListener('click', () => { localStorage.setItem('rating_' + surah, i); renderRating(surah);} );
+    // تفعيل التقييم
+    function renderRating(surah){
+      ratingDiv.innerHTML='';
+      const saved=localStorage.getItem('rating_'+surah)||0;
+      for(let i=1;i<=5;i++){
+        const star=document.createElement('span');
+        star.className='star'+(i<=saved?' active':'');
+        star.textContent='★';
+        star.addEventListener('click',()=>{localStorage.setItem('rating_'+surah,i);renderRating(surah);});
         ratingDiv.appendChild(star);
       }
     }
 
-    async function loadSurah(number) {
-      localStorage.setItem('lastSurah', number);
+    // جلب الآيات وتشغيل الصوت
+    async function loadSurah(number){
+      localStorage.setItem('lastSurah',number);
       renderRating(number);
-      const res = await fetch(`https://api.alquran.cloud/v1/surah/${number}/ar.alafasy`);
-      const data = await res.json();
-      versesDiv.innerHTML = '';
-      ayahAudios = data.data.ayahs.map(v => v.audio);
-      currentAyah = 0;
-      data.data.ayahs.forEach(v => {
-        const div = document.createElement('div');
-        div.className = 'verse';
-        div.textContent = v.numberInSurah + '. ' + v.text;
-        versesDiv.appendChild(div);
+      const res=await fetch(`https://api.alquran.cloud/v1/surah/${number}/ar.alafasy`);
+      const dat=await res.json();
+      versesDiv.innerHTML='';
+      ayahAudios=dat.data.ayahs.map(v=>v.audio);
+      currentAyah=0;
+      dat.data.ayahs.forEach(v=>{
+        const d=document.createElement('div');
+        d.className='verse';
+        d.textContent=`${v.numberInSurah}. ${v.text}`;
+        versesDiv.appendChild(d);
       });
       setupAudio();
       playAyah(currentAyah);
     }
 
-    function playAyah(index) {
-      if (index >= ayahAudios.length) return;
-      audio.src = ayahAudios[index];
-      audio.play();
-      playPauseBtn.textContent = '⏸️';
-      currentAyah = index;
+    function playAyah(idx){
+      if(idx>=ayahAudios.length)return;
+      audio.src=ayahAudios[idx];audio.play();
+      playPauseBtn.textContent='⏸️';currentAyah=idx;
     }
 
-    audio.onended = () => {
-      if (currentAyah + 1 < ayahAudios.length) playAyah(currentAyah + 1);
-      else playPauseBtn.textContent = '▶️';
-    };
+    audio.onended=()=>{if(currentAyah+1<ayahAudios.length)playAyah(currentAyah+1);else playPauseBtn.textContent='▶️';};
 
-    function setupAudio() {
-      playPauseBtn.textContent = '▶️';
-      audio.currentTime = 0;
-      audio.addEventListener('timeupdate', () => {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        progress.style.width = pct + '%';
-        timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    function setupAudio(){
+      playPauseBtn.textContent='▶️';audio.currentTime=0;
+      audio.addEventListener('timeupdate',()=>{
+        const pct=(audio.currentTime/audio.duration)*100;
+        progress.style.width=`${pct}%`;
+        timeDisplay.textContent=`${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
       });
     }
 
-    function formatTime(sec) {
-      if (isNaN(sec)) return '00:00';
-      const m = Math.floor(sec / 60).toString().padStart(2, '0');
-      const s = Math.floor(sec % 60).toString().padStart(2, '0');
-      return `${m}:${s}`;
+    function formatTime(sec){if(isNaN(sec))return'00:00';
+      const m=Math.floor(sec/60).toString().padStart(2,'0');
+      const s=Math.floor(sec%60).toString().padStart(2,'0');
+      return`${m}:${s}`;
     }
 
-    playPauseBtn.addEventListener('click', () => {
-      if (audio.paused) { audio.play(); playPauseBtn.textContent = '⏸️'; }
-      else { audio.pause(); playPauseBtn.textContent = '▶️'; }
-    });
+    playPauseBtn.addEventListener('click',()=>{if(audio.paused){audio.play();playPauseBtn.textContent='⏸️';}else{audio.pause();playPauseBtn.textContent='▶️';}});
+    backwardBtn.addEventListener('click',()=>audio.currentTime=Math.max(0,audio.currentTime-5));
+    forwardBtn.addEventListener('click',()=>audio.currentTime=Math.min(audio.duration,audio.currentTime+5));
+    progressBar.addEventListener('click',e=>{const rect=progressBar.getBoundingClientRect();audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration;});
 
-    backwardBtn.addEventListener('click', () => audio.currentTime = Math.max(0, audio.currentTime - 5));
-    forwardBtn.addEventListener('click', () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 5));
-
-    progressBar.addEventListener('click', e => {
-      const rect = progressBar.getBoundingClientRect();
-      audio.currentTime = ((e.clientX - rect.left)/rect.width) * audio.duration;
-    });
-
-    // Init
+    // ابدأ
     loadSurahList();
   </script></body>
 </html>
