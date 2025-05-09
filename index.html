@@ -124,13 +124,16 @@ footer .maker { margin-top: .5rem; font-style: italic; opacity: .8; }
       data.data.forEach(s => {
         const opt = document.createElement('option');
         opt.value = s.number;
-        opt.text = s.englishName + ' - ' + s.name;
+        opt.text = `${s.number}. ${s.englishName} - ${s.name}`;
         surahSelect.add(opt);
       });
       const last = localStorage.getItem('lastSurah') || '1';
       surahSelect.value = last;
       loadSurah(last);
     }
+
+    // On change select
+    surahSelect.addEventListener('change', () => loadSurah(surahSelect.value));
 
     // Rating
     function renderRating(surah) {
@@ -202,4 +205,12 @@ footer .maker { margin-top: .5rem; font-style: italic; opacity: .8; }
     backwardBtn.addEventListener('click', () => audio.currentTime = Math.max(0, audio.currentTime - 5));
     forwardBtn.addEventListener('click', () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 5));
 
-    progressBar.addEventListener
+    progressBar.addEventListener('click', e => {
+      const rect = progressBar.getBoundingClientRect();
+      audio.currentTime = ((e.clientX - rect.left)/rect.width) * audio.duration;
+    });
+
+    // Init
+    loadSurahList();
+  </script></body>
+</html>
