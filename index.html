@@ -1,286 +1,184 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>موقع الشيخ</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>موقع القرآن التفاعلي</title>
   <style>
-    body { margin:0; padding:0; font-family:'Segoe UI',Tahoma,sans-serif;
-      background:linear-gradient(to bottom,#1c1c1c,#2b2b2b); color:#fff;
-      display:flex; flex-direction:column; align-items:center; min-height:100vh;
-    }
-    header, main, footer { width:100%; max-width:800px; padding:20px; box-sizing:border-box }
-    header { text-align:center }
-    header h1 { font-size:3em; color:#00ffe7; text-shadow:0 0 10px #00ffe7; margin:0 }
-    header p  { margin:5px 0 0; font-size:1.2em; color:#ccc }
-
-    .selectors, .controls, .rating {
-      display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:20px 0;
-    }
-    select, button, input[type="range"] {
-      background:#333; color:#fff; border:none; border-radius:5px;
-      padding:10px; font-size:1em; cursor:pointer;
-    }
-    select { min-width:180px }
-    button { min-width:80px }
-    input[type="range"] {
-      -webkit-appearance:none; width:100%; max-width:600px; background:transparent; 
-      margin:10px 0;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance:none; height:16px; width:16px; border-radius:50%;
-      background:#ff0066; cursor:pointer; margin-top:-6px;
-    }
-    input[type="range"]::-webkit-slider-runnable-track {
-      height:4px; background:#555; border-radius:2px;
-    }
-
-    .error-message { color:#f66; text-align:center; margin:5px 0 }
-    .stars span { font-size:2em; cursor:pointer; color:#ccc; transition:color .3s }
-    .stars .selected { color:#ffcc00 }
-    .rating-result { font-size:1em; margin-left:10px }
-
-    .info { display:flex; flex-direction:column; align-items:flex-start; gap:5px; margin-bottom:20px }
-    .info #clock { font-size:1.1em }
-    .info #prayer-times h2 { margin:10px 0 5px; font-size:1.2em }
-    .info #prayer-times span, .info #prayer-error { display:block; margin:2px 0 }
-    .info #prayer-error { color:#f66 }
-
-    #player { width:100%; max-width:800px; height:360px; background:#000 }
-    footer { text-align:center; font-size:.9em; color:#999; padding:20px 0; margin-top:auto }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: #333; }
+    header, footer { background: #004d40; color: white; padding: 1rem; text-align: center; }
+    main { padding: 1rem; max-width: 800px; margin: auto; }
+    .controls a { margin: 0 .5rem; color: #004d40; text-decoration: none; }
+    select, .clock, .prayer-times { width: 100%; margin: .5rem 0; padding: .5rem; font-size: 1rem; }
+    .verses { margin-top: 1rem; }
+    .verse { padding: .5rem; border-bottom: 1px solid #ddd; }
+    .rating { display: flex; gap: .2rem; }
+    .star { font-size: 1.5rem; cursor: pointer; }
+    .active { color: gold; }
+    .audio-controls { display: flex; align-items: center; gap: .5rem; margin-top: .5rem; }
+    .progress-bar { flex: 1; height: 5px; background: #ddd; border-radius: 2px; overflow: hidden; cursor: pointer; }
+    .progress { height: 100%; background: #004d40; width: 0%; }
+    @media (max-width: 600px) { main { padding: .5rem; } }
   </style>
 </head>
 <body>
   <header>
-    <h1>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</h1>
-    <p>موقع الشيخ</p>
+    <h1>موقع القرآن التفاعلي</h1>
+    <div class="clock" id="clock"></div>
   </header>
   <main>
-    <div class="selectors">
-      <label>اختر سورة:
-        <select id="sura-select"><option value="" disabled selected>-- السورة --</option></select>
-      </label>
-      <label>اختر دولتك:
-        <select id="country-select"><option value="" disabled selected>-- الدولة --</option></select>
-      </label>
-    </div>
+    <label for="surahSelect">اختر السورة:</label>
+    <select id="surahSelect"></select>
+    <div class="rating" id="rating"></div><div class="audio-controls">
+  <button id="backward">⏪</button>
+  <button id="playPause">▶️</button>
+  <button id="forward">⏩</button>
+  <div class="progress-bar" id="progressBar"><div class="progress" id="progress"></div></div>
+  <span id="timeDisplay">00:00 / 00:00</span>
+</div>
+<div class="verses" id="verses"></div>
 
-    <div class="controls">
-      <button onclick="seek(-10)">« 10 ث</button>
-      <button id="playButton" onclick="togglePlay()" disabled>▶ تشغيل</button>
-      <button onclick="seek(10)">10 ث »</button>
-    </div>
-    <div class="error-message" id="audio-error"></div>
+<h2>مواقيت الصلاة</h2>
+<div>
+  <input type="text" id="city" placeholder="المدينة" />
+  <input type="text" id="country" placeholder="الدولة" />
+  <button id="getTimes">جلب المواقيت</button>
+</div>
+<div class="prayer-times" id="prayerTimes"></div>
 
-    <input type="range" id="progress" value="0" min="0" step="0.1">
+<div class="controls">
+  <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
+  <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
+  <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
+  <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
+</div>
 
-    <!-- مشغل YouTube -->
-    <div id="player"></div>
-
-    <div class="controls">
-      <a href="https://t.me/HNR55" target="_blank">راسلني على تليجرام</a>
-      <a href="https://www.amazon.com/T3-develper-Car-Fury/dp/B0DWY3QHWF" target="_blank">تحميل CarFury</a>
-      <a href="https://t.me/Developer160" target="_blank">قناة المطورين</a>
-      <a href="https://t.me/+LM2b9cRHxmA2YmU8" target="_blank">قناة CarFury</a>
-    </div>
-
-    <div class="rating">
-      <div class="stars">
-        <span data-value="1">★</span><span data-value="2">★</span>
-        <span data-value="3">★</span><span data-value="4">★</span>
-        <span data-value="5">★</span>
-      </div>
-      <div class="rating-result">0%</div>
-    </div>
-
-    <div class="info">
-      <div id="clock">الوقت: --:-- --</div>
-      <div id="prayer-times">
-        <h2>مواقيت الصلاة</h2>
-        <span id="fajr">الفجر: --:--</span>
-        <span id="dhuhr">الظهر: --:--</span>
-        <span id="asr">العصر: --:--</span>
-        <span id="maghrib">المغرب: --:--</span>
-        <span id="isha">العشاء: --:--</span>
-        <div id="prayer-error"></div>
-      </div>
-    </div>
   </main>
-  <footer>&copy; 2025 – made by alshiek</footer>
+  <footer>&copy; 2025 موقع القرآن التفاعلي</footer>  <script>
+  const surahSelect = document.getElementById('surahSelect');
+  const versesDiv = document.getElementById('verses');
+  const ratingDiv = document.getElementById('rating');
+  const clockEl = document.getElementById('clock');
+  const cityInput = document.getElementById('city');
+  const countryInput = document.getElementById('country');
+  const getTimesBtn = document.getElementById('getTimes');
+  const prayerTimesDiv = document.getElementById('prayerTimes');
+  const playPauseBtn = document.getElementById('playPause');
+  const backwardBtn = document.getElementById('backward');
+  const forwardBtn = document.getElementById('forward');
+  const progressBar = document.getElementById('progressBar');
+  const progress = document.getElementById('progress');
+  const timeDisplay = document.getElementById('timeDisplay');
+  let audio = new Audio();
 
-  <!-- YouTube IFrame API -->
-  <script src="https://www.youtube.com/iframe_api"></script>
-  <script>
-  let player, progressInterval;
-
-  // قائمة السور
-  const suras = [
-    "الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود",
-    "يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون",
-    "النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب",
-    "سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف",
-    "محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة",
-    "الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة",
-    "المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبإ","النازعات","عبس",
-    "التكوير","الإنفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس",
-    "الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر",
-    "الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"
-  ];
-  // بدّل المعرف بقائمة تشغيل سليمة تحتوي الـ114 فيديو (مثال)
-  const PLAYLIST_ID = 'PLmYBuwzH1Pq9nGV_zIytx-3Fns4X9T5gk';
-
-  const sel = document.getElementById('sura-select'),
-        btn = document.getElementById('playButton'),
-        err = document.getElementById('audio-error'),
-        progress = document.getElementById('progress');
-
-  // ملء القوائم
-  suras.forEach((s, i) => {
-    const o = document.createElement('option');
-    o.value = i; // يبدأ من 0
-    o.textContent = `${i+1} - ${s}`;
-    sel.append(o);
-  });
-  // الدول
-  ['لبنان','مصر','السعودية','الأردن','الإمارات','الكويت','قطر','البحرين','عمان','العراق','سوريا',
-   'فلسطين','الجزائر','المغرب','تونس','ليبيا','موريتانيا','السودان','اليمن','الصومال','جيبوتي','جزر القمر'
-  ].forEach(c=>{
-    const o = document.createElement('option');
-    o.value = c; o.textContent = c;
-    document.getElementById('country-select').append(o);
-  });
-
-  // حفظ/استرجاع
-  if(localStorage.sura) sel.value = localStorage.sura;
-  sel.addEventListener('change', ()=>{
-    localStorage.sura = sel.value;
-    loadSura(+sel.value);
-  });
-  if(localStorage.country){
-    const cs = document.getElementById('country-select');
-    cs.value = localStorage.country;
-    fetchPrayerTimes();
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    let h = now.getHours();
+    const m = now.getMinutes().toString().padStart(2, '0');
+    const ampm = h >= 12 ? 'م' : 'ص';
+    h = h % 12 || 12;
+    clockEl.textContent = `${h}:${m} ${ampm}`;
   }
-  document.getElementById('country-select')
-    .addEventListener('change', e=>{
-      localStorage.country = e.target.value;
-      fetchPrayerTimes();
+  setInterval(updateClock, 1000); updateClock();
+
+  // Surah list
+  async function loadSurahList() {
+    const res = await fetch('https://api.alquran.cloud/v1/surah');
+    const data = await res.json();
+    data.data.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.number; opt.text = s.englishName + ' - ' + s.name;
+      surahSelect.add(opt);
     });
-
-  // إنشاء المشغل YouTube
-  function onYouTubeIframeAPIReady(){
-    player = new YT.Player('player', {
-      height: '360', width: '640',
-      playerVars:{
-        listType: 'playlist',
-        list: PLAYLIST_ID,
-        index: sel.value||0,
-        origin: window.location.origin
-      },
-      events:{
-        onError:()=> err.textContent='تعذّر تشغيل الفيديو'
-      }
-    });
-    btn.disabled = false;
+    const last = localStorage.getItem('lastSurah') || '1';
+    surahSelect.value = last;
+    loadSurah(last);
   }
 
-  // تحميل السورة عند الاختيار
-  function loadSura(index){
-    err.textContent = '';
-    if(player && player.loadPlaylist){
-      player.loadPlaylist({
-        listType:'playlist',
-        list:PLAYLIST_ID,
-        index:index,
-        suggestedQuality:'small'
+  // Rating
+  function renderRating(surah) {
+    ratingDiv.innerHTML = '';
+    const saved = localStorage.getItem('rating_' + surah) || 0;
+    for (let i = 1; i <= 5; i++) {
+      const star = document.createElement('span');
+      star.className = 'star' + (i <= saved ? ' active' : '');
+      star.textContent = '★';
+      star.addEventListener('click', () => {
+        localStorage.setItem('rating_' + surah, i);
+        renderRating(surah);
       });
-      btn.textContent = '❚❚ إيقاف';
-      player.playVideo();
-      startProgress();
-    } else {
-      err.textContent = 'المشغل غير جاهز';
+      ratingDiv.appendChild(star);
     }
   }
 
-  // زرّ تشغيل/إيقاف
-  function togglePlay(){
-    err.textContent = '';
-    if(player.getPlayerState()===YT.PlayerState.PLAYING){
-      player.pauseVideo();
-      btn.textContent='▶ تشغيل';
-    } else {
-      player.playVideo();
-      btn.textContent='❚❚ إيقاف';
-    }
+  // Load verses and audio
+  async function loadSurah(number) {
+    localStorage.setItem('lastSurah', number);
+    renderRating(number);
+    const res = await fetch(`https://api.alquran.cloud/v1/surah/${number}/ar.alafasy`);
+    const data = await res.json();
+    versesDiv.innerHTML = '';
+    data.data.ayahs.forEach(v => {
+      const div = document.createElement('div'); div.className = 'verse';
+      div.textContent = v.numberInSurah + '. ' + v.text;
+      versesDiv.appendChild(div);
+    });
+    audio.src = data.data.ayahs.map(v => v.audio).join(',');
+    setupAudio();
   }
-  window.togglePlay = togglePlay;
 
-  // seek بالعشر ثواني
-  function seek(sec){
-    const t = player.getCurrentTime() + sec;
-    player.seekTo(Math.max(0,t), true);
+  // Audio controls
+  function setupAudio() {
+    playPauseBtn.textContent = '▶️';
+    audio.currentTime = 0;
+    audio.addEventListener('timeupdate', () => {
+      const pct = (audio.currentTime / audio.duration) * 100;
+      progress.style.width = pct + '%';
+      timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    });
   }
-  window.seek = seek;
-
-  // شريط التقدّم
-  function startProgress(){
-    clearInterval(progressInterval);
-    progress.max = player.getDuration();
-    progressInterval = setInterval(()=>{
-      const t = player.getCurrentTime();
-      progress.value = t;
-    }, 500);
-  }
-  progress.addEventListener('input', ()=>{
-    player.seekTo(progress.value, true);
+  function formatTime(sec) { if (isNaN(sec)) return '00:00'; const m = Math.floor(sec/60).toString().padStart(2,'0'); const s = Math.floor(sec%60).toString().padStart(2,'0'); return `${m}:${s}`; }
+  playPauseBtn.addEventListener('click', () => {
+    audio.paused ? audio.play() : audio.pause();
+    playPauseBtn.textContent = audio.paused ? '▶️' : '⏸️';
+  });
+  backwardBtn.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 5); });
+  forwardBtn.addEventListener('click', () => { audio.currentTime = Math.min(audio.duration, audio.currentTime + 5); });
+  progressBar.addEventListener('click', e => {
+    const rect = progressBar.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = pct * audio.duration;
   });
 
-  // تقييم النجوم
-  const stars = document.querySelectorAll('.stars span'),
-        ratingResult = document.querySelector('.rating-result');
-  if(localStorage.rating) setStars(+localStorage.rating);
-  stars.forEach(s=>s.addEventListener('click', e=>{
-    setStars(+e.target.dataset.value);
-    localStorage.rating = +e.target.dataset.value;
-  }));
-  function setStars(v){
-    stars.forEach((s,i)=> s.classList.toggle('selected', i< v));
-    ratingResult.textContent = `${(v/5)*100}%`;
+  // Prayer times
+  function loadPrayerDefaults() {
+    cityInput.value = localStorage.getItem('city') || '';
+    countryInput.value = localStorage.getItem('country') || '';
+    if (cityInput.value && countryInput.value) fetchPrayerTimes();
+  }
+  async function fetchPrayerTimes() {
+    const city = cityInput.value.trim(); const country = countryInput.value.trim();
+    if (!city || !country) return;
+    localStorage.setItem('city', city);
+    localStorage.setItem('country', country);
+    const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=2`);
+    const data = await res.json();
+    const t = data.data.timings;
+    prayerTimesDiv.innerHTML = `
+      <p>الفجر: ${t.Fajr}</p>
+      <p>الظهر: ${t.Dhuhr}</p>
+      <p>العصر: ${t.Asr}</p>
+      <p>المغرب: ${t.Maghrib}</p>
+      <p>العشاء: ${t.Isha}</p>
+    `;
   }
 
-  // الساعة
-  function updateClock(){
-    const d=new Date(), h=d.getHours(), m=d.getMinutes();
-    const ampm=h>=12?'م':'ص';
-    let hh=h%12||12; hh=hh.toString().padStart(2,'0');
-    const mm=m.toString().padStart(2,'0');
-    document.getElementById('clock').textContent=`الوقت: ${hh}:${mm} ${ampm}`;
-  }
-  setInterval(updateClock,1000); updateClock();
+  // Events
+  surahSelect.addEventListener('change', () => loadSurah(surahSelect.value));
+  getTimesBtn.addEventListener('click', fetchPrayerTimes);
 
-  // مواقيت الصلاة
-  async function fetchPrayerTimes(){
-    const pErr = document.getElementById('prayer-error');
-    pErr.textContent='';
-    const addr=encodeURIComponent(localStorage.country);
-    const d=new Date(), day=d.getDate(), mon=d.getMonth()+1, yr=d.getFullYear();
-    try{
-      const res=await fetch(`https://api.aladhan.com/v1/timingsByAddress?address=${addr}&date=${day}-${mon}-${yr}`);
-      const json=await res.json();
-      if(json.code!==200) throw '';
-      ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(key=>{
-        let [H,MM]=json.data.timings[key].split(':').map(Number);
-        const ampm=H>=12?'م':'ص'; H=H%12||12;
-        document.getElementById(key.toLowerCase()).textContent=
-          `${{Fajr:'الفجر',Dhuhr:'الظهر',Asr:'العصر',Maghrib:'المغرب',Isha:'العشاء'}[key]}: ${H.toString().padStart(2,'0')}:${MM.toString().padStart(2,'0')} ${ampm}`;
-      });
-    }catch{
-      pErr.textContent='تعذّر جلب مواقيت الصلاة';
-    }
-  }
-
-  // ابدأ لو كان محدد
-  if(sel.value!=='') loadSura(+sel.value);
-  if(localStorage.country) fetchPrayerTimes();
-  </script>
-</body>
+  // Init
+  loadSurahList();
+  loadPrayerDefaults();
+  </script></body>
 </html>
