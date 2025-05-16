@@ -123,6 +123,11 @@
     .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
     .daily-quiz button, .stats p { margin-top: .5rem; }
   </style>
+
+  <!-- Firebase App (the core SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <!-- Firebase Realtime Database -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
   <header>
@@ -168,8 +173,51 @@
   </footer>
 
   <script>
-    // لإعادة التجربة من الجهاز نفسه، قم بإلغاء التعليق مؤقتاً هذا السطر ثم إعادة تحميل الصفحة:
-    // localStorage.removeItem('counted');
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
+      authDomain: "gmae-fae90.firebaseapp.com",
+      databaseURL: "https://gmae-fae90-default-rtdb.firebaseio.com",
+      projectId: "gmae-fae90",
+      storageBucket: "gmae-fae90.firebasestorage.app",
+      messagingSenderId: "768482186329",
+      appId: "1:768482186329:web:18937587e530f8674e0d48",
+      measurementId: "G-V4ZLJ4BJGD"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // توليد UUID مبسط وخزن في localStorage
+    function generateId() {
+      return 'xxxx-xxxx-xxxx'.replace(/x/g, () =>
+        Math.floor(Math.random() * 16).toString(16)
+      );
+    }
+    let visitorId = localStorage.getItem('visitorId');
+    if (!visitorId) {
+      visitorId = generateId();
+      localStorage.setItem('visitorId', visitorId);
+    }
+
+    // سجل الزائر مرة واحدة فقط
+    function registerVisitor() {
+      const refPath = 'visitors/' + visitorId;
+      db.ref(refPath).once('value', snap => {
+        if (!snap.exists()) {
+          db.ref(refPath).set({ ts: Date.now() });
+        }
+      });
+    }
+
+    // اعرض عد الزوار
+    function displayVisitorCount() {
+      db.ref('visitors').on('value', snap => {
+        document.getElementById('deviceCount').textContent = snap.numChildren();
+      });
+    }
+
+    // دوال موقعك الأصلية (clock, stats, quiz, audio, loadSurahList...)...
+    // **ابدأ تضمين الكود الأصلي من هنا كما كان دون حذف أي جزء**:
 
     const surahSelect   = document.getElementById('surahSelect');
     const ratingDiv     = document.getElementById('rating');
@@ -186,32 +234,11 @@
     const quizAnswer    = document.getElementById('quizAnswer');
     const readCountEl   = document.getElementById('readCount');
     const playCountEl   = document.getElementById('playCount');
-    const deviceCountEl = document.getElementById('deviceCount');
     const themeToggle   = document.getElementById('themeToggle');
 
     let audio = new Audio();
     let ayahAudios = [], ayahList = [], currentAyah = 0;
 
-    // CountAPI namespace/key
-    const namespace = 'alquran_page';
-    const key       = 'deviceCount';
-
-    // تتبّع جهاز فريد
-    async function trackDevice() {
-      try {
-        if (!localStorage.getItem('counted')) {
-          await fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`);
-          localStorage.setItem('counted', 'yes');
-        }
-        const res = await fetch(`https://api.countapi.xyz/get/${namespace}/${key}`);
-        const data = await res.json();
-        deviceCountEl.textContent = data.value;
-      } catch (e) {
-        console.error('خطأ في تتبّع الجهاز', e);
-      }
-    }
-
-    // استعادة وضع النهار/الليل
     const savedTheme = localStorage.getItem('theme') || 'dark';
     if (savedTheme === 'light') {
       document.body.classList.add('light');
@@ -364,6 +391,7 @@
         playPauseBtn.textContent = '▶️';
       }
     };
+
     backwardBtn.onclick = () => audio.currentTime = Math.max(0, audio.currentTime - 5);
     forwardBtn.onclick  = () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
     progressBar.onclick  = e => {
@@ -372,37 +400,37 @@
     };
 
     const quizzes = [
-      { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
-      { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
-      { q: 'كم عدد آيات سورة البقرة؟', a: '286 آية' },
-      { q: 'ما هي السورة التي نزلت كلها دفعة واحدة؟', a: 'سورة الأنعام' },
-      { q: 'من هو الصحابي الذي حفظ الكثير من القرآن وهو صغير السن وكان يؤم قومه؟', a: 'عمرو بن سلمة رضي الله عنه' },
-      { q: 'في أي سورة ذكر الله عز وجل قصة أصحاب الكهف؟', a: 'سورة الكهف' },
-      { q: 'ما هي الآية التي تسمى "آية الكرسي"؟', a: 'آية 255 من سورة البقرة' },
-      { q: 'ما هي أركان الإيمان الستة؟', a: 'الإيمان بالله، وملائكته، وكتبه، ورسله، واليوم الآخر، والقدر خيره وشره' },
-      { q: 'ما السورة التي تسمى "قلب القرآن"؟', a: 'سورة يس' },
-      { q: 'كم عدد أجزاء القرآن الكريم؟', a: '30 جزءًا' },
-      { q: 'ما السورة التي تبدأ بقسم الله بالنجم؟', a: 'سورة النجم' },
-      { q: 'من هو النبي الذي ابتلعه الحوت؟', a: 'النبي يونس عليه السلام' },
-      { q: 'ما هي السورة التي تحدثت عن ليلة القدر؟', a: 'سورة القدر' },
-      { q: 'كم عدد ركعات صلاة الفجر؟', a: 'ركعتان' },
-      { q: 'من هو الصحابي الذي جمع القرآن في مصحف واحد بعد وفاة النبي؟', a: 'زيد بن ثابت رضي الله عنه' },
-      { q: 'ما هي السورة التي تسمى بـ "الصمد"؟', a: 'سورة الإخلاص' },
-      { q: 'في أي سورة أمر الله ببر الوالدين؟', a: 'سورة الإسراء، الآية 23' },
-      { q: 'ما السورة التي تحتوي على قصة النبي يوسف عليه السلام؟', a: 'سورة يوسف' },
-      { q: 'ما هي السورة التي تسمى "الكوثر"؟', a: 'سورة الكوثر' },
-      { q: 'من هو الصحابي الذي لقب بـ "سيد القراء"؟', a: 'أُبي بن كعب رضي الله عنه' },
-      { q: 'في أي سورة ورد ذكر الجنة والنار؟', a: 'سورة الرحمن' },
-      { q: 'ما هي السورة التي بدأت بـ "الحمد لله رب العالمين"؟', a: 'سورة الفاتحة' },
-      { q: 'كم عدد الأحزاب في القرآن الكريم؟', a: '60 حزبًا' },
-      { q: 'ما هي أول سورة نزلت من القرآن الكريم؟', a: 'سورة العلق' },
-      { q: 'ما هي السورة التي تسمى "الملك"؟', a: 'سورة الملك' },
-      { q: 'كم عدد ركعات صلاة المغرب؟', a: '3 ركعات' },
-      { q: 'من هو الصحابي الذي قال له النبي: "خيركم من تعلم القرآن وعلمه"؟', a: 'عثمان بن عفان رضي الله عنه' },
-      { q: 'ما هي السورة التي تسمى "الفلق"؟', a: 'سورة الفلق' },
-      { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
-      { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
-    ];
+  { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
+  { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
+  { q: 'كم عدد آيات سورة البقرة؟', a: '286 آية' },
+  { q: 'ما هي السورة التي نزلت كلها دفعة واحدة؟', a: 'سورة الأنعام' },
+  { q: 'من هو الصحابي الذي حفظ الكثير من القرآن وهو صغير السن وكان يؤم قومه؟', a: 'عمرو بن سلمة رضي الله عنه' },
+  { q: 'في أي سورة ذكر الله عز وجل قصة أصحاب الكهف؟', a: 'سورة الكهف' },
+  { q: 'ما هي الآية التي تسمى "آية الكرسي"؟', a: 'آية 255 من سورة البقرة' },
+  { q: 'ما هي أركان الإيمان الستة؟', a: 'الإيمان بالله، وملائكته، وكتبه، ورسله، واليوم الآخر، والقدر خيره وشره' },
+  { q: 'ما السورة التي تسمى "قلب القرآن"؟', a: 'سورة يس' },
+  { q: 'كم عدد أجزاء القرآن الكريم؟', a: '30 جزءًا' },
+  { q: 'ما السورة التي تبدأ بقسم الله بالنجم؟', a: 'سورة النجم' },
+  { q: 'من هو النبي الذي ابتلعه الحوت؟', a: 'النبي يونس عليه السلام' },
+  { q: 'ما هي السورة التي تحدثت عن ليلة القدر؟', a: 'سورة القدر' },
+  { q: 'كم عدد ركعات صلاة الفجر؟', a: 'ركعتان' },
+  { q: 'من هو الصحابي الذي جمع القرآن في مصحف واحد بعد وفاة النبي؟', a: 'زيد بن ثابت رضي الله عنه' },
+  { q: 'ما هي السورة التي تسمى بـ "الصمد"؟', a: 'سورة الإخلاص' },
+  { q: 'في أي سورة أمر الله ببر الوالدين؟', a: 'سورة الإسراء، الآية 23' },
+  { q: 'ما السورة التي تحتوي على قصة النبي يوسف عليه السلام؟', a: 'سورة يوسف' },
+  { q: 'ما هي السورة التي تسمى "الكوثر"؟', a: 'سورة الكوثر' },
+  { q: 'من هو الصحابي الذي لقب بـ "سيد القراء"؟', a: 'أُبي بن كعب رضي الله عنه' },
+  { q: 'في أي سورة ورد ذكر الجنة والنار؟', a: 'سورة الرحمن' },
+  { q: 'ما هي السورة التي بدأت بـ "الحمد لله رب العالمين"؟', a: 'سورة الفاتحة' },
+  { q: 'كم عدد الأحزاب في القرآن الكريم؟', a: '60 حزبًا' },
+  { q: 'ما هي أول سورة نزلت من القرآن الكريم؟', a: 'سورة العلق' },
+  { q: 'ما هي السورة التي تسمى "الملك"؟', a: 'سورة الملك' },
+  { q: 'كم عدد ركعات صلاة المغرب؟', a: '3 ركعات' },
+  { q: 'من هو الصحابي الذي قال له النبي: "خيركم من تعلم القرآن وعلمه"؟', a: 'عثمان بن عفان رضي الله عنه' },
+  { q: 'ما هي السورة التي تسمى "الفلق"؟', a: 'سورة الفلق' },
+  { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
+  { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
+];
 
     function loadQuiz() {
       const idx = Math.floor(Math.random() * quizzes.length);
@@ -428,7 +456,10 @@
       loadQuiz();
       loadSurahList();
       surahSelect.onchange = () => loadSurah(surahSelect.value);
-      trackDevice();
+
+      // سجل الزائر واظهر العدد
+      registerVisitor();
+      displayVisitorCount();
     });
   </script>
 </body>
