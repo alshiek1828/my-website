@@ -132,12 +132,6 @@
     }
     .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
     .daily-quiz button, .stats p { margin-top: .5rem; }
-
-    /* Footer Maker */
-    footer .maker {
-      margin-top: .5rem; font-style: italic;
-      color: #ffde7d; text-shadow: 0 0 4px #f80;
-    }
   </style>
 </head>
 <body>
@@ -172,6 +166,7 @@
       <h3>إحصائياتك</h3>
       <p>السور المقروءة: <span id="readCount">0</span></p>
       <p>عدد الاستماعات: <span id="playCount">0</span></p>
+      <p>عدد الأجهزة: <span id="deviceCount">0</span></p>
     </div>
     <div class="verses" id="verses"></div>
     <button class="btn-open-prayer" onclick="window.open('https://timesprayer.today/', '_blank')">
@@ -198,10 +193,28 @@
     const quizAnswer    = document.getElementById('quizAnswer');
     const readCountEl   = document.getElementById('readCount');
     const playCountEl   = document.getElementById('playCount');
+    const deviceCountEl = document.getElementById('deviceCount');
     const themeToggle   = document.getElementById('themeToggle');
 
     let audio = new Audio();
     let ayahAudios = [], ayahList = [], currentAyah = 0;
+
+    // CountAPI namespace/key
+    const namespace = 'alquran_page';
+    const key       = 'deviceCount';
+
+    // تتبّع جهاز فريد
+    async function trackDevice() {
+      if (!localStorage.getItem('counted')) {
+        // زيادة العداد للمرة الأولى على هذا الجهاز
+        await fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`);
+        localStorage.setItem('counted', 'yes');
+      }
+      // جلب القيمة الحالية للعداد
+      const res = await fetch(`https://api.countapi.xyz/get/${namespace}/${key}`);
+      const data = await res.json();
+      deviceCountEl.textContent = data.value;
+    }
 
     // استعادة وضع النهار/الليل
     const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -396,8 +409,6 @@
   { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
   { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
 ];
-
-    // دالة اختيار سؤال عشوائي في كل تحميل
     function loadQuiz() {
       const idx = Math.floor(Math.random() * quizzes.length);
       quizQuestion.textContent = quizzes[idx].q;
@@ -418,6 +429,7 @@
     loadQuiz();
     loadSurahList();
     surahSelect.onchange = () => loadSurah(surahSelect.value);
+    trackDevice();
   </script>
 </body>
 </html>
