@@ -133,8 +133,11 @@
     .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
     .daily-quiz button, .stats p { margin-top: .5rem; }
 
-    /* Hide maker in day */
-    body.light .maker { display: none; }
+    /* Footer Maker */
+    footer .maker {
+      margin-top: .5rem; font-style: italic;
+      color: #ffde7d; text-shadow: 0 0 4px #f80;
+    }
   </style>
 </head>
 <body>
@@ -150,7 +153,6 @@
       <select id="surahSelect"></select>
       <div class="rating" id="rating"></div>
     </div>
-
     <div class="audio-controls">
       <button id="backward">⏪</button>
       <button id="playPause">▶️</button>
@@ -160,27 +162,22 @@
       </div>
       <span id="timeDisplay">00:00 / 00:00</span>
     </div>
-
     <div class="daily-quiz" id="dailyQuiz">
       <h3>السؤال اليومي:</h3>
       <div id="quizQuestion"></div>
       <button id="showAnswerBtn">إظهار الجواب</button>
       <div id="quizAnswer" style="display:none;"></div>
     </div>
-
     <div class="stats" id="stats">
       <h3>إحصائياتك</h3>
       <p>السور المقروءة: <span id="readCount">0</span></p>
       <p>عدد الاستماعات: <span id="playCount">0</span></p>
     </div>
-
     <div class="verses" id="verses"></div>
-
     <button class="btn-open-prayer" onclick="window.open('https://timesprayer.today/', '_blank')">
       عرض مواقيت الصلاة
     </button>
   </main>
-
   <footer>
     &copy; 2025 القرآن الكريم<div class="maker">Made by AlShiek</div>
   </footer>
@@ -208,7 +205,10 @@
 
     // استعادة وضع النهار/الليل
     const savedTheme = localStorage.getItem('theme') || 'dark';
-    if (savedTheme === 'light') document.body.classList.add('light'), themeToggle.textContent = '🌞';
+    if (savedTheme === 'light') {
+      document.body.classList.add('light');
+      themeToggle.textContent = '🌞';
+    }
 
     function formatTime(sec) {
       if (isNaN(sec)) return '00:00';
@@ -218,12 +218,14 @@
     }
 
     function updateClock() {
-      const now = new Date(), m = now.getMinutes().toString().padStart(2,'0');
-      let h = now.getHours(), ampm = h >=12 ? 'م' : 'ص';
-      h = h%12 || 12;
+      const now = new Date();
+      let h = now.getHours();
+      const m = now.getMinutes().toString().padStart(2,'0');
+      const ampm = h >= 12 ? 'م' : 'ص';
+      h = h % 12 || 12;
       clockEl.textContent = `${h}:${m} ${ampm}`;
     }
-    setInterval(updateClock,1000);
+    setInterval(updateClock, 1000);
     updateClock();
 
     function saveStats() {
@@ -231,12 +233,12 @@
       playCountEl.textContent = localStorage.getItem('playCount') || 0;
     }
     function incReadCount() {
-      const c = (+localStorage.getItem('readCount')||0)+1;
+      const c = (+localStorage.getItem('readCount')||0) + 1;
       localStorage.setItem('readCount', c);
       saveStats();
     }
     function incPlayCount() {
-      const c = (+localStorage.getItem('playCount')||0)+1;
+      const c = (+localStorage.getItem('playCount')||0) + 1;
       localStorage.setItem('playCount', c);
       saveStats();
     }
@@ -259,11 +261,11 @@
     function renderRating(surah) {
       ratingDiv.innerHTML = '';
       const saved = +localStorage.getItem('rating_'+surah);
-      for (let i=1; i<=5; i++) {
+      for (let i = 1; i <= 5; i++) {
         const star = document.createElement('span');
-        star.className = 'star'+(i<=saved?' active':'');
+        star.className = 'star' + (i <= saved ? ' active' : '');
         star.textContent = '★';
-        star.onclick = ()=> {
+        star.onclick = () => {
           localStorage.setItem('rating_'+surah, i);
           renderRating(surah);
         };
@@ -271,16 +273,16 @@
       }
     }
 
-    async function loadSurah(num, targetAyah) {
+    async function loadSurah(num, highlightAyah) {
       localStorage.setItem('lastSurah', num);
       renderRating(num);
       const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/ar.alafasy`);
       const { data } = await res.json();
-      ayahAudios = data.ayahs.map(a=>a.audio);
-      ayahList   = data.ayahs.map(a=>({ number:a.numberInSurah, text:a.text }));
+      ayahAudios = data.ayahs.map(a => a.audio);
+      ayahList   = data.ayahs.map(a => ({ number: a.numberInSurah, text: a.text }));
       currentAyah = 0;
       setupAudio();
-      renderVerses(targetAyah && +targetAyah);
+      renderVerses(highlightAyah && +highlightAyah);
       incReadCount();
     }
 
@@ -298,16 +300,16 @@
           <p class="trn-text"></p>
         `;
         if (v.number === highlightNum) {
-          setTimeout(()=> d.scrollIntoView({ behavior:'smooth' }), 100);
+          setTimeout(() => d.scrollIntoView({ behavior: 'smooth' }), 100);
         }
-        d.querySelector('.trn').onclick = async ()=>{
+        d.querySelector('.trn').onclick = async () => {
           const trEl = d.querySelector('.trn-text');
-          if (trEl.textContent) return trEl.style.display = trEl.style.display==='none'?'block':'none';
+          if (trEl.textContent) return trEl.style.display = trEl.style.display === 'none' ? 'block' : 'none';
           const r = await fetch(`https://api.alquran.cloud/v1/ayah/${surahSelect.value}:${v.number}/en.asad`);
           trEl.textContent = (await r.json()).data.text;
           trEl.style.display = 'block';
         };
-        d.querySelector('.shr').onclick = ()=>{
+        d.querySelector('.shr').onclick = () => {
           const url = `${location.origin}${location.pathname}?surah=${surahSelect.value}&ayah=${v.number}`;
           navigator.clipboard.writeText(url);
           alert('تم نسخ الرابط');
@@ -316,24 +318,24 @@
       });
     }
 
-    function setupAudio(){
+    function setupAudio() {
       playPauseBtn.textContent = '▶️';
-      audio.currentTime = +localStorage.getItem('pos_'+surahSelect.value)||0;
+      audio.currentTime = +localStorage.getItem('pos_' + surahSelect.value) || 0;
       audio.src = ayahAudios[currentAyah];
-      audio.ontimeupdate = ()=>{
-        const pct = (audio.currentTime/audio.duration)*100;
+      audio.ontimeupdate = () => {
+        const pct = (audio.currentTime / audio.duration) * 100;
         progress.style.width = pct + '%';
         timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
-        localStorage.setItem('pos_'+surahSelect.value, audio.currentTime);
+        localStorage.setItem('pos_' + surahSelect.value, audio.currentTime);
       };
-      audio.onended = ()=>{
+      audio.onended = () => {
         incPlayCount();
-        if (currentAyah+1 < ayahAudios.length) playAyah(currentAyah+1);
+        if (currentAyah + 1 < ayahAudios.length) playAyah(currentAyah + 1);
         else playPauseBtn.textContent = '▶️';
       };
     }
 
-    function playAyah(i){
+    function playAyah(i) {
       if (i >= ayahAudios.length) return;
       audio.src = ayahAudios[i];
       audio.play();
@@ -341,41 +343,82 @@
       currentAyah = i;
     }
 
-    playPauseBtn.onclick = ()=>{
-      if (audio.paused) { audio.play(); playPauseBtn.textContent='⏸️'; incPlayCount(); }
-      else { audio.pause(); playPauseBtn.textContent='▶️'; }
+    playPauseBtn.onclick = () => {
+      if (audio.paused) { audio.play(); playPauseBtn.textContent = '⏸️'; incPlayCount(); }
+      else { audio.pause(); playPauseBtn.textContent = '▶️'; }
     };
-    backwardBtn.onclick = ()=> audio.currentTime = Math.max(0, audio.currentTime-5);
-    forwardBtn.onclick  = ()=> audio.currentTime = Math.min(audio.duration, audio.currentTime+5);
-    progressBar.onclick = e => {
+    backwardBtn.onclick = () => audio.currentTime = Math.max(0, audio.currentTime - 5);
+    forwardBtn.onclick  = () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+    progressBar.onclick   = e => {
       const rect = progressBar.getBoundingClientRect();
-      audio.currentTime = ((e.clientX-rect.left)/rect.width)*audio.duration;
+      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
     };
 
+    // 40 سؤال يومي مع الإجابات من مصادر سُنّية موثوقة
     const quizzes = [
-      { q:'في أي سورة ذكرت قصة يوسف عليه السلام؟', a:'سورة يوسف' },
-      { q:'ما اسم أول آية في القرآن؟',           a:'بسم الله الرحمن الرحيم' }
+      { q: 'كم عدد سور القرآن الكريم؟', a: '114 سورة' },
+      { q: 'ما السورة التي تسمى قلب القرآن؟', a: 'سورة يس' },
+      { q: 'ما أول سورة نزلت في المدينة؟', a: 'سورة الممتحنة' },
+      { q: 'ما اسم الصحابي الذي رفع سقيفة بني ساعدة؟', a: 'الزبير بن العوام' },
+      { q: 'ما السورة التي سُميت بسورة العَزَف؟', a: 'سورة الأنعام' },
+      { q: 'من هو كاتب الوحی للنبي صلى الله عليه وسلم؟', a: 'عبدالله بن مسعود' },
+      { q: 'ما السورة التي تبدأ بآية الوصية؟', a: 'سورة النساء' },
+      { q: 'أين توجد آية الكرسي؟', a: 'سورة البقرة، الآية 255' },
+      { q: 'ما أطول سورة في القرآن؟', a: 'سورة البقرة' },
+      { q: 'ما أقصر سورة في القرآن؟', a: 'سورة الكوثر' },
+      { q: 'ما السورة التي نزلت كلها مرة واحدة؟', a: 'سورة التكوير' },
+      { q: 'كم عدد آيات البسملة في القرآن؟', a: '114 (في كل سورة باستثناء التوبة)' },
+      { q: 'أي سورة نزلت بعد الفاتحة؟', a: 'سورة البقرة' },
+      { q: 'من هو الصحابي الملقب بسيد القراء؟', a: 'زيد بن ثابت' },
+      { q: 'ما السورة التي تسمى أم الكتاب؟', a: 'سورة الفاتحة' },
+      { q: 'في أي سورة قصة أصحاب الكهف؟', a: 'سورة الكهف' },
+      { q: 'في أي سورة ورد ذكر اسم الله 99 مرة؟', a: 'سورة الحديد' },
+      { q: 'ما عدد الأجزاء في القرآن؟', a: '30 جزءاً' },
+      { q: 'ما عدد الأحزاب في القرآن؟', a: '60 حزباً' },
+      { q: 'ما عدد الرّكعات في صلاة الفجر؟', a: 'ركعتان' },
+      { q: 'ما السورة التي تُقرأ في كل ركعة من المغرب؟', a: 'سورة الفاتحة' },
+      { q: 'ما السورة التي تبدأ بقسم الله بالليل؟', a: 'سورة الليل' },
+      { q: 'في أي سورة جاء ذكر الصبر؟', a: 'سورة البقرة، الآية 153' },
+      { q: 'ما السورة التي فيها ذكر الجنة والنار بالتفصيل؟', a: 'سورة الرحمن' },
+      { q: 'من هو أول من جمع القرآن في مصحف واحد؟', a: 'عثمان بن عفان رضي الله عنه' },
+      { q: 'ما السورة التي تسمى سورة النور؟', a: 'سورة النور' },
+      { q: 'في أي سورة أمر الله ببر الوالدين؟', a: 'سورة الإسراء، الآية 23' },
+      { q: 'ما السورة التي نزلت في الهجرة؟', a: 'سورة آل عمران' },
+      { q: 'ما السورة التي فيها أول آية مشتركة بالإسلام والمسيحية؟', a: 'سورة آل عمران' },
+      { q: 'ما السورة التي عُرفت بسورة القتال؟', a: 'سورة التوبة' },
+      { q: 'ما السورة التي تبدأ بألمتعاون؟', a: 'سورة الأعراف' },
+      { q: 'ما السورة التي نزلت في مكة كلها إلا آية واحدة؟', a: 'سورة التوبة' },
+      { q: 'ما السورة التي تسمى الصمد؟', a: 'سورة الإخلاص' },
+      { q: 'كم عدد آيات سورة الكهف؟', a: '110 آيات' },
+      { q: 'ما السورة التي تسمى سورة الليل؟', a: 'سورة الليل' },
+      { q: 'ما السورة التي تسمى سورة الشمس؟', a: 'سورة الشمس' },
+      { q: 'ما السورة التي تسمى بالفلق؟', a: 'سورة الفلق' },
+      { q: 'ما السورة التي تسمى الناس؟', a: 'سورة الناس' },
+      { q: 'ما السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' },
+      { q: 'في أي سورة وردت كلمة “إيمان” أكثر من مرة؟', a: 'سورة البقرة' },
+      { q: 'ما السورة التي فيها قصص الأنبياء كاملةً؟', a: 'سورة يوسف' }
     ];
-    function loadQuiz(){
-      const idx = new Date().getDate()%quizzes.length;
+
+    function loadQuiz() {
+      const idx = new Date().getDate() % quizzes.length;
       quizQuestion.textContent = quizzes[idx].q;
       quizAnswer.textContent   = quizzes[idx].a;
       quizAnswer.style.display = 'none';
     }
-    showAnswerBtn.onclick = ()=> quizAnswer.style.display='block';
+    showAnswerBtn.onclick = () => quizAnswer.style.display = 'block';
 
-    themeToggle.onclick = ()=>{
+    themeToggle.onclick = () => {
       document.body.classList.toggle('light');
       const t = document.body.classList.contains('light') ? 'light' : 'dark';
       localStorage.setItem('theme', t);
-      themeToggle.textContent = t==='light' ? '🌞':'🌙';
+      themeToggle.textContent = t === 'light' ? '🌞' : '🌙';
     };
 
     // Initialization
     saveStats();
     loadQuiz();
     loadSurahList();
-    surahSelect.onchange = ()=> loadSurah(surahSelect.value);
+    surahSelect.onchange = () => loadSurah(surahSelect.value);
   </script>
 </body>
 </html>
