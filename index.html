@@ -133,12 +133,6 @@
     .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
     .daily-quiz button, .stats p { margin-top: .5rem; }
 
-    /* Shared link style */
-    .shared-link {
-      display: block; margin-top: .5rem; color: #f00;
-      text-decoration: underline; word-break: break-all;
-    }
-
     /* Hide maker in day */
     body.light .maker { display: none; }
   </style>
@@ -150,7 +144,6 @@
     <h2>بوابتك التفاعلية لقراءة القرآن الكريم والاستماع</h2>
     <div class="clock" id="clock"></div>
   </header>
-
   <main>
     <div class="surah-container">
       <label for="surahSelect">اختر السورة:</label>
@@ -213,6 +206,10 @@
     let audio = new Audio();
     let ayahAudios = [], ayahList = [], currentAyah = 0;
 
+    // استعادة وضع النهار/الليل
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') document.body.classList.add('light'), themeToggle.textContent = '🌞';
+
     function formatTime(sec) {
       if (isNaN(sec)) return '00:00';
       const m = Math.floor(sec/60).toString().padStart(2,'0');
@@ -222,16 +219,16 @@
 
     function updateClock() {
       const now = new Date(), m = now.getMinutes().toString().padStart(2,'0');
-      let h = now.getHours(), ampm = h>=12?'م':'ص';
-      h = h%12||12;
+      let h = now.getHours(), ampm = h >=12 ? 'م' : 'ص';
+      h = h%12 || 12;
       clockEl.textContent = `${h}:${m} ${ampm}`;
     }
     setInterval(updateClock,1000);
     updateClock();
 
     function saveStats() {
-      readCountEl.textContent = localStorage.getItem('readCount')||0;
-      playCountEl.textContent = localStorage.getItem('playCount')||0;
+      readCountEl.textContent = localStorage.getItem('readCount') || 0;
+      playCountEl.textContent = localStorage.getItem('playCount') || 0;
     }
     function incReadCount() {
       const c = (+localStorage.getItem('readCount')||0)+1;
@@ -291,7 +288,7 @@
       versesDiv.innerHTML = '';
       ayahList.forEach(v => {
         const d = document.createElement('div');
-        d.className = 'verse' + (v.number===highlightNum?' highlight':'');
+        d.className = 'verse' + (v.number === highlightNum ? ' highlight' : '');
         d.innerHTML = `
           <p><strong>${v.number}.</strong> ${v.text}</p>
           <div class="actions">
@@ -300,7 +297,7 @@
           </div>
           <p class="trn-text"></p>
         `;
-        if (v.number===highlightNum) {
+        if (v.number === highlightNum) {
           setTimeout(()=> d.scrollIntoView({ behavior:'smooth' }), 100);
         }
         d.querySelector('.trn').onclick = async ()=>{
@@ -311,7 +308,7 @@
           trEl.style.display = 'block';
         };
         d.querySelector('.shr').onclick = ()=>{
-          const url = `${location.origin + location.pathname}?surah=${surahSelect.value}&ayah=${v.number}`;
+          const url = `${location.origin}${location.pathname}?surah=${surahSelect.value}&ayah=${v.number}`;
           navigator.clipboard.writeText(url);
           alert('تم نسخ الرابط');
         };
@@ -321,7 +318,7 @@
 
     function setupAudio(){
       playPauseBtn.textContent = '▶️';
-      audio.currentTime = +localStorage.getItem('pos_'+surahSelect.value) || 0;
+      audio.currentTime = +localStorage.getItem('pos_'+surahSelect.value)||0;
       audio.src = ayahAudios[currentAyah];
       audio.ontimeupdate = ()=>{
         const pct = (audio.currentTime/audio.duration)*100;
@@ -331,12 +328,13 @@
       };
       audio.onended = ()=>{
         incPlayCount();
-        if(currentAyah+1 < ayahAudios.length) playAyah(currentAyah+1);
+        if (currentAyah+1 < ayahAudios.length) playAyah(currentAyah+1);
         else playPauseBtn.textContent = '▶️';
       };
     }
+
     function playAyah(i){
-      if(i>=ayahAudios.length) return;
+      if (i >= ayahAudios.length) return;
       audio.src = ayahAudios[i];
       audio.play();
       playPauseBtn.textContent = '⏸️';
@@ -344,12 +342,12 @@
     }
 
     playPauseBtn.onclick = ()=>{
-      if(audio.paused){ audio.play(); playPauseBtn.textContent='⏸️'; incPlayCount(); }
+      if (audio.paused) { audio.play(); playPauseBtn.textContent='⏸️'; incPlayCount(); }
       else { audio.pause(); playPauseBtn.textContent='▶️'; }
     };
-    backwardBtn.onclick = ()=> audio.currentTime = Math.max(0,audio.currentTime-5);
-    forwardBtn.onclick  = ()=> audio.currentTime = Math.min(audio.duration,audio.currentTime+5);
-    progressBar.onclick = e=>{
+    backwardBtn.onclick = ()=> audio.currentTime = Math.max(0, audio.currentTime-5);
+    forwardBtn.onclick  = ()=> audio.currentTime = Math.min(audio.duration, audio.currentTime+5);
+    progressBar.onclick = e => {
       const rect = progressBar.getBoundingClientRect();
       audio.currentTime = ((e.clientX-rect.left)/rect.width)*audio.duration;
     };
@@ -368,9 +366,12 @@
 
     themeToggle.onclick = ()=>{
       document.body.classList.toggle('light');
-      themeToggle.textContent = document.body.classList.contains('light') ? '🌞':'🌙';
+      const t = document.body.classList.contains('light') ? 'light' : 'dark';
+      localStorage.setItem('theme', t);
+      themeToggle.textContent = t==='light' ? '🌞':'🌙';
     };
 
+    // Initialization
     saveStats();
     loadQuiz();
     loadSurahList();
