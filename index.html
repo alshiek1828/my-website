@@ -59,6 +59,10 @@
       background: #222; color: #fff;
       box-shadow: 0 0 8px rgba(255,140,0,0.5);
     }
+    body.light select {
+      background: #fff; color: #222;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
 
     /* Audio Controls */
     .audio-controls {
@@ -74,6 +78,9 @@
     }
     .progress { height: 100%; background: #ff8c00; width: 0%; }
     #timeDisplay { font-size: .9rem; min-width: 80px; text-align: right; }
+    body.light .audio-controls button { color: #222; background: #ddd; }
+    body.light .progress-bar { background: #eee; }
+    body.light .progress { background: #ff4500; }
 
     /* Verses & Spacing */
     .verses {
@@ -85,6 +92,10 @@
       background: #222; border-radius: 8px; padding: 1rem;
       box-shadow: 0 0 10px rgba(255,140,0,0.3);
       font-size: .95rem; position: relative;
+    }
+    body.light .verse {
+      background: #fff; color: #222;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
     .verse p { margin-bottom: .75rem; }
     .actions { display: flex; gap: .5rem; font-size: .9rem; margin-bottom: .5rem; cursor: pointer; }
@@ -109,10 +120,15 @@
       transition: background .3s;
     }
     .btn-open-prayer:hover { background: #e63e00; }
+    body.light .btn-open-prayer { background: #ffa500; color: #222; }
+    body.light .btn-open-prayer:hover { background: #ff8c00; }
 
     /* Quiz & Stats */
     .daily-quiz, .stats {
       background: #222; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;
+    }
+    body.light .daily-quiz, body.light .stats {
+      background: #f1f1f1; color: #222;
     }
     .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
     .daily-quiz button, .stats p { margin-top: .5rem; }
@@ -123,7 +139,7 @@
       text-decoration: underline; word-break: break-all;
     }
 
-    /* Hide QuranCloud badge in day mode */
+    /* Hide maker in day */
     body.light .maker { display: none; }
   </style>
 </head>
@@ -287,7 +303,6 @@
         if (v.number===highlightNum) {
           setTimeout(()=> d.scrollIntoView({ behavior:'smooth' }), 100);
         }
-        // translation
         d.querySelector('.trn').onclick = async ()=>{
           const trEl = d.querySelector('.trn-text');
           if (trEl.textContent) return trEl.style.display = trEl.style.display==='none'?'block':'none';
@@ -295,7 +310,6 @@
           trEl.textContent = (await r.json()).data.text;
           trEl.style.display = 'block';
         };
-        // share
         d.querySelector('.shr').onclick = ()=>{
           const url = `${location.origin + location.pathname}?surah=${surahSelect.value}&ayah=${v.number}`;
           navigator.clipboard.writeText(url);
@@ -329,7 +343,6 @@
       currentAyah = i;
     }
 
-    // Controls
     playPauseBtn.onclick = ()=>{
       if(audio.paused){ audio.play(); playPauseBtn.textContent='⏸️'; incPlayCount(); }
       else { audio.pause(); playPauseBtn.textContent='▶️'; }
@@ -341,7 +354,6 @@
       audio.currentTime = ((e.clientX-rect.left)/rect.width)*audio.duration;
     };
 
-    // Quiz
     const quizzes = [
       { q:'في أي سورة ذكرت قصة يوسف عليه السلام؟', a:'سورة يوسف' },
       { q:'ما اسم أول آية في القرآن؟',           a:'بسم الله الرحمن الرحيم' }
@@ -354,13 +366,11 @@
     }
     showAnswerBtn.onclick = ()=> quizAnswer.style.display='block';
 
-    // Theme toggle
     themeToggle.onclick = ()=>{
       document.body.classList.toggle('light');
       themeToggle.textContent = document.body.classList.contains('light') ? '🌞':'🌙';
     };
 
-    // Init
     saveStats();
     loadQuiz();
     loadSurahList();
