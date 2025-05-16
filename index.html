@@ -23,9 +23,7 @@
     main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
 
     /* Theme toggle */
-    .theme-toggle {
-      position: absolute; top: 1rem; left: 1rem; cursor: pointer; font-size: 1.5rem;
-    }
+    .theme-toggle { position: absolute; top: 1rem; left: 1rem; cursor: pointer; font-size: 1.5rem; }
 
     /* Header */
     header h1 {
@@ -44,9 +42,7 @@
     }
 
     /* Surah Selector */
-    .surah-container {
-      margin: 2rem 0; display: flex; flex-direction: column; gap: .5rem;
-    }
+    .surah-container { margin: 2rem 0; display: flex; flex-direction: column; gap: .5rem; }
     .surah-container label {
       font-weight: bold; font-size: 1.1rem;
       background: linear-gradient(45deg, #ff8c00, #ffa500);
@@ -65,9 +61,7 @@
     }
 
     /* Audio Controls */
-    .audio-controls {
-      display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem;
-    }
+    .audio-controls { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem; }
     .audio-controls button {
       background: #333; border: none; color: #fff; padding: .8rem;
       border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: background .3s;
@@ -103,9 +97,7 @@
     .verse.highlight { border-bottom: 2px solid #f00; }
 
     /* Rating */
-    .rating {
-      display: flex; justify-content: center; gap: .3rem; margin-top: .5rem;
-    }
+    .rating { display: flex; justify-content: center; gap: .3rem; margin-top: .5rem; }
     .star {
       font-size: 1.8rem; cursor: pointer; transition: transform .2s; color: #888;
     }
@@ -127,9 +119,7 @@
     .daily-quiz, .stats {
       background: #222; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;
     }
-    body.light .daily-quiz, body.light .stats {
-      background: #f1f1f1; color: #222;
-    }
+    body.light .daily-quiz, body.light .stats { background: #f1f1f1; color: #222; }
     .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
     .daily-quiz button, .stats p { margin-top: .5rem; }
   </style>
@@ -178,6 +168,9 @@
   </footer>
 
   <script>
+    // لإعادة التجربة من الجهاز نفسه، قم بإلغاء التعليق مؤقتاً هذا السطر ثم إعادة تحميل الصفحة:
+    // localStorage.removeItem('counted');
+
     const surahSelect   = document.getElementById('surahSelect');
     const ratingDiv     = document.getElementById('rating');
     const versesDiv     = document.getElementById('verses');
@@ -205,15 +198,17 @@
 
     // تتبّع جهاز فريد
     async function trackDevice() {
-      if (!localStorage.getItem('counted')) {
-        // زيادة العداد للمرة الأولى على هذا الجهاز
-        await fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`);
-        localStorage.setItem('counted', 'yes');
+      try {
+        if (!localStorage.getItem('counted')) {
+          await fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`);
+          localStorage.setItem('counted', 'yes');
+        }
+        const res = await fetch(`https://api.countapi.xyz/get/${namespace}/${key}`);
+        const data = await res.json();
+        deviceCountEl.textContent = data.value;
+      } catch (e) {
+        console.error('خطأ في تتبّع الجهاز', e);
       }
-      // جلب القيمة الحالية للعداد
-      const res = await fetch(`https://api.countapi.xyz/get/${namespace}/${key}`);
-      const data = await res.json();
-      deviceCountEl.textContent = data.value;
     }
 
     // استعادة وضع النهار/الليل
@@ -238,18 +233,18 @@
       h = h % 12 || 12;
       clockEl.textContent = `${h}:${m} ${ampm}`;
     }
-    setInterval(updateClock, 1000);
-    updateClock();
 
     function saveStats() {
       readCountEl.textContent = localStorage.getItem('readCount') || 0;
       playCountEl.textContent = localStorage.getItem('playCount') || 0;
     }
+
     function incReadCount() {
       const c = (+localStorage.getItem('readCount')||0) + 1;
       localStorage.setItem('readCount', c);
       saveStats();
     }
+
     function incPlayCount() {
       const c = (+localStorage.getItem('playCount')||0) + 1;
       localStorage.setItem('playCount', c);
@@ -376,45 +371,46 @@
       audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
     };
 
-    // 40 سؤال يومي مع الإجابات من مصادر سُنّية موثوقة
     const quizzes = [
-  { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
-  { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
-  { q: 'كم عدد آيات سورة البقرة؟', a: '286 آية' },
-  { q: 'ما هي السورة التي نزلت كلها دفعة واحدة؟', a: 'سورة الأنعام' },
-  { q: 'من هو الصحابي الذي حفظ الكثير من القرآن وهو صغير السن وكان يؤم قومه؟', a: 'عمرو بن سلمة رضي الله عنه' },
-  { q: 'في أي سورة ذكر الله عز وجل قصة أصحاب الكهف؟', a: 'سورة الكهف' },
-  { q: 'ما هي الآية التي تسمى "آية الكرسي"؟', a: 'آية 255 من سورة البقرة' },
-  { q: 'ما هي أركان الإيمان الستة؟', a: 'الإيمان بالله، وملائكته، وكتبه، ورسله، واليوم الآخر، والقدر خيره وشره' },
-  { q: 'ما السورة التي تسمى "قلب القرآن"؟', a: 'سورة يس' },
-  { q: 'كم عدد أجزاء القرآن الكريم؟', a: '30 جزءًا' },
-  { q: 'ما السورة التي تبدأ بقسم الله بالنجم؟', a: 'سورة النجم' },
-  { q: 'من هو النبي الذي ابتلعه الحوت؟', a: 'النبي يونس عليه السلام' },
-  { q: 'ما هي السورة التي تحدثت عن ليلة القدر؟', a: 'سورة القدر' },
-  { q: 'كم عدد ركعات صلاة الفجر؟', a: 'ركعتان' },
-  { q: 'من هو الصحابي الذي جمع القرآن في مصحف واحد بعد وفاة النبي؟', a: 'زيد بن ثابت رضي الله عنه' },
-  { q: 'ما هي السورة التي تسمى بـ "الصمد"؟', a: 'سورة الإخلاص' },
-  { q: 'في أي سورة أمر الله ببر الوالدين؟', a: 'سورة الإسراء، الآية 23' },
-  { q: 'ما السورة التي تحتوي على قصة النبي يوسف عليه السلام؟', a: 'سورة يوسف' },
-  { q: 'ما هي السورة التي تسمى "الكوثر"؟', a: 'سورة الكوثر' },
-  { q: 'من هو الصحابي الذي لقب بـ "سيد القراء"؟', a: 'أُبي بن كعب رضي الله عنه' },
-  { q: 'في أي سورة ورد ذكر الجنة والنار؟', a: 'سورة الرحمن' },
-  { q: 'ما هي السورة التي بدأت بـ "الحمد لله رب العالمين"؟', a: 'سورة الفاتحة' },
-  { q: 'كم عدد الأحزاب في القرآن الكريم؟', a: '60 حزبًا' },
-  { q: 'ما هي أول سورة نزلت من القرآن الكريم؟', a: 'سورة العلق' },
-  { q: 'ما هي السورة التي تسمى "الملك"؟', a: 'سورة الملك' },
-  { q: 'كم عدد ركعات صلاة المغرب؟', a: '3 ركعات' },
-  { q: 'من هو الصحابي الذي قال له النبي: "خيركم من تعلم القرآن وعلمه"؟', a: 'عثمان بن عفان رضي الله عنه' },
-  { q: 'ما هي السورة التي تسمى "الفلق"؟', a: 'سورة الفلق' },
-  { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
-  { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
-];
+      { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
+      { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
+      { q: 'كم عدد آيات سورة البقرة؟', a: '286 آية' },
+      { q: 'ما هي السورة التي نزلت كلها دفعة واحدة؟', a: 'سورة الأنعام' },
+      { q: 'من هو الصحابي الذي حفظ الكثير من القرآن وهو صغير السن وكان يؤم قومه؟', a: 'عمرو بن سلمة رضي الله عنه' },
+      { q: 'في أي سورة ذكر الله عز وجل قصة أصحاب الكهف؟', a: 'سورة الكهف' },
+      { q: 'ما هي الآية التي تسمى "آية الكرسي"؟', a: 'آية 255 من سورة البقرة' },
+      { q: 'ما هي أركان الإيمان الستة؟', a: 'الإيمان بالله، وملائكته، وكتبه، ورسله، واليوم الآخر، والقدر خيره وشره' },
+      { q: 'ما السورة التي تسمى "قلب القرآن"؟', a: 'سورة يس' },
+      { q: 'كم عدد أجزاء القرآن الكريم؟', a: '30 جزءًا' },
+      { q: 'ما السورة التي تبدأ بقسم الله بالنجم؟', a: 'سورة النجم' },
+      { q: 'من هو النبي الذي ابتلعه الحوت؟', a: 'النبي يونس عليه السلام' },
+      { q: 'ما هي السورة التي تحدثت عن ليلة القدر؟', a: 'سورة القدر' },
+      { q: 'كم عدد ركعات صلاة الفجر؟', a: 'ركعتان' },
+      { q: 'من هو الصحابي الذي جمع القرآن في مصحف واحد بعد وفاة النبي؟', a: 'زيد بن ثابت رضي الله عنه' },
+      { q: 'ما هي السورة التي تسمى بـ "الصمد"؟', a: 'سورة الإخلاص' },
+      { q: 'في أي سورة أمر الله ببر الوالدين؟', a: 'سورة الإسراء، الآية 23' },
+      { q: 'ما السورة التي تحتوي على قصة النبي يوسف عليه السلام؟', a: 'سورة يوسف' },
+      { q: 'ما هي السورة التي تسمى "الكوثر"؟', a: 'سورة الكوثر' },
+      { q: 'من هو الصحابي الذي لقب بـ "سيد القراء"؟', a: 'أُبي بن كعب رضي الله عنه' },
+      { q: 'في أي سورة ورد ذكر الجنة والنار؟', a: 'سورة الرحمن' },
+      { q: 'ما هي السورة التي بدأت بـ "الحمد لله رب العالمين"؟', a: 'سورة الفاتحة' },
+      { q: 'كم عدد الأحزاب في القرآن الكريم؟', a: '60 حزبًا' },
+      { q: 'ما هي أول سورة نزلت من القرآن الكريم؟', a: 'سورة العلق' },
+      { q: 'ما هي السورة التي تسمى "الملك"؟', a: 'سورة الملك' },
+      { q: 'كم عدد ركعات صلاة المغرب؟', a: '3 ركعات' },
+      { q: 'من هو الصحابي الذي قال له النبي: "خيركم من تعلم القرآن وعلمه"؟', a: 'عثمان بن عفان رضي الله عنه' },
+      { q: 'ما هي السورة التي تسمى "الفلق"؟', a: 'سورة الفلق' },
+      { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
+      { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
+    ];
+
     function loadQuiz() {
       const idx = Math.floor(Math.random() * quizzes.length);
       quizQuestion.textContent = quizzes[idx].q;
       quizAnswer.textContent   = quizzes[idx].a;
       quizAnswer.style.display = 'none';
     }
+
     showAnswerBtn.onclick = () => quizAnswer.style.display = 'block';
 
     themeToggle.onclick = () => {
@@ -425,11 +421,15 @@
     };
 
     // Initialization
-    saveStats();
-    loadQuiz();
-    loadSurahList();
-    surahSelect.onchange = () => loadSurah(surahSelect.value);
-    trackDevice();
+    window.addEventListener('load', () => {
+      saveStats();
+      updateClock();
+      setInterval(updateClock, 1000);
+      loadQuiz();
+      loadSurahList();
+      surahSelect.onchange = () => loadSurah(surahSelect.value);
+      trackDevice();
+    });
   </script>
 </body>
 </html>
