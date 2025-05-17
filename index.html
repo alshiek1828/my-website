@@ -23,9 +23,7 @@
     main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
 
     /* Theme toggle */
-    .theme-toggle {
-      position: absolute; top: 1rem; left: 1rem; cursor: pointer; font-size: 1.5rem;
-    }
+    .theme-toggle { position: absolute; top: 1rem; left: 1rem; cursor: pointer; font-size: 1.5rem; }
 
     /* Header */
     header h1 {
@@ -44,9 +42,7 @@
     }
 
     /* Surah Selector */
-    .surah-container {
-      margin: 2rem 0; display: flex; flex-direction: column; gap: .5rem;
-    }
+    .surah-container { margin: 2rem 0; display: flex; flex-direction: column; gap: .5rem; }
     .surah-container label {
       font-weight: bold; font-size: 1.1rem;
       background: linear-gradient(45deg, #ff8c00, #ffa500);
@@ -65,9 +61,7 @@
     }
 
     /* Audio Controls */
-    .audio-controls {
-      display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem;
-    }
+    .audio-controls { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem; }
     .audio-controls button {
       background: #333; border: none; color: #fff; padding: .8rem;
       border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: background .3s;
@@ -103,9 +97,7 @@
     .verse.highlight { border-bottom: 2px solid #f00; }
 
     /* Rating */
-    .rating {
-      display: flex; justify-content: center; gap: .3rem; margin-top: .5rem;
-    }
+    .rating { display: flex; justify-content: center; gap: .3rem; margin-top: .5rem; }
     .star {
       font-size: 1.8rem; cursor: pointer; transition: transform .2s; color: #888;
     }
@@ -127,18 +119,15 @@
     .daily-quiz, .stats {
       background: #222; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;
     }
-    body.light .daily-quiz, body.light .stats {
-      background: #f1f1f1; color: #222;
-    }
+    body.light .daily-quiz, body.light .stats { background: #f1f1f1; color: #222; }
     .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
     .daily-quiz button, .stats p { margin-top: .5rem; }
-
-    /* Footer Maker */
-    footer .maker {
-      margin-top: .5rem; font-style: italic;
-      color: #ffde7d; text-shadow: 0 0 4px #f80;
-    }
   </style>
+
+  <!-- Firebase App (the core SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <!-- Firebase Realtime Database -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
   <header>
@@ -172,6 +161,7 @@
       <h3>إحصائياتك</h3>
       <p>السور المقروءة: <span id="readCount">0</span></p>
       <p>عدد الاستماعات: <span id="playCount">0</span></p>
+      <p>عدد الأجهزة: <span id="deviceCount">0</span></p>
     </div>
     <div class="verses" id="verses"></div>
     <button class="btn-open-prayer" onclick="window.open('https://timesprayer.today/', '_blank')">
@@ -183,6 +173,52 @@
   </footer>
 
   <script>
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
+      authDomain: "gmae-fae90.firebaseapp.com",
+      databaseURL: "https://gmae-fae90-default-rtdb.firebaseio.com",
+      projectId: "gmae-fae90",
+      storageBucket: "gmae-fae90.firebasestorage.app",
+      messagingSenderId: "768482186329",
+      appId: "1:768482186329:web:18937587e530f8674e0d48",
+      measurementId: "G-V4ZLJ4BJGD"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // توليد UUID مبسط وخزن في localStorage
+    function generateId() {
+      return 'xxxx-xxxx-xxxx'.replace(/x/g, () =>
+        Math.floor(Math.random() * 16).toString(16)
+      );
+    }
+    let visitorId = localStorage.getItem('visitorId');
+    if (!visitorId) {
+      visitorId = generateId();
+      localStorage.setItem('visitorId', visitorId);
+    }
+
+    // سجل الزائر مرة واحدة فقط
+    function registerVisitor() {
+      const refPath = 'visitors/' + visitorId;
+      db.ref(refPath).once('value', snap => {
+        if (!snap.exists()) {
+          db.ref(refPath).set({ ts: Date.now() });
+        }
+      });
+    }
+
+    // اعرض عد الزوار
+    function displayVisitorCount() {
+      db.ref('visitors').on('value', snap => {
+        document.getElementById('deviceCount').textContent = snap.numChildren();
+      });
+    }
+
+    // دوال موقعك الأصلية (clock, stats, quiz, audio, loadSurahList...)...
+    // **ابدأ تضمين الكود الأصلي من هنا كما كان دون حذف أي جزء**:
+
     const surahSelect   = document.getElementById('surahSelect');
     const ratingDiv     = document.getElementById('rating');
     const versesDiv     = document.getElementById('verses');
@@ -203,7 +239,6 @@
     let audio = new Audio();
     let ayahAudios = [], ayahList = [], currentAyah = 0;
 
-    // استعادة وضع النهار/الليل
     const savedTheme = localStorage.getItem('theme') || 'dark';
     if (savedTheme === 'light') {
       document.body.classList.add('light');
@@ -225,18 +260,18 @@
       h = h % 12 || 12;
       clockEl.textContent = `${h}:${m} ${ampm}`;
     }
-    setInterval(updateClock, 1000);
-    updateClock();
 
     function saveStats() {
       readCountEl.textContent = localStorage.getItem('readCount') || 0;
       playCountEl.textContent = localStorage.getItem('playCount') || 0;
     }
+
     function incReadCount() {
       const c = (+localStorage.getItem('readCount')||0) + 1;
       localStorage.setItem('readCount', c);
       saveStats();
     }
+
     function incPlayCount() {
       const c = (+localStorage.getItem('playCount')||0) + 1;
       localStorage.setItem('playCount', c);
@@ -356,6 +391,7 @@
         playPauseBtn.textContent = '▶️';
       }
     };
+
     backwardBtn.onclick = () => audio.currentTime = Math.max(0, audio.currentTime - 5);
     forwardBtn.onclick  = () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
     progressBar.onclick  = e => {
@@ -363,7 +399,6 @@
       audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
     };
 
-    // 40 سؤال يومي مع الإجابات من مصادر سُنّية موثوقة
     const quizzes = [
   { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
   { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
@@ -397,13 +432,13 @@
   { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
 ];
 
-    // دالة اختيار سؤال عشوائي في كل تحميل
     function loadQuiz() {
       const idx = Math.floor(Math.random() * quizzes.length);
       quizQuestion.textContent = quizzes[idx].q;
       quizAnswer.textContent   = quizzes[idx].a;
       quizAnswer.style.display = 'none';
     }
+
     showAnswerBtn.onclick = () => quizAnswer.style.display = 'block';
 
     themeToggle.onclick = () => {
@@ -414,10 +449,18 @@
     };
 
     // Initialization
-    saveStats();
-    loadQuiz();
-    loadSurahList();
-    surahSelect.onchange = () => loadSurah(surahSelect.value);
+    window.addEventListener('load', () => {
+      saveStats();
+      updateClock();
+      setInterval(updateClock, 1000);
+      loadQuiz();
+      loadSurahList();
+      surahSelect.onchange = () => loadSurah(surahSelect.value);
+
+      // سجل الزائر واظهر العدد
+      registerVisitor();
+      displayVisitorCount();
+    });
   </script>
 </body>
 </html>
