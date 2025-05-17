@@ -13,26 +13,23 @@
 
     /* Flame Text Animation */
     @keyframes flame {
-      0%,100% { text-shadow: 0 0 2px #ff6,0 0 10px #f80,0 0 20px #f40; }
-      50%   { text-shadow: 0 0 5px #ff6,0 0 15px #f80,0 0 30px #f40; }
+      0%,100% { text-shadow: 0 0 2px #ff6, 0 0 10px #f80, 0 0 20px #f40; }
+      50%   { text-shadow: 0 0 5px #ff6, 0 0 15px #f80, 0 0 30px #f40; }
     }
 
     /* Layout */
     header, footer { text-align: center; padding: 2rem 1rem; background: #000; color: #fff; position: relative; }
     body.light header, body.light footer { background: #ddd; color: #000; }
-    main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; transition: filter .3s; }
 
     /* Overlay for blocked users */
     #blockOverlay {
       display: none;
-      position: fixed;
-      top: 0; left: 0;
+      position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.9);
-      color: #fff;
-      z-index: 10000;
-      text-align: center;
-      padding-top: 20vh;
+      color: #fff; z-index: 10000;
+      text-align: center; padding-top: 20vh;
       font-size: 1.2rem;
     }
     #blockOverlay h2 { margin-bottom: 1rem; }
@@ -94,8 +91,7 @@
 
     /* Verses & Spacing */
     .verses {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 1rem; margin-bottom: 2rem;
     }
     .verse {
@@ -114,9 +110,7 @@
 
     /* Rating */
     .rating { display: flex; justify-content: center; gap: .3rem; margin-top: .5rem; }
-    .star {
-      font-size: 1.8rem; cursor: pointer; transition: transform .2s; color: #888;
-    }
+    .star { font-size: 1.8rem; cursor: pointer; transition: transform .2s; color: #888; }
     .star:hover { transform: scale(1.2); }
     .active { color: gold; }
 
@@ -138,7 +132,6 @@
     body.light .daily-quiz, body.light .stats { background: #f1f1f1; color: #222; }
     .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
     .daily-quiz button, .stats p { margin-top: .5rem; }
-
   </style>
 
   <!-- Firebase SDK -->
@@ -160,7 +153,8 @@
     <h2>بوابتك التفاعلية لقراءة القرآن الكريم والاستماع</h2>
     <div class="clock" id="clock"></div>
   </header>
-  <main>
+
+  <main id="mainContent">
     <div class="surah-container">
       <label for="surahSelect">اختر السورة:</label>
       <select id="surahSelect"></select>
@@ -192,6 +186,7 @@
       عرض مواقيت الصلاة
     </button>
   </main>
+
   <footer>
     &copy; 2025 القرآن الكريم<div class="maker">Made by AlShiek</div>
   </footer>
@@ -223,33 +218,30 @@
       localStorage.setItem('visitorId', visitorId);
     }
 
-    // دوال الحظر
-    function blockUser(id, durationMinutes) {
-      const until = Date.now() + durationMinutes * 60 * 1000;
-      db.ref('blockedUsers/' + id).set({ blockedUntil: until });
-    }
-    function unblockUser(id) {
-      db.ref('blockedUsers/' + id).remove();
-    }
+    // عرض/إخفاء Overlay
     function showBlockOverlay(until) {
       const diff = Math.ceil((until - Date.now()) / 60000);
-      document.getElementById('blockMsg').textContent =
-        'مدة الحظر المتبقية: ' + diff + ' دقيقة';
+      document.getElementById('blockMsg').textContent = 'مدة الحظر المتبقية: ' + diff + ' دقيقة';
       document.getElementById('blockOverlay').style.display = 'block';
+      document.getElementById('mainContent').style.filter = 'blur(4px)';
     }
-    function checkIfBlocked(id, cb) {
-      db.ref('blockedUsers/' + id).once('value', snap => {
-        if (snap.exists() && snap.val().blockedUntil > Date.now()) {
-          cb(true, snap.val().blockedUntil);
-        } else {
-          if (snap.exists()) unblockUser(id);
-          document.getElementById('blockOverlay').style.display = 'none';
-          cb(false);
-        }
-      });
+    function hideBlockOverlay() {
+      document.getElementById('blockOverlay').style.display = 'none';
+      document.getElementById('mainContent').style.filter = 'none';
     }
 
-    // تسجيل الزائر وعد الأجهزة
+    // مستمع لحالة الحظر في الوقت الحقيقي
+    const blockRef = db.ref('blockedUsers/' + visitorId);
+    blockRef.on('value', snap => {
+      if (snap.exists() && snap.val().blockedUntil > Date.now()) {
+        showBlockOverlay(snap.val().blockedUntil);
+      } else {
+        if (snap.exists()) blockRef.remove();
+        hideBlockOverlay();
+      }
+    });
+
+    // سجل الزائر وعد الأجهزة
     function registerVisitor() {
       const path = 'visitors/' + visitorId;
       db.ref(path).once('value', snap => {
@@ -262,7 +254,7 @@
       });
     }
 
-    // متغيرات DOM
+    // عناصر DOM
     const surahSelect   = document.getElementById('surahSelect');
     const ratingDiv     = document.getElementById('rating');
     const versesDiv     = document.getElementById('verses');
@@ -302,21 +294,21 @@
       clockEl.textContent = `${h}:${m} ${ampm}`;
     }
     function saveStats() {
-      readCountEl.textContent = localStorage.getItem('readCount')||0;
-      playCountEl.textContent = localStorage.getItem('playCount')||0;
+      readCountEl.textContent = localStorage.getItem('readCount') || 0;
+      playCountEl.textContent = localStorage.getItem('playCount') || 0;
     }
     function incReadCount() {
-      const c = (+localStorage.getItem('readCount')||0) +1;
+      const c = (+localStorage.getItem('readCount')||0) + 1;
       localStorage.setItem('readCount', c);
       saveStats();
     }
     function incPlayCount() {
-      const c = (+localStorage.getItem('playCount')||0) +1;
+      const c = (+localStorage.getItem('playCount')||0) + 1;
       localStorage.setItem('playCount', c);
       saveStats();
     }
 
-    // تحميل القرآن
+    // تحميل السور والآيات
     async function loadSurahList() {
       const res = await fetch('https://api.alquran.cloud/v1/surah');
       const { data } = await res.json();
@@ -330,123 +322,156 @@
       surahSelect.value = sel;
       loadSurah(sel, params.get('ayah'));
     }
-    function renderRating(s) {
+    function renderRating(surah) {
       ratingDiv.innerHTML = '';
-      const saved = +localStorage.getItem('rating_'+s);
-      for (let i=1;i<=5;i++){
+      const saved = +localStorage.getItem('rating_' + surah);
+      for (let i = 1; i <= 5; i++) {
         const star = document.createElement('span');
-        star.className = 'star'+(i<=saved?' active':'');
+        star.className = 'star' + (i <= saved ? ' active' : '');
         star.textContent = '★';
-        star.onclick =()=>{ localStorage.setItem('rating_'+s,i); renderRating(s); };
+        star.onclick = () => {
+          localStorage.setItem('rating_' + surah, i);
+          renderRating(surah);
+        };
         ratingDiv.appendChild(star);
       }
     }
     async function loadSurah(num, highlightAyah) {
-      localStorage.setItem('lastSurah',num);
+      localStorage.setItem('lastSurah', num);
       renderRating(num);
       const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/ar.alafasy`);
       const { data } = await res.json();
-      ayahAudios = data.ayahs.map(a=>a.audio);
-      ayahList   = data.ayahs.map(a=>({number:a.numberInSurah,text:a.text}));
-      currentAyah=0; setupAudio(); renderVerses(highlightAyah&&+highlightAyah); incReadCount();
+      ayahAudios = data.ayahs.map(a => a.audio);
+      ayahList   = data.ayahs.map(a => ({ number: a.numberInSurah, text: a.text }));
+      currentAyah = 0; setupAudio(); renderVerses(highlightAyah && +highlightAyah); incReadCount();
     }
-    function renderVerses(highlightNum){
-      versesDiv.innerHTML='';
-      ayahList.forEach(v=>{
-        const d=document.createElement('div');
-        d.className='verse'+(v.number===highlightNum?' highlight':'');
-        d.innerHTML=`
+    function renderVerses(highlightNum) {
+      versesDiv.innerHTML = '';
+      ayahList.forEach(v => {
+        const d = document.createElement('div');
+        d.className = 'verse' + (v.number === highlightNum ? ' highlight' : '');
+        d.innerHTML = `
           <p><strong>${v.number}.</strong> ${v.text}</p>
           <div class="actions">
             <span class="trn">ترجمة</span>
             <span class="shr">مشاركة</span>
           </div>
-          <p class="trn-text"></p>`;
-        if(v.number===highlightNum) setTimeout(()=>d.scrollIntoView({behavior:'smooth'}),100);
-        d.querySelector('.trn').onclick=async()=>{
-          const trEl=d.querySelector('.trn-text');
-          if(trEl.textContent){ trEl.style.display=trEl.style.display==='none'?'block':'none'; return; }
-          const r=await fetch(`https://api.alquran.cloud/v1/ayah/${surahSelect.value}:${v.number}/en.asad`);
-          trEl.textContent=(await r.json()).data.text; trEl.style.display='block';
+          <p class="trn-text"></p>
+        `;
+        if (v.number === highlightNum) setTimeout(() => d.scrollIntoView({ behavior: 'smooth' }), 100);
+        d.querySelector('.trn').onclick = async () => {
+          const trEl = d.querySelector('.trn-text');
+          if (trEl.textContent) {
+            trEl.style.display = trEl.style.display === 'none' ? 'block' : 'none';
+            return;
+          }
+          const r = await fetch(`https://api.alquran.cloud/v1/ayah/${surahSelect.value}:${v.number}/en.asad`);
+          trEl.textContent = (await r.json()).data.text;
+          trEl.style.display = 'block';
         };
-        d.querySelector('.shr').onclick=()=>{
-          const url=`${location.origin}${location.pathname}?surah=${surahSelect.value}&ayah=${v.number}`;
-          navigator.clipboard.writeText(url); alert('تم نسخ الرابط');
+        d.querySelector('.shr').onclick = () => {
+          const url = `${location.origin}${location.pathname}?surah=${surahSelect.value}&ayah=${v.number}`;
+          navigator.clipboard.writeText(url);
+          alert('تم نسخ الرابط');
         };
         versesDiv.appendChild(d);
       });
     }
-    function setupAudio(){
-      playPauseBtn.textContent='▶️';
-      audio.currentTime=+localStorage.getItem('pos_'+surahSelect.value)||0;
-      audio.src=ayahAudios[currentAyah];
-      audio.ontimeupdate=()=>{
-        const pct=(audio.currentTime/audio.duration)*100;
-        progress.style.width=pct+'%';
-        timeDisplay.textContent=`${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
-        localStorage.setItem('pos_'+surahSelect.value,audio.currentTime);
+    function setupAudio() {
+      playPauseBtn.textContent = '▶️';
+      audio.currentTime = +localStorage.getItem('pos_' + surahSelect.value) || 0;
+      audio.src = ayahAudios[currentAyah];
+      audio.ontimeupdate = () => {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        progress.style.width = pct + '%';
+        timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+        localStorage.setItem('pos_' + surahSelect.value, audio.currentTime);
       };
-      audio.onended=()=>{
+      audio.onended = () => {
         incPlayCount();
-        if(currentAyah+1<ayahAudios.length) playAyah(currentAyah+1);
-        else playPauseBtn.textContent='▶️';
+        if (currentAyah + 1 < ayahAudios.length) playAyah(currentAyah + 1);
+        else playPauseBtn.textContent = '▶️';
       };
     }
-    function playAyah(i){ if(i>=ayahAudios.length) return; audio.src=ayahAudios[i]; audio.play(); playPauseBtn.textContent='⏸️'; currentAyah=i; }
-    playPauseBtn.onclick=()=>{ if(audio.paused){ audio.play(); playPauseBtn.textContent='⏸️'; incPlayCount(); } else{ audio.pause(); playPauseBtn.textContent='▶️'; }};
-    backwardBtn.onclick=()=>audio.currentTime=Math.max(0,audio.currentTime-5);
-    forwardBtn.onclick=()=>audio.currentTime=Math.min(audio.duration,audio.currentTime+5);
-    progressBar.onclick=e=>{ const rect=progressBar.getBoundingClientRect(); audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration; };
+    function playAyah(i) {
+      if (i >= ayahAudios.length) return;
+      audio.src = ayahAudios[i];
+      audio.play();
+      playPauseBtn.textContent = '⏸️';
+      currentAyah = i;
+    }
+    playPauseBtn.onclick = () => {
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = '⏸️';
+        incPlayCount();
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = '▶️';
+      }
+    };
+    backwardBtn.onclick = () => audio.currentTime = Math.max(0, audio.currentTime - 5);
+    forwardBtn.onclick  = () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+    progressBar.onclick  = e => {
+      const rect = progressBar.getBoundingClientRect();
+      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    };
 
     const quizzes = [
-  { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
-  { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
-  { q: 'كم عدد آيات سورة البقرة؟', a: '286 آية' },
-  { q: 'ما هي السورة التي نزلت كلها دفعة واحدة؟', a: 'سورة الأنعام' },
-  { q: 'من هو الصحابي الذي حفظ الكثير من القرآن وهو صغير السن وكان يؤم قومه؟', a: 'عمرو بن سلمة رضي الله عنه' },
-  { q: 'في أي سورة ذكر الله عز وجل قصة أصحاب الكهف؟', a: 'سورة الكهف' },
-  { q: 'ما هي الآية التي تسمى "آية الكرسي"؟', a: 'آية 255 من سورة البقرة' },
-  { q: 'ما هي أركان الإيمان الستة؟', a: 'الإيمان بالله، وملائكته، وكتبه، ورسله، واليوم الآخر، والقدر خيره وشره' },
-  { q: 'ما السورة التي تسمى "قلب القرآن"؟', a: 'سورة يس' },
-  { q: 'كم عدد أجزاء القرآن الكريم؟', a: '30 جزءًا' },
-  { q: 'ما السورة التي تبدأ بقسم الله بالنجم؟', a: 'سورة النجم' },
-  { q: 'من هو النبي الذي ابتلعه الحوت؟', a: 'النبي يونس عليه السلام' },
-  { q: 'ما هي السورة التي تحدثت عن ليلة القدر؟', a: 'سورة القدر' },
-  { q: 'كم عدد ركعات صلاة الفجر؟', a: 'ركعتان' },
-  { q: 'من هو الصحابي الذي جمع القرآن في مصحف واحد بعد وفاة النبي؟', a: 'زيد بن ثابت رضي الله عنه' },
-  { q: 'ما هي السورة التي تسمى بـ "الصمد"؟', a: 'سورة الإخلاص' },
-  { q: 'في أي سورة أمر الله ببر الوالدين؟', a: 'سورة الإسراء، الآية 23' },
-  { q: 'ما السورة التي تحتوي على قصة النبي يوسف عليه السلام؟', a: 'سورة يوسف' },
-  { q: 'ما هي السورة التي تسمى "الكوثر"؟', a: 'سورة الكوثر' },
-  { q: 'من هو الصحابي الذي لقب بـ "سيد القراء"؟', a: 'أُبي بن كعب رضي الله عنه' },
-  { q: 'في أي سورة ورد ذكر الجنة والنار؟', a: 'سورة الرحمن' },
-  { q: 'ما هي السورة التي بدأت بـ "الحمد لله رب العالمين"؟', a: 'سورة الفاتحة' },
-  { q: 'كم عدد الأحزاب في القرآن الكريم؟', a: '60 حزبًا' },
-  { q: 'ما هي أول سورة نزلت من القرآن الكريم؟', a: 'سورة العلق' },
-  { q: 'ما هي السورة التي تسمى "الملك"؟', a: 'سورة الملك' },
-  { q: 'كم عدد ركعات صلاة المغرب؟', a: '3 ركعات' },
-  { q: 'من هو الصحابي الذي قال له النبي: "خيركم من تعلم القرآن وعلمه"؟', a: 'عثمان بن عفان رضي الله عنه' },
-  { q: 'ما هي السورة التي تسمى "الفلق"؟', a: 'سورة الفلق' },
-  { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
-  { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
-];
-    function loadQuiz(){ const idx=Math.floor(Math.random()*quizzes.length); quizQuestion.textContent=quizzes[idx].q; quizAnswer.textContent=quizzes[idx].a; quizAnswer.style.display='none'; }
-    showAnswerBtn.onclick=()=>quizAnswer.style.display='block';
-    themeToggle.onclick=()=>{ document.body.classList.toggle('light'); const t=document.body.classList.contains('light')?'light':'dark'; localStorage.setItem('theme',t); themeToggle.textContent=t==='light'?'🌞':'🌙'; };
+      { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
+      { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
+      { q: 'كم عدد آيات سورة البقرة؟', a: '286 آية' },
+      { q: 'ما هي السورة التي نزلت كلها دفعة واحدة؟', a: 'سورة الأنعام' },
+      { q: 'من هو الصحابي الذي حفظ الكثير من القرآن وهو صغير السن وكان يؤم قومه؟', a: 'عمرو بن سلمة رضي الله عنه' },
+      { q: 'في أي سورة ذكر الله عز وجل قصة أصحاب الكهف؟', a: 'سورة الكهف' },
+      { q: 'ما هي الآية التي تسمى "آية الكرسي"؟', a: 'آية 255 من سورة البقرة' },
+      { q: 'ما هي أركان الإيمان الستة؟', a: 'الإيمان بالله، وملائكته، وكتبه، ورسله، واليوم الآخر، والقدر خيره وشره' },
+      { q: 'ما السورة التي تسمى "قلب القرآن"؟', a: 'سورة يس' },
+      { q: 'كم عدد أجزاء القرآن الكريم؟', a: '30 جزءًا' },
+      { q: 'ما السورة التي تبدأ بقسم الله بالنجم؟', a: 'سورة النجم' },
+      { q: 'من هو النبي الذي ابتلعه الحوت؟', a: 'النبي يونس عليه السلام' },
+      { q: 'ما هي السورة التي تحدثت عن ليلة القدر؟', a: 'سورة القدر' },
+      { q: 'كم عدد ركعات صلاة الفجر؟', a: 'ركعتان' },
+      { q: 'من هو الصحابي الذي جمع القرآن في مصحف واحد بعد وفاة النبي؟', a: 'زيد بن ثابت رضي الله عنه' },
+      { q: 'ما هي السورة التي تسمى بـ "الصمد"؟', a: 'سورة الإخلاص' },
+      { q: 'في أي سورة أمر الله ببر الوالدين؟', a: 'سورة الإسراء، الآية 23' },
+      { q: 'ما السورة التي تحتوي على قصة النبي يوسف عليه السلام؟', a: 'سورة يوسف' },
+      { q: 'ما هي السورة التي تسمى "الكوثر"؟', a: 'سورة الكوثر' },
+      { q: 'من هو الصحابي الذي لقب بـ "سيد القراء"؟', a: 'أُبي بن كعب رضي الله عنه' },
+      { q: 'في أي سورة ورد ذكر الجنة والنار؟', a: 'سورة الرحمن' },
+      { q: 'ما هي السورة التي بدأت بـ "الحمد لله رب العالمين"؟', a: 'سورة الفاتحة' },
+      { q: 'كم عدد الأحزاب في القرآن الكريم؟', a: '60 حزبًا' },
+      { q: 'ما هي أول سورة نزلت من القرآن الكريم؟', a: 'سورة العلق' },
+      { q: 'ما هي السورة التي تسمى "الملك"؟', a: 'سورة الملك' },
+      { q: 'كم عدد ركعات صلاة المغرب؟', a: '3 ركعات' },
+      { q: 'من هو الصحابي الذي قال له النبي: "خيركم من تعلم القرآن وعلمه"؟', a: 'عثمان بن عفان رضي الله عنه' },
+      { q: 'ما هي السورة التي تسمى "الفلق"؟', a: 'سورة الفلق' },
+      { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
+      { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
+    ];
+    function loadQuiz() {
+      const idx = Math.floor(Math.random() * quizzes.length);
+      quizQuestion.textContent = quizzes[idx].q;
+      quizAnswer.textContent   = quizzes[idx].a;
+      quizAnswer.style.display = 'none';
+    }
+    showAnswerBtn.onclick = () => quizAnswer.style.display = 'block';
+    themeToggle.onclick = () => {
+      document.body.classList.toggle('light');
+      const t = document.body.classList.contains('light') ? 'light' : 'dark';
+      localStorage.setItem('theme', t);
+      themeToggle.textContent = t === 'light' ? '🌞' : '🌙';
+    };
 
-    // التهيئة مع التحقق من الحظر أولاً
-    window.addEventListener('load',()=>{
-      checkIfBlocked(visitorId,(blocked,until)=>{
-        if(blocked){ showBlockOverlay(until); }
-        else {
-          saveStats(); updateClock(); setInterval(updateClock,1000);
-          loadQuiz(); loadSurahList();
-          surahSelect.onchange=()=>loadSurah(surahSelect.value);
-          registerVisitor(); displayVisitorCount();
-        }
-      });
-      // تحقق دوري كل دقيقة
-      setInterval(()=>checkIfBlocked(visitorId,(b,u)=>{ if(b) showBlockOverlay(u); }),60000);
+    // تهيئة التطبيق عند التحميل
+    window.addEventListener('load', () => {
+      registerVisitor();
+      displayVisitorCount();
+      updateClock(); setInterval(updateClock, 1000);
+      loadQuiz();
+      loadSurahList();
+      surahSelect.onchange = () => loadSurah(surahSelect.value);
+      saveStats();
     });
   </script>
 </body>
