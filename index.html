@@ -11,32 +11,25 @@
     body.light { background: #f9f9f9; color: #222; }
     a { color: inherit; text-decoration: none; }
 
-    /* Flame Animation */
+    /* Flame Text Animation */
     @keyframes flame {
-      0%,100% { text-shadow: 0 0 2px #ff6, 0 0 10px #f80, 0 0 20px #f40; }
-      50%     { text-shadow: 0 0 5px #ff6, 0 0 15px #f80, 0 0 30px #f40; }
+      0%,100% { text-shadow: 0 0 2px #ff6,0 0 10px #f80,0 0 20px #f40; }
+      50%   { text-shadow: 0 0 5px #ff6,0 0 15px #f80,0 0 30px #f40; }
     }
 
     /* Layout */
     header, footer { text-align: center; padding: 2rem 1rem; background: #000; color: #fff; position: relative; }
     body.light header, body.light footer { background: #ddd; color: #000; }
-    main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; transition: filter .3s; }
-
-    /* Overlay */
-    #blockOverlay {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9); color: #fff; z-index: 10000;
-      text-align: center; padding-top: 20vh; font-size: 1.2rem;
-    }
-    #blockOverlay h2 { margin-bottom: 1rem; }
-    #blockOverlay a { color: #0ff; text-decoration: underline; }
+    main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
 
     /* Theme toggle */
-    .theme-toggle { position: absolute; top: 1rem; left: 1rem; cursor: pointer; font-size: 1.5rem; }
+    .theme-toggle {
+      position: absolute; top: 1rem; left: 1rem; cursor: pointer; font-size: 1.5rem;
+    }
 
     /* Header */
     header h1 {
-      font-size: 3rem; font-weight: bold; letter-spacing: 2px; margin-bottom: .5rem;
+      font-size: 3rem; letter-spacing: 2px; margin-bottom: .5rem; font-weight: bold;
       background: linear-gradient(45deg, #ff4500, #ff8c00, #ffd700);
       -webkit-background-clip: text; color: transparent;
       animation: flame 1.5s infinite alternate;
@@ -46,195 +39,150 @@
       color: #ffde7d; text-shadow: 0 0 6px #ff8c00;
     }
     .clock {
-      font-size: 1.2rem; font-weight: bold; opacity: .9;
+      font-size: 1.2rem; opacity: .9; font-weight: bold;
       color: #f8f871; text-shadow: 0 0 4px #f80;
     }
 
-    /* Surah selector */
-    .surah-container { margin: 2rem 0; display: flex; flex-direction: column; gap: .5rem; }
+    /* Surah Selector */
+    .surah-container {
+      margin: 2rem 0; display: flex; flex-direction: column; gap: .5rem;
+    }
     .surah-container label {
-      font-size: 1.1rem; font-weight: bold;
+      font-weight: bold; font-size: 1.1rem;
       background: linear-gradient(45deg, #ff8c00, #ffa500);
       -webkit-background-clip: text; color: transparent;
+      text-shadow: 0 0 4px #f40;
       animation: flame 2s infinite alternate-reverse;
     }
     select {
-      padding: .7rem; border: none; border-radius: 8px; font-size: 1rem;
-      background: #222; color: #fff; box-shadow: 0 0 8px rgba(255,140,0,0.5);
+      padding: .7rem; border-radius: 8px; border: none; font-size: 1rem;
+      background: #222; color: #fff;
+      box-shadow: 0 0 8px rgba(255,140,0,0.5);
     }
-    body.light select { background: #fff; color: #222; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+    body.light select {
+      background: #fff; color: #222;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
 
-    /* Audio */
-    .audio-controls { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem; }
+    /* Audio Controls */
+    .audio-controls {
+      display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem;
+    }
     .audio-controls button {
       background: #333; border: none; color: #fff; padding: .8rem;
-      border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: background .3s;
+      border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: background .3s;
     }
     .audio-controls button:hover { background: #444; }
-    .progress-bar { flex: 1; height: 6px; background: #222; border-radius: 4px; overflow: hidden; cursor: pointer; }
-    .progress { height: 100%; width: 0%; background: #ff8c00; }
+    .progress-bar {
+      flex: 1; height: 6px; background: #222; border-radius: 4px; overflow: hidden; cursor: pointer;
+    }
+    .progress { height: 100%; background: #ff8c00; width: 0%; }
     #timeDisplay { font-size: .9rem; min-width: 80px; text-align: right; }
-    body.light .audio-controls button { background: #ddd; color: #222; }
+    body.light .audio-controls button { color: #222; background: #ddd; }
     body.light .progress-bar { background: #eee; }
     body.light .progress { background: #ff4500; }
 
-    /* Verses */
-    .verses { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:1rem; margin-bottom:2rem; }
-    .verse {
-      background: #222; padding:1rem; border-radius:8px;
-      box-shadow:0 0 10px rgba(255,140,0,0.3); position:relative; font-size:.95rem;
+    /* Verses & Spacing */
+    .verses {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem; margin-bottom: 2rem;
     }
-    body.light .verse { background:#fff; color:#222; box-shadow:0 0 8px rgba(0,0,0,0.1); }
-    .actions { display:flex; gap:.5rem; margin-bottom:.5rem; cursor:pointer; }
-    .actions span:hover { text-decoration:underline; }
-    .verse.highlight { border-bottom:2px solid #f00; }
+    .verse {
+      background: #222; border-radius: 8px; padding: 1rem;
+      box-shadow: 0 0 10px rgba(255,140,0,0.3);
+      font-size: .95rem; position: relative;
+    }
+    body.light .verse {
+      background: #fff; color: #222;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .verse p { margin-bottom: .75rem; }
+    .actions { display: flex; gap: .5rem; font-size: .9rem; margin-bottom: .5rem; cursor: pointer; }
+    .actions span:hover { text-decoration: underline; }
+    .verse.highlight { border-bottom: 2px solid #f00; }
 
     /* Rating */
-    .rating { display:flex; justify-content:center; gap:.3rem; margin-top:.5rem; }
-    .star { font-size:1.8rem; cursor:pointer; transition:transform .2s; color:#888; }
-    .star:hover { transform:scale(1.2); } .active { color:gold; }
-
-    /* Prayer */
-    .btn-open-prayer {
-      display:block; width:100%; padding:1rem; margin-bottom:2rem;
-      background:#ff4500; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:1.1rem; transition:background .3s;
+    .rating {
+      display: flex; justify-content: center; gap: .3rem; margin-top: .5rem;
     }
-    .btn-open-prayer:hover { background:#e63e00; }
-    body.light .btn-open-prayer { background:#ffa500; color:#222; }
-    body.light .btn-open-prayer:hover { background:#ff8c00; }
+    .star {
+      font-size: 1.8rem; cursor: pointer; transition: transform .2s; color: #888;
+    }
+    .star:hover { transform: scale(1.2); }
+    .active { color: gold; }
+
+    /* Prayer Button */
+    .btn-open-prayer {
+      display: block; width: 100%; padding: 1rem; margin-bottom: 2rem;
+      background: #ff4500; color: #fff; border: none;
+      border-radius: 8px; font-size: 1.1rem; cursor: pointer;
+      transition: background .3s;
+    }
+    .btn-open-prayer:hover { background: #e63e00; }
+    body.light .btn-open-prayer { background: #ffa500; color: #222; }
+    body.light .btn-open-prayer:hover { background: #ff8c00; }
 
     /* Quiz & Stats */
-    .daily-quiz, .stats { background:#222; padding:1rem; border-radius:8px; margin-bottom:2rem; }
-    body.light .daily-quiz, body.light .stats { background:#f1f1f1; color:#222; }
-    .daily-quiz h3, .stats h3 { margin-bottom:.5rem; }
-    .daily-quiz button, .stats p { margin-top:.5rem; }
+    .daily-quiz, .stats {
+      background: #222; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;
+    }
+    body.light .daily-quiz, body.light .stats {
+      background: #f1f1f1; color: #222;
+    }
+    .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
+    .daily-quiz button, .stats p { margin-top: .5rem; }
+
+    /* Footer Maker */
+    footer .maker {
+      margin-top: .5rem; font-style: italic;
+      color: #ffde7d; text-shadow: 0 0 4px #f80;
+    }
   </style>
 </head>
 <body>
-
-  <!-- Block overlay -->
-  <div id="blockOverlay">
-    <h2>حسابك محظور مؤقتًا</h2>
-    <p id="blockMsg"></p>
-    <p>للاستفسار تواصل مع المدير عبر تيليجرام:</p>
-    <a href="https://t.me/HNR55" target="_blank">@HNR55</a>
-  </div>
-
   <header>
     <div class="theme-toggle" id="themeToggle">🌙</div>
     <h1>بسم الله الرحمن الرحيم</h1>
     <h2>بوابتك التفاعلية لقراءة القرآن الكريم والاستماع</h2>
     <div class="clock" id="clock"></div>
   </header>
-
-  <main id="mainContent">
+  <main>
     <div class="surah-container">
       <label for="surahSelect">اختر السورة:</label>
       <select id="surahSelect"></select>
       <div class="rating" id="rating"></div>
     </div>
-
     <div class="audio-controls">
       <button id="backward">⏪</button>
       <button id="playPause">▶️</button>
       <button id="forward">⏩</button>
-      <div class="progress-bar" id="progressBar"><div class="progress" id="progress"></div></div>
+      <div class="progress-bar" id="progressBar">
+        <div class="progress" id="progress"></div>
+      </div>
       <span id="timeDisplay">00:00 / 00:00</span>
     </div>
-
     <div class="daily-quiz" id="dailyQuiz">
       <h3>السؤال اليومي:</h3>
       <div id="quizQuestion"></div>
       <button id="showAnswerBtn">إظهار الجواب</button>
       <div id="quizAnswer" style="display:none;"></div>
     </div>
-
     <div class="stats" id="stats">
       <h3>إحصائياتك</h3>
       <p>السور المقروءة: <span id="readCount">0</span></p>
       <p>عدد الاستماعات: <span id="playCount">0</span></p>
-      <p>عدد الأجهزة: <span id="deviceCount">0</span></p>
     </div>
-
     <div class="verses" id="verses"></div>
-
-    <button class="btn-open-prayer" onclick="window.open('https://timesprayer.today/','_blank')">
+    <button class="btn-open-prayer" onclick="window.open('https://timesprayer.today/', '_blank')">
       عرض مواقيت الصلاة
     </button>
   </main>
-
   <footer>
-    &copy; 2025 القرآن الكريم <div class="maker">Made by AlShiek</div>
+    &copy; 2025 القرآن الكريم<div class="maker">Made by AlShiek</div>
   </footer>
 
-  <!-- Firebase & Script -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script>
-    // Initialize Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
-      authDomain: "gmae-fae90.firebaseapp.com",
-      databaseURL: "https://gmae-fae90-default-rtdb.firebaseio.com",
-      projectId: "gmae-fae90",
-      storageBucket: "gmae-fae90.firebasestorage.app",
-      messagingSenderId: "768482186329",
-      appId: "1:768482186329:web:18937587e530f8674e0d48",
-      measurementId: "G-V4ZLJ4BJGD"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // Generate visitorId
-    function generateId() {
-      return 'xxxx-xxxx-xxxx'.replace(/x/g, () =>
-        Math.floor(Math.random()*16).toString(16)
-      );
-    }
-    let visitorId = localStorage.getItem('visitorId');
-    if (!visitorId) {
-      visitorId = generateId();
-      localStorage.setItem('visitorId', visitorId);
-    }
-
-    // Show/hide block overlay
-    function showBlock(until) {
-      const mins = Math.ceil((until - Date.now())/60000);
-      document.getElementById('blockMsg').textContent = 'مدة الحظر المتبقية: '+mins+' دقيقة';
-      document.getElementById('blockOverlay').style.display = 'block';
-      document.getElementById('mainContent').style.filter = 'blur(4px)';
-    }
-    function hideBlock() {
-      document.getElementById('blockOverlay').style.display = 'none';
-      document.getElementById('mainContent').style.filter = 'none';
-    }
-
-    // Real‑time block listener
-    const blockRef = db.ref('blockedUsers/'+visitorId);
-    blockRef.on('value', snap => {
-      if (snap.exists()) {
-        const until = snap.val().blockedUntil;
-        if (until > Date.now()) showBlock(until);
-        else hideBlock();
-      } else {
-        hideBlock();
-      }
-    });
-
-    // Visitor registration & count
-    function registerVisitor() {
-      const path = 'visitors/'+visitorId;
-      db.ref(path).once('value', snap=>{
-        if (!snap.exists()) db.ref(path).set({ts:Date.now()});
-      });
-    }
-    function displayVisitorCount() {
-      db.ref('visitors').on('value', snap=>{
-        document.getElementById('deviceCount').textContent = snap.numChildren();
-      });
-    }
-
-    // DOM refs
     const surahSelect   = document.getElementById('surahSelect');
     const ratingDiv     = document.getElementById('rating');
     const versesDiv     = document.getElementById('verses');
@@ -252,74 +200,170 @@
     const playCountEl   = document.getElementById('playCount');
     const themeToggle   = document.getElementById('themeToggle');
 
-    let audio=new Audio(), ayahAudios=[], ayahList=[], currentAyah=0;
+    let audio = new Audio();
+    let ayahAudios = [], ayahList = [], currentAyah = 0;
 
-    // Theme & stats
-    const savedTheme = localStorage.getItem('theme')||'dark';
-    if(savedTheme==='light'){ document.body.classList.add('light'); themeToggle.textContent='🌞'; }
-    function formatTime(s){ if(isNaN(s))return'00:00'; const m=Math.floor(s/60).toString().padStart(2,'0'), sec=Math.floor(s%60).toString().padStart(2,'0'); return`${m}:${sec}`; }
-    function updateClock(){ const now=new Date(), m=now.getMinutes().toString().padStart(2,'0'); let h=now.getHours()%12||12, ap=now.getHours()>=12?'م':'ص'; clockEl.textContent=`${h}:${m} ${ap}`; }
-    function saveStats(){ readCountEl.textContent=localStorage.getItem('readCount')||0; playCountEl.textContent=localStorage.getItem('playCount')||0; }
-    function incRead(){ let c=(+localStorage.getItem('readCount')||0)+1; localStorage.setItem('readCount',c); saveStats(); }
-    function incPlay(){ let c=(+localStorage.getItem('playCount')||0)+1; localStorage.setItem('playCount',c); saveStats(); }
+    // استعادة وضع النهار/الليل
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+      document.body.classList.add('light');
+      themeToggle.textContent = '🌞';
+    }
 
-    // Load Quran
-    async function loadSurahList(){
-      const res=await fetch('https://api.alquran.cloud/v1/surah'), {data}=await res.json();
-      data.forEach(s=>{ let o=document.createElement('option'); o.value=s.number; o.textContent=`${s.number}. ${s.name}`; surahSelect.appendChild(o); });
-      const p=new URLSearchParams(location.search), sel=p.get('surah')||localStorage.getItem('lastSurah')||'1';
-      surahSelect.value=sel; loadSurah(sel,p.get('ayah'));
+    function formatTime(sec) {
+      if (isNaN(sec)) return '00:00';
+      const m = Math.floor(sec/60).toString().padStart(2,'0');
+      const s = Math.floor(sec%60).toString().padStart(2,'0');
+      return `${m}:${s}`;
     }
-    function renderRating(s){
-      ratingDiv.innerHTML=''; let saved=+localStorage.getItem('rating_'+s);
-      for(let i=1;i<=5;i++){ let star=document.createElement('span'); star.className='star'+(i<=saved?' active':''); star.textContent='★'; star.onclick=()=>{ localStorage.setItem('rating_'+s,i); renderRating(s); }; ratingDiv.appendChild(star); }
+
+    function updateClock() {
+      const now = new Date();
+      let h = now.getHours();
+      const m = now.getMinutes().toString().padStart(2,'0');
+      const ampm = h >= 12 ? 'م' : 'ص';
+      h = h % 12 || 12;
+      clockEl.textContent = `${h}:${m} ${ampm}`;
     }
-    async function loadSurah(num, high){
-      localStorage.setItem('lastSurah',num); renderRating(num);
-      const res=await fetch(`https://api.alquran.cloud/v1/surah/${num}/ar.alafasy`), {data}=await res.json();
-      ayahAudios=data.ayahs.map(a=>a.audio); ayahList=data.ayahs.map(a=>({number:a.numberInSurah,text:a.text}));
-      currentAyah=0; setupAudio(); renderVerses(high&&+high); incRead();
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function saveStats() {
+      readCountEl.textContent = localStorage.getItem('readCount') || 0;
+      playCountEl.textContent = localStorage.getItem('playCount') || 0;
     }
-    function renderVerses(high){
-      versesDiv.innerHTML='';
-      ayahList.forEach(v=>{
-        let d=document.createElement('div'); d.className='verse'+(v.number===high?' highlight':'');
-        d.innerHTML=`<p><strong>${v.number}.</strong> ${v.text}</p><div class="actions"><span class="trn">ترجمة</span><span class="shr">مشاركة</span></div><p class="trn-text"></p>`;
-        if(v.number===high) setTimeout(()=>d.scrollIntoView({behavior:'smooth'}),100);
-        d.querySelector('.trn').onclick=async()=>{
-          let tr=d.querySelector('.trn-text');
-          if(tr.textContent){ tr.style.display=tr.style.display==='none'?'block':'none'; return; }
-          let r=await fetch(`https://api.alquran.cloud/v1/ayah/${surahSelect.value}:${v.number}/en.asad`), j=await r.json();
-          tr.textContent=j.data.text; tr.style.display='block';
+    function incReadCount() {
+      const c = (+localStorage.getItem('readCount')||0) + 1;
+      localStorage.setItem('readCount', c);
+      saveStats();
+    }
+    function incPlayCount() {
+      const c = (+localStorage.getItem('playCount')||0) + 1;
+      localStorage.setItem('playCount', c);
+      saveStats();
+    }
+
+    async function loadSurahList() {
+      const res = await fetch('https://api.alquran.cloud/v1/surah');
+      const { data } = await res.json();
+      data.forEach(s => {
+        const o = document.createElement('option');
+        o.value = s.number;
+        o.textContent = `${s.number}. ${s.name}`;
+        surahSelect.appendChild(o);
+      });
+      const params = new URLSearchParams(window.location.search);
+      const sel = params.get('surah') || localStorage.getItem('lastSurah') || '1';
+      surahSelect.value = sel;
+      loadSurah(sel, params.get('ayah'));
+    }
+
+    function renderRating(surah) {
+      ratingDiv.innerHTML = '';
+      const saved = +localStorage.getItem('rating_'+surah);
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.className = 'star' + (i <= saved ? ' active' : '');
+        star.textContent = '★';
+        star.onclick = () => {
+          localStorage.setItem('rating_'+surah, i);
+          renderRating(surah);
         };
-        d.querySelector('.shr').onclick=()=>{
-          let url=`${location.origin}${location.pathname}?surah=${surahSelect.value}&ayah=${v.number}`;
-          navigator.clipboard.writeText(url); alert('تم نسخ الرابط');
+        ratingDiv.appendChild(star);
+      }
+    }
+
+    async function loadSurah(num, highlightAyah) {
+      localStorage.setItem('lastSurah', num);
+      renderRating(num);
+      const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/ar.alafasy`);
+      const { data } = await res.json();
+      ayahAudios = data.ayahs.map(a => a.audio);
+      ayahList   = data.ayahs.map(a => ({ number: a.numberInSurah, text: a.text }));
+      currentAyah = 0;
+      setupAudio();
+      renderVerses(highlightAyah && +highlightAyah);
+      incReadCount();
+    }
+
+    function renderVerses(highlightNum) {
+      versesDiv.innerHTML = '';
+      ayahList.forEach(v => {
+        const d = document.createElement('div');
+        d.className = 'verse' + (v.number === highlightNum ? ' highlight' : '');
+        d.innerHTML = `
+          <p><strong>${v.number}.</strong> ${v.text}</p>
+          <div class="actions">
+            <span class="trn">ترجمة</span>
+            <span class="shr">مشاركة</span>
+          </div>
+          <p class="trn-text"></p>
+        `;
+        if (v.number === highlightNum) {
+          setTimeout(() => d.scrollIntoView({ behavior: 'smooth' }), 100);
+        }
+        d.querySelector('.trn').onclick = async () => {
+          const trEl = d.querySelector('.trn-text');
+          if (trEl.textContent) {
+            trEl.style.display = trEl.style.display === 'none' ? 'block' : 'none';
+            return;
+          }
+          const r = await fetch(`https://api.alquran.cloud/v1/ayah/${surahSelect.value}:${v.number}/en.asad`);
+          trEl.textContent = (await r.json()).data.text;
+          trEl.style.display = 'block';
+        };
+        d.querySelector('.shr').onclick = () => {
+          const url = `${location.origin}${location.pathname}?surah=${surahSelect.value}&ayah=${v.number}`;
+          navigator.clipboard.writeText(url);
+          alert('تم نسخ الرابط');
         };
         versesDiv.appendChild(d);
       });
     }
-    function setupAudio(){
-      playPauseBtn.textContent='▶️';
-      audio.currentTime=+localStorage.getItem('pos_'+surahSelect.value)||0;
-      audio.src=ayahAudios[currentAyah];
-      audio.ontimeupdate=()=>{
-        let pct=(audio.currentTime/audio.duration)*100;
-        progress.style.width=pct+'%';
-        timeDisplay.textContent=`${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
-        localStorage.setItem('pos_'+surahSelect.value,audio.currentTime);
-      };
-      audio.onended=()=>{ incPlay(); if(currentAyah+1<ayahAudios.length) playAyah(currentAyah+1); else playPauseBtn.textContent='▶️'; };
-    }
-    function playAyah(i){ if(i>=ayahAudios.length) return; audio.src=ayahAudios[i]; audio.play(); playPauseBtn.textContent='⏸️'; currentAyah=i; }
-    playPauseBtn.onclick=()=>{
-      if(audio.paused){ audio.play(); playPauseBtn.textContent='⏸️'; incPlay(); }
-      else{ audio.pause(); playPauseBtn.textContent='▶️'; }
-    };
-    backwardBtn.onclick=()=>audio.currentTime=Math.max(0,audio.currentTime-5);
-    forwardBtn.onclick=()=>audio.currentTime=Math.min(audio.duration,audio.currentTime+5);
-    progressBar.onclick=e=>{ let r=progressBar.getBoundingClientRect(); audio.currentTime=((e.clientX-r.left)/r.width)*audio.duration; };
 
+    function setupAudio() {
+      playPauseBtn.textContent = '▶️';
+      audio.currentTime = +localStorage.getItem('pos_' + surahSelect.value) || 0;
+      audio.src = ayahAudios[currentAyah];
+      audio.ontimeupdate = () => {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        progress.style.width = pct + '%';
+        timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+        localStorage.setItem('pos_' + surahSelect.value, audio.currentTime);
+      };
+      audio.onended = () => {
+        incPlayCount();
+        if (currentAyah + 1 < ayahAudios.length) playAyah(currentAyah + 1);
+        else playPauseBtn.textContent = '▶️';
+      };
+    }
+
+    function playAyah(i) {
+      if (i >= ayahAudios.length) return;
+      audio.src = ayahAudios[i];
+      audio.play();
+      playPauseBtn.textContent = '⏸️';
+      currentAyah = i;
+    }
+
+    playPauseBtn.onclick = () => {
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = '⏸️';
+        incPlayCount();
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = '▶️';
+      }
+    };
+    backwardBtn.onclick = () => audio.currentTime = Math.max(0, audio.currentTime - 5);
+    forwardBtn.onclick  = () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+    progressBar.onclick  = e => {
+      const rect = progressBar.getBoundingClientRect();
+      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    };
+
+    // 40 سؤال يومي مع الإجابات من مصادر سُنّية موثوقة
     const quizzes = [
   { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
   { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
@@ -352,20 +396,28 @@
   { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
   { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
 ];
-    function loadQuiz(){ let i=Math.floor(Math.random()*quizzes.length); quizQuestion.textContent=quizzes[i].q; quizAnswer.textContent=quizzes[i].a; quizAnswer.style.display='none'; }
-    showAnswerBtn.onclick=()=>quizAnswer.style.display='block';
-    themeToggle.onclick=()=>{ document.body.classList.toggle('light'); let t=document.body.classList.contains('light')?'light':'dark'; localStorage.setItem('theme',t); themeToggle.textContent=t==='light'?'🌞':'🌙'; };
 
-    // Init
-    window.addEventListener('load',()=>{
-      registerVisitor();
-      displayVisitorCount();
-      updateClock(); setInterval(updateClock,1000);
-      loadQuiz();
-      loadSurahList();
-      surahSelect.onchange=()=>loadSurah(surahSelect.value);
-      saveStats();
-    });
+    // دالة اختيار سؤال عشوائي في كل تحميل
+    function loadQuiz() {
+      const idx = Math.floor(Math.random() * quizzes.length);
+      quizQuestion.textContent = quizzes[idx].q;
+      quizAnswer.textContent   = quizzes[idx].a;
+      quizAnswer.style.display = 'none';
+    }
+    showAnswerBtn.onclick = () => quizAnswer.style.display = 'block';
+
+    themeToggle.onclick = () => {
+      document.body.classList.toggle('light');
+      const t = document.body.classList.contains('light') ? 'light' : 'dark';
+      localStorage.setItem('theme', t);
+      themeToggle.textContent = t === 'light' ? '🌞' : '🌙';
+    };
+
+    // Initialization
+    saveStats();
+    loadQuiz();
+    loadSurahList();
+    surahSelect.onchange = () => loadSurah(surahSelect.value);
   </script>
 </body>
 </html>
