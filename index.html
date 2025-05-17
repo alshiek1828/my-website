@@ -199,6 +199,28 @@
       localStorage.setItem('visitorId', visitorId);
     }
 
+    // --- دوال حظر / فك حظر ---
+    function blockUser(id, durationMinutes) {
+      const until = Date.now() + durationMinutes * 60 * 1000;
+      db.ref('blockedUsers/' + id).set({ blockedUntil: until });
+    }
+
+    function unblockUser(id) {
+      db.ref('blockedUsers/' + id).remove();
+    }
+
+    function checkIfBlocked(id, callback) {
+      db.ref('blockedUsers/' + id).once('value', snap => {
+        if (snap.exists() && snap.val().blockedUntil > Date.now()) {
+          callback(true, snap.val().blockedUntil);
+        } else {
+          // إذا انتهى الحظر نزيله
+          if (snap.exists()) unblockUser(id);
+          callback(false, null);
+        }
+      });
+    }
+
     // سجل الزائر مرة واحدة فقط
     function registerVisitor() {
       const refPath = 'visitors/' + visitorId;
@@ -448,18 +470,27 @@
       themeToggle.textContent = t === 'light' ? '🌞' : '🌙';
     };
 
-    // Initialization
+    // Initialization with التحقق من الحظر أولاً
     window.addEventListener('load', () => {
-      saveStats();
-      updateClock();
-      setInterval(updateClock, 1000);
-      loadQuiz();
-      loadSurahList();
-      surahSelect.onchange = () => loadSurah(surahSelect.value);
-
-      // سجل الزائر واظهر العدد
-      registerVisitor();
-      displayVisitorCount();
+      checkIfBlocked(visitorId, (isBlocked, until) => {
+        if (isBlocked) {
+          const diff = Math.ceil((until - Date.now()) / 60000);
+          document.body.innerHTML = `
+            <main style="text-align:center;padding:2rem">
+              <h2>حسابك محظور لمدة ${diff} دقيقة.</h2>
+              <p>يرجى المحاولة لاحقًا.</p>
+            </main>`;
+        } else {
+          saveStats();
+          updateClock();
+          setInterval(updateClock, 1000);
+          loadQuiz();
+          loadSurahList();
+          surahSelect.onchange = () => loadSurah(surahSelect.value);
+          registerVisitor();
+          displayVisitorCount();
+        }
+      });
     });
   </script>
 </body>
