@@ -13,8 +13,8 @@
 
     /* Flame Text Animation */
     @keyframes flame {
-      0%,100% { text-shadow: 0 0 2px #ff6, 0 0 10px #f80, 0 0 20px #f40; }
-      50%   { text-shadow: 0 0 5px #ff6, 0 0 15px #f80, 0 0 30px #f40; }
+      0%,100% { text-shadow: 0 0 2px #ff6,0 0 10px #f80,0 0 20px #f40; }
+      50%   { text-shadow: 0 0 5px #ff6,0 0 15px #f80,0 0 30px #f40; }
     }
 
     /* Layout */
@@ -42,8 +42,7 @@
     header h1 {
       font-size: 3rem; letter-spacing: 2px; margin-bottom: .5rem; font-weight: bold;
       background: linear-gradient(45deg, #ff4500, #ff8c00, #ffd700);
-      -webkit-background-clip: text; color: transparent;
-      animation: flame 1.5s infinite alternate;
+      -webkit-background-clip: text; color: transparent; animation: flame 1.5s infinite alternate;
     }
     header h2 {
       font-size: 1.2rem; font-style: italic; opacity: .9; margin-bottom: 1.5rem;
@@ -60,17 +59,14 @@
       font-weight: bold; font-size: 1.1rem;
       background: linear-gradient(45deg, #ff8c00, #ffa500);
       -webkit-background-clip: text; color: transparent;
-      text-shadow: 0 0 4px #f40;
-      animation: flame 2s infinite alternate-reverse;
+      text-shadow: 0 0 4px #f40; animation: flame 2s infinite alternate-reverse;
     }
     select {
       padding: .7rem; border-radius: 8px; border: none; font-size: 1rem;
-      background: #222; color: #fff;
-      box-shadow: 0 0 8px rgba(255,140,0,0.5);
+      background: #222; color: #fff; box-shadow: 0 0 8px rgba(255,140,0,0.5);
     }
     body.light select {
-      background: #fff; color: #222;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      background: #fff; color: #222; box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
 
     /* Audio Controls */
@@ -90,48 +86,40 @@
     body.light .progress { background: #ff4500; }
 
     /* Verses & Spacing */
-    .verses {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem; margin-bottom: 2rem;
-    }
+    .verses { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:1rem; margin-bottom:2rem; }
     .verse {
-      background: #222; border-radius: 8px; padding: 1rem;
-      box-shadow: 0 0 10px rgba(255,140,0,0.3);
-      font-size: .95rem; position: relative;
+      background: #222; border-radius:8px; padding:1rem;
+      box-shadow:0 0 10px rgba(255,140,0,0.3); font-size:.95rem; position:relative;
     }
     body.light .verse {
-      background: #fff; color: #222;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      background:#fff; color:#222; box-shadow:0 0 8px rgba(0,0,0,0.1);
     }
-    .verse p { margin-bottom: .75rem; }
-    .actions { display: flex; gap: .5rem; font-size: .9rem; margin-bottom: .5rem; cursor: pointer; }
-    .actions span:hover { text-decoration: underline; }
-    .verse.highlight { border-bottom: 2px solid #f00; }
+    .verse p { margin-bottom:.75rem; }
+    .actions { display:flex; gap:.5rem; font-size:.9rem; margin-bottom:.5rem; cursor:pointer; }
+    .actions span:hover { text-decoration:underline; }
+    .verse.highlight { border-bottom:2px solid #f00; }
 
     /* Rating */
-    .rating { display: flex; justify-content: center; gap: .3rem; margin-top: .5rem; }
-    .star { font-size: 1.8rem; cursor: pointer; transition: transform .2s; color: #888; }
-    .star:hover { transform: scale(1.2); }
-    .active { color: gold; }
+    .rating { display:flex; justify-content:center; gap:.3rem; margin-top:.5rem; }
+    .star { font-size:1.8rem; cursor:pointer; transition:transform .2s; color:#888; }
+    .star:hover { transform:scale(1.2); } .active { color:gold; }
 
     /* Prayer Button */
     .btn-open-prayer {
-      display: block; width: 100%; padding: 1rem; margin-bottom: 2rem;
-      background: #ff4500; color: #fff; border: none;
-      border-radius: 8px; font-size: 1.1rem; cursor: pointer;
-      transition: background .3s;
+      display:block; width:100%; padding:1rem; margin-bottom:2rem;
+      background:#ff4500; color:#fff; border:none; border-radius:8px; font-size:1.1rem; cursor:pointer; transition:background .3s;
     }
-    .btn-open-prayer:hover { background: #e63e00; }
-    body.light .btn-open-prayer { background: #ffa500; color: #222; }
-    body.light .btn-open-prayer:hover { background: #ff8c00; }
+    .btn-open-prayer:hover { background:#e63e00; }
+    body.light .btn-open-prayer { background:#ffa500; color:#222; }
+    body.light .btn-open-prayer:hover { background:#ff8c00; }
 
     /* Quiz & Stats */
     .daily-quiz, .stats {
-      background: #222; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;
+      background:#222; padding:1rem; border-radius:8px; margin-bottom:2rem;
     }
-    body.light .daily-quiz, body.light .stats { background: #f1f1f1; color: #222; }
-    .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
-    .daily-quiz button, .stats p { margin-top: .5rem; }
+    body.light .daily-quiz, body.light .stats { background:#f1f1f1; color:#222; }
+    .daily-quiz h3, .stats h3 { margin-bottom:.5rem; }
+    .daily-quiz button, .stats p { margin-top:.5rem; }
   </style>
 
   <!-- Firebase SDK -->
@@ -139,6 +127,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
+
   <!-- Overlay لمنع المحظورين -->
   <div id="blockOverlay">
     <h2>حسابك محظور مؤقتًا</h2>
@@ -230,18 +219,22 @@
       document.getElementById('mainContent').style.filter = 'none';
     }
 
-    // مستمع لحالة الحظر في الوقت الحقيقي
+    // مستمع لحالة الحظر في الوقت الحقيقي (بدون إزالة السجل من العميل)
     const blockRef = db.ref('blockedUsers/' + visitorId);
     blockRef.on('value', snap => {
-      if (snap.exists() && snap.val().blockedUntil > Date.now()) {
-        showBlockOverlay(snap.val().blockedUntil);
+      if (snap.exists()) {
+        const until = snap.val().blockedUntil;
+        if (until > Date.now()) {
+          showBlockOverlay(until);
+        } else {
+          hideBlockOverlay();
+        }
       } else {
-        if (snap.exists()) blockRef.remove();
         hideBlockOverlay();
       }
     });
 
-    // سجل الزائر وعد الأجهزة
+    // تسجيل الزائر وعد الأجهزة
     function registerVisitor() {
       const path = 'visitors/' + visitorId;
       db.ref(path).once('value', snap => {
@@ -418,37 +411,37 @@
     };
 
     const quizzes = [
-      { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
-      { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
-      { q: 'كم عدد آيات سورة البقرة؟', a: '286 آية' },
-      { q: 'ما هي السورة التي نزلت كلها دفعة واحدة؟', a: 'سورة الأنعام' },
-      { q: 'من هو الصحابي الذي حفظ الكثير من القرآن وهو صغير السن وكان يؤم قومه؟', a: 'عمرو بن سلمة رضي الله عنه' },
-      { q: 'في أي سورة ذكر الله عز وجل قصة أصحاب الكهف؟', a: 'سورة الكهف' },
-      { q: 'ما هي الآية التي تسمى "آية الكرسي"؟', a: 'آية 255 من سورة البقرة' },
-      { q: 'ما هي أركان الإيمان الستة؟', a: 'الإيمان بالله، وملائكته، وكتبه، ورسله، واليوم الآخر، والقدر خيره وشره' },
-      { q: 'ما السورة التي تسمى "قلب القرآن"؟', a: 'سورة يس' },
-      { q: 'كم عدد أجزاء القرآن الكريم؟', a: '30 جزءًا' },
-      { q: 'ما السورة التي تبدأ بقسم الله بالنجم؟', a: 'سورة النجم' },
-      { q: 'من هو النبي الذي ابتلعه الحوت؟', a: 'النبي يونس عليه السلام' },
-      { q: 'ما هي السورة التي تحدثت عن ليلة القدر؟', a: 'سورة القدر' },
-      { q: 'كم عدد ركعات صلاة الفجر؟', a: 'ركعتان' },
-      { q: 'من هو الصحابي الذي جمع القرآن في مصحف واحد بعد وفاة النبي؟', a: 'زيد بن ثابت رضي الله عنه' },
-      { q: 'ما هي السورة التي تسمى بـ "الصمد"؟', a: 'سورة الإخلاص' },
-      { q: 'في أي سورة أمر الله ببر الوالدين؟', a: 'سورة الإسراء، الآية 23' },
-      { q: 'ما السورة التي تحتوي على قصة النبي يوسف عليه السلام؟', a: 'سورة يوسف' },
-      { q: 'ما هي السورة التي تسمى "الكوثر"؟', a: 'سورة الكوثر' },
-      { q: 'من هو الصحابي الذي لقب بـ "سيد القراء"؟', a: 'أُبي بن كعب رضي الله عنه' },
-      { q: 'في أي سورة ورد ذكر الجنة والنار؟', a: 'سورة الرحمن' },
-      { q: 'ما هي السورة التي بدأت بـ "الحمد لله رب العالمين"؟', a: 'سورة الفاتحة' },
-      { q: 'كم عدد الأحزاب في القرآن الكريم؟', a: '60 حزبًا' },
-      { q: 'ما هي أول سورة نزلت من القرآن الكريم؟', a: 'سورة العلق' },
-      { q: 'ما هي السورة التي تسمى "الملك"؟', a: 'سورة الملك' },
-      { q: 'كم عدد ركعات صلاة المغرب؟', a: '3 ركعات' },
-      { q: 'من هو الصحابي الذي قال له النبي: "خيركم من تعلم القرآن وعلمه"؟', a: 'عثمان بن عفان رضي الله عنه' },
-      { q: 'ما هي السورة التي تسمى "الفلق"؟', a: 'سورة الفلق' },
-      { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
-      { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
-    ];
+  { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
+  { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
+  { q: 'كم عدد آيات سورة البقرة؟', a: '286 آية' },
+  { q: 'ما هي السورة التي نزلت كلها دفعة واحدة؟', a: 'سورة الأنعام' },
+  { q: 'من هو الصحابي الذي حفظ الكثير من القرآن وهو صغير السن وكان يؤم قومه؟', a: 'عمرو بن سلمة رضي الله عنه' },
+  { q: 'في أي سورة ذكر الله عز وجل قصة أصحاب الكهف؟', a: 'سورة الكهف' },
+  { q: 'ما هي الآية التي تسمى "آية الكرسي"؟', a: 'آية 255 من سورة البقرة' },
+  { q: 'ما هي أركان الإيمان الستة؟', a: 'الإيمان بالله، وملائكته، وكتبه، ورسله، واليوم الآخر، والقدر خيره وشره' },
+  { q: 'ما السورة التي تسمى "قلب القرآن"؟', a: 'سورة يس' },
+  { q: 'كم عدد أجزاء القرآن الكريم؟', a: '30 جزءًا' },
+  { q: 'ما السورة التي تبدأ بقسم الله بالنجم؟', a: 'سورة النجم' },
+  { q: 'من هو النبي الذي ابتلعه الحوت؟', a: 'النبي يونس عليه السلام' },
+  { q: 'ما هي السورة التي تحدثت عن ليلة القدر؟', a: 'سورة القدر' },
+  { q: 'كم عدد ركعات صلاة الفجر؟', a: 'ركعتان' },
+  { q: 'من هو الصحابي الذي جمع القرآن في مصحف واحد بعد وفاة النبي؟', a: 'زيد بن ثابت رضي الله عنه' },
+  { q: 'ما هي السورة التي تسمى بـ "الصمد"؟', a: 'سورة الإخلاص' },
+  { q: 'في أي سورة أمر الله ببر الوالدين؟', a: 'سورة الإسراء، الآية 23' },
+  { q: 'ما السورة التي تحتوي على قصة النبي يوسف عليه السلام؟', a: 'سورة يوسف' },
+  { q: 'ما هي السورة التي تسمى "الكوثر"؟', a: 'سورة الكوثر' },
+  { q: 'من هو الصحابي الذي لقب بـ "سيد القراء"؟', a: 'أُبي بن كعب رضي الله عنه' },
+  { q: 'في أي سورة ورد ذكر الجنة والنار؟', a: 'سورة الرحمن' },
+  { q: 'ما هي السورة التي بدأت بـ "الحمد لله رب العالمين"؟', a: 'سورة الفاتحة' },
+  { q: 'كم عدد الأحزاب في القرآن الكريم؟', a: '60 حزبًا' },
+  { q: 'ما هي أول سورة نزلت من القرآن الكريم؟', a: 'سورة العلق' },
+  { q: 'ما هي السورة التي تسمى "الملك"؟', a: 'سورة الملك' },
+  { q: 'كم عدد ركعات صلاة المغرب؟', a: '3 ركعات' },
+  { q: 'من هو الصحابي الذي قال له النبي: "خيركم من تعلم القرآن وعلمه"؟', a: 'عثمان بن عفان رضي الله عنه' },
+  { q: 'ما هي السورة التي تسمى "الفلق"؟', a: 'سورة الفلق' },
+  { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
+  { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
+];
     function loadQuiz() {
       const idx = Math.floor(Math.random() * quizzes.length);
       quizQuestion.textContent = quizzes[idx].q;
@@ -463,7 +456,7 @@
       themeToggle.textContent = t === 'light' ? '🌞' : '🌙';
     };
 
-    // تهيئة التطبيق عند التحميل
+    // Initialization
     window.addEventListener('load', () => {
       registerVisitor();
       displayVisitorCount();
