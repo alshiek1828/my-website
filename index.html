@@ -194,26 +194,14 @@
       <div id="game" class="section active">
         <h2>لعبة كرة الوجه المبتسم - المرحلة <span id="current-level">1</span></h2>
         <p id="game-status">اضغط على "ابدأ التحدي" لبدء المرحلة الأولى.</p>
-        <button class="btn" id="start-game-btn" onclick="startChallenge()">ابدأ التحدي</button>
-        <div id="countdown"></div>
-        <div id="emoji-container"></div>
-        <!-- Container for displaying a key layout stage (if applicable) -->
-        <div id="key-layout-container"></div>
-      </div>
-      <!-- Leaderboard Section -->
-      <div id="leaderboard" class="section">
-        <h2>لوحة المتصدرين</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>الترتيب</th>
+        <buttonth>الترتيب</th>
               <th>الاسم</th>
               <th>النقاط</th>
               <th>المستوى</th>
             </tr>
           </thead>
           <tbody id="leaderboard-body">
-            <!-- يتم تعبئته ديناميكيًا -->
+            <!-- سيتم تعبئته ديناميكيًا -->
           </tbody>
         </table>
       </div>
@@ -230,19 +218,7 @@
       <button class="btn" onclick="closeAdminPanel()">إغلاق الأدمن</button>
     </div>
     <footer>
-      &copy; 2025 - Made with madness by ツ 《👑》Ͳ３ 《شــيـخ》
-    </footer>
-    <!-- Firebase JS SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-    <script>
-      // إعداد Firebase
-      const firebaseConfig = {
-        apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
-        authDomain: "gmae-fae90.firebaseapp.com",
-        databaseURL: "https://gmae-fae90-default-rtdb.firebaseio.com",
-        projectId: "gmae-fae90",
-        storageBucket: "gmae-fae90.firebasestorage.app",
+      &copy; 2025 - Made with madness by ツ 《👑》Ͳ３ 《ش90.firebasestorage.app",
         messagingSenderId: "768482186329",
         appId: "1:768482186329:web:18937587e530f8674e0d48",
         measurementId: "G-V4ZLJ4BJGD",
@@ -257,18 +233,12 @@
         );
       }
       let visitorId = localStorage.getItem("visitorId");
-      if (!visitorId) {
-        visitorId = generateId();
-        localStorage.setItem("visitorId", visitorId);
-      }
-    </script>
-    <!-- Stage Keys Definitions (simulating Telegram inline keyboards) -->
+      if inline keyboards) -->
     <script>
-      // These keys simulate various stage layouts; they mimic the JSON structure from your PHP bot code.
+      // These keys simulate various stage layouts (such as inline-keyboard layouts in your Game.php code)
       const stageKeys = [
         {"inline_keyboard": [
-          [{"text": "☺️", "callback_data": "go"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
-          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
+          [{"text": "☺️", "callback_data": "go"}, {"text": "☹️", "callback "no"}, {"text": "☹️", "callback_data": "no"}],
           [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}]
         ]},
         {"inline_keyboard": [
@@ -281,24 +251,28 @@
           [{"text": "☹️", "callback_data": "no"}, {"text": "☹", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
           [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}]
         ]},
-        // ... Additional keys can be added similarly (key4, key5, ..., key19)
         {"inline_keyboard": [
-          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☺", "callback_data": "goo"}],
           [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
-          [{"text": "☹️", "callback_data": "no"}, {"text": "☺", "callback_data": "goo"}, {"text": "☹️", "callback_data": "no"}]
+          [{"text": "☺️", "callback_data": "go"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}]
+        ]},
+        {"inline_keyboard": [
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☺", "callback_data": "goo"}, {"text": "☹️", "callback_data": "no"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}]
         ]}
       ];
   
-      // Choose a random key layout from the array
+      // Choose a random stage key layout from the array
       function getRandomStageKey() {
         const idx = Math.floor(Math.random() * stageKeys.length);
         return stageKeys[idx];
       }
   
-      // Render the chosen key layout as HTML buttons
+      // Render the key layout as HTML buttons
       function renderKeyLayout(keyData) {
         const container = document.getElementById("key-layout-container");
-        container.innerHTML = ""; // Clear any existing layout
+        container.innerHTML = "";
         const layoutDiv = document.createElement("div");
         layoutDiv.className = "key-layout";
         keyData.inline_keyboard.forEach((row) => {
@@ -308,7 +282,6 @@
             const btn = document.createElement("button");
             btn.className = "key-button";
             btn.textContent = btnData.text;
-            // Simulate callback actions:
             btn.addEventListener("click", () => {
               if (btnData.callback_data === "go" || btnData.callback_data === "goo") {
                 alert("تم اختيار الإجابة الصحيحة!");
@@ -325,10 +298,10 @@
     </script>
     <!-- Main Application Script -->
     <script>
-      // Global variables for current user and level
+      // Global variables for the current user and level
       let currentUser = null; // { name, username, userId, score, level }
   
-      // On page load, if user is registered, load their data
+      // On page load, if a user is already stored then load that data
       window.onload = function () {
         const storedUser = localStorage.getItem("currentUser");
         if (storedUser) {
@@ -340,7 +313,7 @@
         }
       };
   
-      // Registration function
+      // Registration function: now simply collecting user name and username
       function registerUser() {
         const name = document.getElementById("reg-name").value.trim();
         const username = document.getElementById("reg-username").value.trim();
@@ -378,7 +351,7 @@
       const correctEmoji = "☺️";
       const wrongEmojis = ["☹️", "😢", "😞", "😟", "🙁"];
   
-      // Start a challenge; stages change time and buttons count based on level
+      // Start a challenge; adjust the challenge based on the current level
       function startChallenge() {
         checkBanStatus().then((banData) => {
           if (banData && banData.banUntil && Date.now() < banData.banUntil) {
@@ -390,13 +363,12 @@
             return;
           }
           const level = currentUser.level || 1;
-          // Set time limit: level 1 gets 5 seconds, higher levels get less time
           challengeTimeLeft = level === 1 ? 5 : 3;
           document.getElementById("game-status").textContent =
             "المرحلة " + level + ": ابحث عن الرمز التعبيري المبتسم!";
           const emojiContainer = document.getElementById("emoji-container");
           emojiContainer.innerHTML = "";
-          // Increase number of emoji buttons as level increases
+          // Increase number of buttons as level increases
           const totalButtons = 8 + (level - 1) * 2;
           const correctIndex = Math.floor(Math.random() * totalButtons);
           for (let i = 0; i < totalButtons; i++) {
@@ -418,7 +390,6 @@
               document.getElementById("game-status").textContent =
                 "انتهى الوقت! حاول مرة أخرى.";
               updateScore(false);
-              // Optionally render a random key layout stage as feedback
               renderKeyLayout(getRandomStageKey());
             }
           }, 1000);
@@ -431,13 +402,11 @@
           document.getElementById("game-status").textContent =
             "أحسنت! إجابتك صحيحة.";
           currentUser.score++;
-          // Advance level if appropriate; for example, if level==1, next becomes 2
           if (currentUser.level === 1) {
             currentUser.level = 2;
             alert("تهانينا! لقد انتقلت إلى المرحلة الثانية.");
           }
           updateScore(true);
-          // Show a random key layout as additional feedback for correct answer
           renderKeyLayout(getRandomStageKey());
         } else {
           document.getElementById("game-status").textContent =
@@ -485,8 +454,7 @@
   
       // ----------------- Ban Handling -----------------
       function checkBanStatus() {
-        if (!currentUser)
-          return Promise.resolve(null);
+        if (!currentUser) return Promise.resolve(null);
         return db
           .ref("bans/" + currentUser.userId)
           .get()
@@ -496,7 +464,7 @@
       }
   
       // ----------------- Admin Panel -----------------
-      const ADMIN_CODE = "0000"; // رمز الدخول للوصول إلى لوحة الأدمن
+      const ADMIN_CODE = "0000"; // رمز دخول الأدمن
       function openAdminPanel() {
         const code = prompt("أدخل الرمز للوصول إلى لوحة الأدمن:");
         if (code === ADMIN_CODE) {
@@ -512,20 +480,11 @@
         switch (action) {
           case "ban":
             const banUserId = prompt("أدخل معرف المستخدم لحظره:");
-            const banMinutes = parseInt(
-              prompt("أدخل مدة الحظر بالدقائق:"),
-              10
-            );
+            const banMinutes = parseInt(prompt("أدخل مدة الحظر بالدقائق:"), 10);
             if (banUserId && banMinutes) {
               const banUntil = Date.now() + banMinutes * 60000;
               db.ref("bans/" + banUserId).set({ banUntil });
-              alert(
-                "تم حظر المستخدم " +
-                  banUserId +
-                  " لمدة " +
-                  banMinutes +
-                  " دقيقة."
-              );
+              alert("تم حظر المستخدم " + banUserId + " لمدة " + banMinutes + " دقيقة.");
             }
             break;
           case "unban":
