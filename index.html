@@ -1,466 +1,578 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>القرآن الكريم</title>
-  <style>
-    /* Reset & Base */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #111; color: #eee; line-height: 1.6; transition: background .3s, color .3s; }
-    body.light { background: #f9f9f9; color: #222; }
-    a { color: inherit; text-decoration: none; }
-
-    /* Flame Text Animation */
-    @keyframes flame {
-      0%,100% { text-shadow: 0 0 2px #ff6,0 0 10px #f80,0 0 20px #f40; }
-      50%   { text-shadow: 0 0 5px #ff6,0 0 15px #f80,0 0 30px #f40; }
-    }
-
-    /* Layout */
-    header, footer { text-align: center; padding: 2rem 1rem; background: #000; color: #fff; position: relative; }
-    body.light header, body.light footer { background: #ddd; color: #000; }
-    main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-
-    /* Theme toggle */
-    .theme-toggle { position: absolute; top: 1rem; left: 1rem; cursor: pointer; font-size: 1.5rem; }
-
-    /* Header */
-    header h1 {
-      font-size: 3rem; letter-spacing: 2px; margin-bottom: .5rem; font-weight: bold;
-      background: linear-gradient(45deg, #ff4500, #ff8c00, #ffd700);
-      -webkit-background-clip: text; color: transparent;
-      animation: flame 1.5s infinite alternate;
-    }
-    header h2 {
-      font-size: 1.2rem; font-style: italic; opacity: .9; margin-bottom: 1.5rem;
-      color: #ffde7d; text-shadow: 0 0 6px #ff8c00;
-    }
-    .clock {
-      font-size: 1.2rem; opacity: .9; font-weight: bold;
-      color: #f8f871; text-shadow: 0 0 4px #f80;
-    }
-
-    /* Surah Selector */
-    .surah-container { margin: 2rem 0; display: flex; flex-direction: column; gap: .5rem; }
-    .surah-container label {
-      font-weight: bold; font-size: 1.1rem;
-      background: linear-gradient(45deg, #ff8c00, #ffa500);
-      -webkit-background-clip: text; color: transparent;
-      text-shadow: 0 0 4px #f40;
-      animation: flame 2s infinite alternate-reverse;
-    }
-    select {
-      padding: .7rem; border-radius: 8px; border: none; font-size: 1rem;
-      background: #222; color: #fff;
-      box-shadow: 0 0 8px rgba(255,140,0,0.5);
-    }
-    body.light select {
-      background: #fff; color: #222;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
-
-    /* Audio Controls */
-    .audio-controls { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem; }
-    .audio-controls button {
-      background: #333; border: none; color: #fff; padding: .8rem;
-      border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: background .3s;
-    }
-    .audio-controls button:hover { background: #444; }
-    .progress-bar {
-      flex: 1; height: 6px; background: #222; border-radius: 4px; overflow: hidden; cursor: pointer;
-    }
-    .progress { height: 100%; background: #ff8c00; width: 0%; }
-    #timeDisplay { font-size: .9rem; min-width: 80px; text-align: right; }
-    body.light .audio-controls button { color: #222; background: #ddd; }
-    body.light .progress-bar { background: #eee; }
-    body.light .progress { background: #ff4500; }
-
-    /* Verses & Spacing */
-    .verses {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem; margin-bottom: 2rem;
-    }
-    .verse {
-      background: #222; border-radius: 8px; padding: 1rem;
-      box-shadow: 0 0 10px rgba(255,140,0,0.3);
-      font-size: .95rem; position: relative;
-    }
-    body.light .verse {
-      background: #fff; color: #222;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
-    .verse p { margin-bottom: .75rem; }
-    .actions { display: flex; gap: .5rem; font-size: .9rem; margin-bottom: .5rem; cursor: pointer; }
-    .actions span:hover { text-decoration: underline; }
-    .verse.highlight { border-bottom: 2px solid #f00; }
-
-    /* Rating */
-    .rating { display: flex; justify-content: center; gap: .3rem; margin-top: .5rem; }
-    .star {
-      font-size: 1.8rem; cursor: pointer; transition: transform .2s; color: #888;
-    }
-    .star:hover { transform: scale(1.2); }
-    .active { color: gold; }
-
-    /* Prayer Button */
-    .btn-open-prayer {
-      display: block; width: 100%; padding: 1rem; margin-bottom: 2rem;
-      background: #ff4500; color: #fff; border: none;
-      border-radius: 8px; font-size: 1.1rem; cursor: pointer;
-      transition: background .3s;
-    }
-    .btn-open-prayer:hover { background: #e63e00; }
-    body.light .btn-open-prayer { background: #ffa500; color: #222; }
-    body.light .btn-open-prayer:hover { background: #ff8c00; }
-
-    /* Quiz & Stats */
-    .daily-quiz, .stats {
-      background: #222; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;
-    }
-    body.light .daily-quiz, body.light .stats { background: #f1f1f1; color: #222; }
-    .daily-quiz h3, .stats h3 { margin-bottom: .5rem; }
-    .daily-quiz button, .stats p { margin-top: .5rem; }
-  </style>
-
-  <!-- Firebase App (the core SDK) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <!-- Firebase Realtime Database -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-</head>
-<body>
-  <header>
-    <div class="theme-toggle" id="themeToggle">🌙</div>
-    <h1>بسم الله الرحمن الرحيم</h1>
-    <h2>بوابتك التفاعلية لقراءة القرآن الكريم والاستماع</h2>
-    <div class="clock" id="clock"></div>
-  </header>
-  <main>
-    <div class="surah-container">
-      <label for="surahSelect">اختر السورة:</label>
-      <select id="surahSelect"></select>
-      <div class="rating" id="rating"></div>
-    </div>
-    <div class="audio-controls">
-      <button id="backward">⏪</button>
-      <button id="playPause">▶️</button>
-      <button id="forward">⏩</button>
-      <div class="progress-bar" id="progressBar">
-        <div class="progress" id="progress"></div>
-      </div>
-      <span id="timeDisplay">00:00 / 00:00</span>
-    </div>
-    <div class="daily-quiz" id="dailyQuiz">
-      <h3>السؤال اليومي:</h3>
-      <div id="quizQuestion"></div>
-      <button id="showAnswerBtn">إظهار الجواب</button>
-      <div id="quizAnswer" style="display:none;"></div>
-    </div>
-    <div class="stats" id="stats">
-      <h3>إحصائياتك</h3>
-      <p>السور المقروءة: <span id="readCount">0</span></p>
-      <p>عدد الاستماعات: <span id="playCount">0</span></p>
-      <p>عدد الأجهزة: <span id="deviceCount">0</span></p>
-    </div>
-    <div class="verses" id="verses"></div>
-    <button class="btn-open-prayer" onclick="window.open('https://timesprayer.today/', '_blank')">
-      عرض مواقيت الصلاة
-    </button>
-  </main>
-  <footer>
-    &copy; 2025 القرآن الكريم<div class="maker">Made by AlShiek</div>
-  </footer>
-
-  <script>
-    // إعداد Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
-      authDomain: "gmae-fae90.firebaseapp.com",
-      databaseURL: "https://gmae-fae90-default-rtdb.firebaseio.com",
-      projectId: "gmae-fae90",
-      storageBucket: "gmae-fae90.firebasestorage.app",
-      messagingSenderId: "768482186329",
-      appId: "1:768482186329:web:18937587e530f8674e0d48",
-      measurementId: "G-V4ZLJ4BJGD"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // توليد UUID مبسط وخزن في localStorage
-    function generateId() {
-      return 'xxxx-xxxx-xxxx'.replace(/x/g, () =>
-        Math.floor(Math.random() * 16).toString(16)
-      );
-    }
-    let visitorId = localStorage.getItem('visitorId');
-    if (!visitorId) {
-      visitorId = generateId();
-      localStorage.setItem('visitorId', visitorId);
-    }
-
-    // سجل الزائر مرة واحدة فقط
-    function registerVisitor() {
-      const refPath = 'visitors/' + visitorId;
-      db.ref(refPath).once('value', snap => {
-        if (!snap.exists()) {
-          db.ref(refPath).set({ ts: Date.now() });
-        }
-      });
-    }
-
-    // اعرض عد الزوار
-    function displayVisitorCount() {
-      db.ref('visitors').on('value', snap => {
-        document.getElementById('deviceCount').textContent = snap.numChildren();
-      });
-    }
-
-    // دوال موقعك الأصلية (clock, stats, quiz, audio, loadSurahList...)...
-    // **ابدأ تضمين الكود الأصلي من هنا كما كان دون حذف أي جزء**:
-
-    const surahSelect   = document.getElementById('surahSelect');
-    const ratingDiv     = document.getElementById('rating');
-    const versesDiv     = document.getElementById('verses');
-    const clockEl       = document.getElementById('clock');
-    const playPauseBtn  = document.getElementById('playPause');
-    const backwardBtn   = document.getElementById('backward');
-    const forwardBtn    = document.getElementById('forward');
-    const progressBar   = document.getElementById('progressBar');
-    const progress      = document.getElementById('progress');
-    const timeDisplay   = document.getElementById('timeDisplay');
-    const quizQuestion  = document.getElementById('quizQuestion');
-    const showAnswerBtn = document.getElementById('showAnswerBtn');
-    const quizAnswer    = document.getElementById('quizAnswer');
-    const readCountEl   = document.getElementById('readCount');
-    const playCountEl   = document.getElementById('playCount');
-    const themeToggle   = document.getElementById('themeToggle');
-
-    let audio = new Audio();
-    let ayahAudios = [], ayahList = [], currentAyah = 0;
-
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    if (savedTheme === 'light') {
-      document.body.classList.add('light');
-      themeToggle.textContent = '🌞';
-    }
-
-    function formatTime(sec) {
-      if (isNaN(sec)) return '00:00';
-      const m = Math.floor(sec/60).toString().padStart(2,'0');
-      const s = Math.floor(sec%60).toString().padStart(2,'0');
-      return `${m}:${s}`;
-    }
-
-    function updateClock() {
-      const now = new Date();
-      let h = now.getHours();
-      const m = now.getMinutes().toString().padStart(2,'0');
-      const ampm = h >= 12 ? 'م' : 'ص';
-      h = h % 12 || 12;
-      clockEl.textContent = `${h}:${m} ${ampm}`;
-    }
-
-    function saveStats() {
-      readCountEl.textContent = localStorage.getItem('readCount') || 0;
-      playCountEl.textContent = localStorage.getItem('playCount') || 0;
-    }
-
-    function incReadCount() {
-      const c = (+localStorage.getItem('readCount')||0) + 1;
-      localStorage.setItem('readCount', c);
-      saveStats();
-    }
-
-    function incPlayCount() {
-      const c = (+localStorage.getItem('playCount')||0) + 1;
-      localStorage.setItem('playCount', c);
-      saveStats();
-    }
-
-    async function loadSurahList() {
-      const res = await fetch('https://api.alquran.cloud/v1/surah');
-      const { data } = await res.json();
-      data.forEach(s => {
-        const o = document.createElement('option');
-        o.value = s.number;
-        o.textContent = `${s.number}. ${s.name}`;
-        surahSelect.appendChild(o);
-      });
-      const params = new URLSearchParams(window.location.search);
-      const sel = params.get('surah') || localStorage.getItem('lastSurah') || '1';
-      surahSelect.value = sel;
-      loadSurah(sel, params.get('ayah'));
-    }
-
-    function renderRating(surah) {
-      ratingDiv.innerHTML = '';
-      const saved = +localStorage.getItem('rating_'+surah);
-      for (let i = 1; i <= 5; i++) {
-        const star = document.createElement('span');
-        star.className = 'star' + (i <= saved ? ' active' : '');
-        star.textContent = '★';
-        star.onclick = () => {
-          localStorage.setItem('rating_'+surah, i);
-          renderRating(surah);
-        };
-        ratingDiv.appendChild(star);
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>لعبة كرة الوجه الشاملة - موقع تفاعلي</title>
+    <style>
+      /* Reset and base styles */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-    }
-
-    async function loadSurah(num, highlightAyah) {
-      localStorage.setItem('lastSurah', num);
-      renderRating(num);
-      const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/ar.alafasy`);
-      const { data } = await res.json();
-      ayahAudios = data.ayahs.map(a => a.audio);
-      ayahList   = data.ayahs.map(a => ({ number: a.numberInSurah, text: a.text }));
-      currentAyah = 0;
-      setupAudio();
-      renderVerses(highlightAyah && +highlightAyah);
-      incReadCount();
-    }
-
-    function renderVerses(highlightNum) {
-      versesDiv.innerHTML = '';
-      ayahList.forEach(v => {
-        const d = document.createElement('div');
-        d.className = 'verse' + (v.number === highlightNum ? ' highlight' : '');
-        d.innerHTML = `
-          <p><strong>${v.number}.</strong> ${v.text}</p>
-          <div class="actions">
-            <span class="trn">ترجمة</span>
-            <span class="shr">مشاركة</span>
-          </div>
-          <p class="trn-text"></p>
-        `;
-        if (v.number === highlightNum) {
-          setTimeout(() => d.scrollIntoView({ behavior: 'smooth' }), 100);
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to bottom, #1c1c1c, #2b2b2b);
+        color: #fff;
+        direction: rtl;
+        line-height: 1.5;
+      }
+      header {
+        text-align: center;
+        padding: 20px;
+      }
+      header h1 {
+        font-size: 2.5em;
+        color: #00ffe7;
+        text-shadow: 0 0 10px #00ffe7;
+      }
+      nav {
+        background: #333;
+        text-align: center;
+        padding: 10px 0;
+      }
+      nav button {
+        background: #ff0066;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      nav button:hover,
+      nav button.active {
+        background: #ff3388;
+        transform: scale(1.05);
+      }
+      .section {
+        display: none;
+        padding: 20px;
+      }
+      .active {
+        display: block;
+      }
+      /* Registration styles */
+      #registration {
+        max-width: 400px;
+        margin: 50px auto;
+        text-align: center;
+        padding: 20px;
+        background: #444;
+        border-radius: 10px;
+      }
+      #registration input {
+        width: 80%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: none;
+      }
+      .btn {
+        background: #00aaff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 10px;
+        transition: background 0.3s;
+      }
+      .btn:hover {
+        background: #33bbff;
+      }
+      /* Admin panel styles */
+      #admin-panel {
+        display: none;
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #555;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px #000;
+        z-index: 1000;
+        width: 90%;
+        max-width: 400px;
+      }
+      #admin-panel h2 {
+        text-align: center;
+        margin-bottom: 15px;
+      }
+      #admin-panel button {
+        width: 100%;
+        margin: 5px 0;
+      }
+      /* Leaderboard Table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+      th,
+      td {
+        border: 1px solid #666;
+        padding: 10px;
+        text-align: center;
+      }
+      th {
+        background: #222;
+      }
+      /* Game area styles */
+      #game-area {
+        text-align: center;
+        padding: 20px;
+      }
+      .emoji-btn {
+        font-size: 2em;
+        margin: 10px;
+        padding: 10px;
+        border: none;
+        background: #777;
+        color: #fff;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .emoji-btn:hover {
+        transform: scale(1.1);
+      }
+      #countdown {
+        font-size: 2em;
+        margin: 15px;
+      }
+      /* Key layout container styles (simulates inline keyboards) */
+      .key-layout {
+        display: inline-block;
+        margin-top: 15px;
+        text-align: center;
+      }
+      .key-row {
+        margin: 5px 0;
+      }
+      .key-button {
+        background: #444;
+        border: 1px solid #666;
+        margin: 3px;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      footer {
+        text-align: center;
+        padding: 10px;
+        margin-top: 20px;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Registration Screen -->
+    <div id="registration" class="section active">
+      <h2>تسجيل الدخول</h2>
+      <input type="text" id="reg-name" placeholder="أدخل اسمك" />
+      <input type="text" id="reg-username" placeholder="اختر يوزرك الخاص" />
+      <button class="btn" onclick="registerUser()">تسجيل</button>
+    </div>
+    <!-- Main Content -->
+    <div id="main-content" class="section">
+      <header>
+        <h1>بوابة الألعاب والاختبارات</h1>
+      </header>
+      <nav>
+        <button data-section="game" onclick="showSection('game')">اللعبة</button>
+        <button data-section="leaderboard" onclick="showSection('leaderboard')">لوحة المتصدرين</button>
+        <button onclick="openAdminPanel()">لوحة الأدمن</button>
+        <button onclick="openSettings()">الإعدادات</button>
+      </nav>
+      <!-- Game Section -->
+      <div id="game" class="section active">
+        <h2>لعبة كرة الوجه المبتسم - المرحلة <span id="current-level">1</span></h2>
+        <p id="game-status">اضغط على "ابدأ التحدي" لبدء المرحلة الأولى.</p>
+        <button class="btn" id="start-game-btn" onclick="startChallenge()">ابدأ التحدي</button>
+        <div id="countdown"></div>
+        <div id="emoji-container"></div>
+        <!-- Container for displaying a key layout stage (if applicable) -->
+        <div id="key-layout-container"></div>
+      </div>
+      <!-- Leaderboard Section -->
+      <div id="leaderboard" class="section">
+        <h2>لوحة المتصدرين</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>الترتيب</th>
+              <th>الاسم</th>
+              <th>النقاط</th>
+              <th>المستوى</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            <!-- يتم تعبئته ديناميكيًا -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Admin Panel (protected with secret code "0000") -->
+    <div id="admin-panel">
+      <h2>لوحة الأدمن</h2>
+      <div id="admin-options">
+        <button class="btn" onclick="adminAction('ban')">حظر مستخدم</button>
+        <button class="btn" onclick="adminAction('unban')">فك حظر مستخدم</button>
+        <button class="btn" onclick="adminAction('stats')">عرض إحصائيات اللعبة</button>
+        <button class="btn" onclick="adminAction('reset')">إعادة تعيين النقاط</button>
+      </div>
+      <button class="btn" onclick="closeAdminPanel()">إغلاق الأدمن</button>
+    </div>
+    <footer>
+      &copy; 2025 - Made with madness by ツ 《👑》Ͳ３ 《شــيـخ》
+    </footer>
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script>
+      // إعداد Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
+        authDomain: "gmae-fae90.firebaseapp.com",
+        databaseURL: "https://gmae-fae90-default-rtdb.firebaseio.com",
+        projectId: "gmae-fae90",
+        storageBucket: "gmae-fae90.firebasestorage.app",
+        messagingSenderId: "768482186329",
+        appId: "1:768482186329:web:18937587e530f8674e0d48",
+        measurementId: "G-V4ZLJ4BJGD",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+  
+      // توليد UUID مبسط وتخزينه في localStorage للزائر
+      function generateId() {
+        return "xxxx-xxxx-xxxx".replace(/x/g, () =>
+          Math.floor(Math.random() * 16).toString(16)
+        );
+      }
+      let visitorId = localStorage.getItem("visitorId");
+      if (!visitorId) {
+        visitorId = generateId();
+        localStorage.setItem("visitorId", visitorId);
+      }
+    </script>
+    <!-- Stage Keys Definitions (simulating Telegram inline keyboards) -->
+    <script>
+      // These keys simulate various stage layouts; they mimic the JSON structure from your PHP bot code.
+      const stageKeys = [
+        {"inline_keyboard": [
+          [{"text": "☺️", "callback_data": "go"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}]
+        ]},
+        {"inline_keyboard": [
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☺️", "callback_data": "go"}, {"text": "☹️", "callback_data": "no"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}]
+        ]},
+        {"inline_keyboard": [
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☺️", "callback_data": "go"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}]
+        ]},
+        // ... Additional keys can be added similarly (key4, key5, ..., key19)
+        {"inline_keyboard": [
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☺", "callback_data": "goo"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}, {"text": "☹️", "callback_data": "no"}],
+          [{"text": "☹️", "callback_data": "no"}, {"text": "☺", "callback_data": "goo"}, {"text": "☹️", "callback_data": "no"}]
+        ]}
+      ];
+  
+      // Choose a random key layout from the array
+      function getRandomStageKey() {
+        const idx = Math.floor(Math.random() * stageKeys.length);
+        return stageKeys[idx];
+      }
+  
+      // Render the chosen key layout as HTML buttons
+      function renderKeyLayout(keyData) {
+        const container = document.getElementById("key-layout-container");
+        container.innerHTML = ""; // Clear any existing layout
+        const layoutDiv = document.createElement("div");
+        layoutDiv.className = "key-layout";
+        keyData.inline_keyboard.forEach((row) => {
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "key-row";
+          row.forEach((btnData) => {
+            const btn = document.createElement("button");
+            btn.className = "key-button";
+            btn.textContent = btnData.text;
+            // Simulate callback actions:
+            btn.addEventListener("click", () => {
+              if (btnData.callback_data === "go" || btnData.callback_data === "goo") {
+                alert("تم اختيار الإجابة الصحيحة!");
+              } else {
+                alert("للأسف، الإجابة خاطئة.");
+              }
+            });
+            rowDiv.appendChild(btn);
+          });
+          layoutDiv.appendChild(rowDiv);
+        });
+        container.appendChild(layoutDiv);
+      }
+    </script>
+    <!-- Main Application Script -->
+    <script>
+      // Global variables for current user and level
+      let currentUser = null; // { name, username, userId, score, level }
+  
+      // On page load, if user is registered, load their data
+      window.onload = function () {
+        const storedUser = localStorage.getItem("currentUser");
+        if (storedUser) {
+          currentUser = JSON.parse(storedUser);
+          document.getElementById("registration").classList.remove("active");
+          document.getElementById("main-content").classList.add("active");
+          document.getElementById("current-level").textContent = currentUser.level || 1;
+          checkBanStatus();
         }
-        d.querySelector('.trn').onclick = async () => {
-          const trEl = d.querySelector('.trn-text');
-          if (trEl.textContent) {
-            trEl.style.display = trEl.style.display === 'none' ? 'block' : 'none';
+      };
+  
+      // Registration function
+      function registerUser() {
+        const name = document.getElementById("reg-name").value.trim();
+        const username = document.getElementById("reg-username").value.trim();
+        if (!name || !username) {
+          alert("الرجاء إدخال الاسم واليوزر الخاص بك");
+          return;
+        }
+        const userId =
+          username.toLowerCase() + "_" + Math.random().toString(36).substr(2, 5);
+        currentUser = { name, username, userId, score: 0, level: 1 };
+        db.ref("users/" + userId).set(currentUser, (error) => {
+          if (error) {
+            alert("فشل التسجيل، حاول مرة أخرى");
+          } else {
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+            document.getElementById("registration").classList.remove("active");
+            document.getElementById("main-content").classList.add("active");
+            checkBanStatus();
+          }
+        });
+      }
+  
+      // Section switching function
+      function showSection(sectionId) {
+        document
+          .querySelectorAll("#main-content > .section")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById(sectionId).classList.add("active");
+        if (sectionId === "leaderboard") renderLeaderboard();
+      }
+  
+      // ----------------- Game Logic with Stages -----------------
+      let challengeTimer;
+      let challengeTimeLeft;
+      const correctEmoji = "☺️";
+      const wrongEmojis = ["☹️", "😢", "😞", "😟", "🙁"];
+  
+      // Start a challenge; stages change time and buttons count based on level
+      function startChallenge() {
+        checkBanStatus().then((banData) => {
+          if (banData && banData.banUntil && Date.now() < banData.banUntil) {
+            alert(
+              "لا يمكنك بدء اللعبة لأنك محظور. الوقت المتبقي للحظر: " +
+                Math.ceil((banData.banUntil - Date.now()) / 60000) +
+                " دقيقة."
+            );
             return;
           }
-          const r = await fetch(`https://api.alquran.cloud/v1/ayah/${surahSelect.value}:${v.number}/en.asad`);
-          trEl.textContent = (await r.json()).data.text;
-          trEl.style.display = 'block';
-        };
-        d.querySelector('.shr').onclick = () => {
-          const url = `${location.origin}${location.pathname}?surah=${surahSelect.value}&ayah=${v.number}`;
-          navigator.clipboard.writeText(url);
-          alert('تم نسخ الرابط');
-        };
-        versesDiv.appendChild(d);
-      });
-    }
-
-    function setupAudio() {
-      playPauseBtn.textContent = '▶️';
-      audio.currentTime = +localStorage.getItem('pos_' + surahSelect.value) || 0;
-      audio.src = ayahAudios[currentAyah];
-      audio.ontimeupdate = () => {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        progress.style.width = pct + '%';
-        timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
-        localStorage.setItem('pos_' + surahSelect.value, audio.currentTime);
-      };
-      audio.onended = () => {
-        incPlayCount();
-        if (currentAyah + 1 < ayahAudios.length) playAyah(currentAyah + 1);
-        else playPauseBtn.textContent = '▶️';
-      };
-    }
-
-    function playAyah(i) {
-      if (i >= ayahAudios.length) return;
-      audio.src = ayahAudios[i];
-      audio.play();
-      playPauseBtn.textContent = '⏸️';
-      currentAyah = i;
-    }
-
-    playPauseBtn.onclick = () => {
-      if (audio.paused) {
-        audio.play();
-        playPauseBtn.textContent = '⏸️';
-        incPlayCount();
-      } else {
-        audio.pause();
-        playPauseBtn.textContent = '▶️';
+          const level = currentUser.level || 1;
+          // Set time limit: level 1 gets 5 seconds, higher levels get less time
+          challengeTimeLeft = level === 1 ? 5 : 3;
+          document.getElementById("game-status").textContent =
+            "المرحلة " + level + ": ابحث عن الرمز التعبيري المبتسم!";
+          const emojiContainer = document.getElementById("emoji-container");
+          emojiContainer.innerHTML = "";
+          // Increase number of emoji buttons as level increases
+          const totalButtons = 8 + (level - 1) * 2;
+          const correctIndex = Math.floor(Math.random() * totalButtons);
+          for (let i = 0; i < totalButtons; i++) {
+            const btn = document.createElement("button");
+            btn.className = "emoji-btn";
+            btn.textContent =
+              i === correctIndex
+                ? correctEmoji
+                : wrongEmojis[Math.floor(Math.random() * wrongEmojis.length)];
+            btn.onclick = () => checkAnswer(btn.textContent);
+            emojiContainer.appendChild(btn);
+          }
+          document.getElementById("countdown").textContent = challengeTimeLeft;
+          challengeTimer = setInterval(() => {
+            challengeTimeLeft--;
+            document.getElementById("countdown").textContent = challengeTimeLeft;
+            if (challengeTimeLeft <= 0) {
+              clearInterval(challengeTimer);
+              document.getElementById("game-status").textContent =
+                "انتهى الوقت! حاول مرة أخرى.";
+              updateScore(false);
+              // Optionally render a random key layout stage as feedback
+              renderKeyLayout(getRandomStageKey());
+            }
+          }, 1000);
+        });
       }
-    };
-
-    backwardBtn.onclick = () => audio.currentTime = Math.max(0, audio.currentTime - 5);
-    forwardBtn.onclick  = () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
-    progressBar.onclick  = e => {
-      const rect = progressBar.getBoundingClientRect();
-      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-    };
-
-    const quizzes = [
-  { q: 'ما السورة التي تحتوي على أطول آية في القرآن الكريم؟', a: 'سورة البقرة (آية الدين 282)' },
-  { q: 'من هو أول من أسلم من الرجال بعد النبي محمد صلى الله عليه وسلم؟', a: 'أبو بكر الصديق رضي الله عنه' },
-  { q: 'كم عدد آيات سورة البقرة؟', a: '286 آية' },
-  { q: 'ما هي السورة التي نزلت كلها دفعة واحدة؟', a: 'سورة الأنعام' },
-  { q: 'من هو الصحابي الذي حفظ الكثير من القرآن وهو صغير السن وكان يؤم قومه؟', a: 'عمرو بن سلمة رضي الله عنه' },
-  { q: 'في أي سورة ذكر الله عز وجل قصة أصحاب الكهف؟', a: 'سورة الكهف' },
-  { q: 'ما هي الآية التي تسمى "آية الكرسي"؟', a: 'آية 255 من سورة البقرة' },
-  { q: 'ما هي أركان الإيمان الستة؟', a: 'الإيمان بالله، وملائكته، وكتبه، ورسله، واليوم الآخر، والقدر خيره وشره' },
-  { q: 'ما السورة التي تسمى "قلب القرآن"؟', a: 'سورة يس' },
-  { q: 'كم عدد أجزاء القرآن الكريم؟', a: '30 جزءًا' },
-  { q: 'ما السورة التي تبدأ بقسم الله بالنجم؟', a: 'سورة النجم' },
-  { q: 'من هو النبي الذي ابتلعه الحوت؟', a: 'النبي يونس عليه السلام' },
-  { q: 'ما هي السورة التي تحدثت عن ليلة القدر؟', a: 'سورة القدر' },
-  { q: 'كم عدد ركعات صلاة الفجر؟', a: 'ركعتان' },
-  { q: 'من هو الصحابي الذي جمع القرآن في مصحف واحد بعد وفاة النبي؟', a: 'زيد بن ثابت رضي الله عنه' },
-  { q: 'ما هي السورة التي تسمى بـ "الصمد"؟', a: 'سورة الإخلاص' },
-  { q: 'في أي سورة أمر الله ببر الوالدين؟', a: 'سورة الإسراء، الآية 23' },
-  { q: 'ما السورة التي تحتوي على قصة النبي يوسف عليه السلام؟', a: 'سورة يوسف' },
-  { q: 'ما هي السورة التي تسمى "الكوثر"؟', a: 'سورة الكوثر' },
-  { q: 'من هو الصحابي الذي لقب بـ "سيد القراء"؟', a: 'أُبي بن كعب رضي الله عنه' },
-  { q: 'في أي سورة ورد ذكر الجنة والنار؟', a: 'سورة الرحمن' },
-  { q: 'ما هي السورة التي بدأت بـ "الحمد لله رب العالمين"؟', a: 'سورة الفاتحة' },
-  { q: 'كم عدد الأحزاب في القرآن الكريم؟', a: '60 حزبًا' },
-  { q: 'ما هي أول سورة نزلت من القرآن الكريم؟', a: 'سورة العلق' },
-  { q: 'ما هي السورة التي تسمى "الملك"؟', a: 'سورة الملك' },
-  { q: 'كم عدد ركعات صلاة المغرب؟', a: '3 ركعات' },
-  { q: 'من هو الصحابي الذي قال له النبي: "خيركم من تعلم القرآن وعلمه"؟', a: 'عثمان بن عفان رضي الله عنه' },
-  { q: 'ما هي السورة التي تسمى "الفلق"؟', a: 'سورة الفلق' },
-  { q: 'في أي سورة وردت كلمة "إيمان" أكثر من مرة؟', a: 'سورة البقرة' },
-  { q: 'ما هي السورة التي تحتوي على آيتين متشابهتين؟', a: 'سورة البقرة' }
-];
-
-    function loadQuiz() {
-      const idx = Math.floor(Math.random() * quizzes.length);
-      quizQuestion.textContent = quizzes[idx].q;
-      quizAnswer.textContent   = quizzes[idx].a;
-      quizAnswer.style.display = 'none';
-    }
-
-    showAnswerBtn.onclick = () => quizAnswer.style.display = 'block';
-
-    themeToggle.onclick = () => {
-      document.body.classList.toggle('light');
-      const t = document.body.classList.contains('light') ? 'light' : 'dark';
-      localStorage.setItem('theme', t);
-      themeToggle.textContent = t === 'light' ? '🌞' : '🌙';
-    };
-
-    // Initialization
-    window.addEventListener('load', () => {
-      saveStats();
-      updateClock();
-      setInterval(updateClock, 1000);
-      loadQuiz();
-      loadSurahList();
-      surahSelect.onchange = () => loadSurah(surahSelect.value);
-
-      // سجل الزائر واظهر العدد
-      registerVisitor();
-      displayVisitorCount();
-    });
-  </script>
-</body>
+  
+      function checkAnswer(selected) {
+        clearInterval(challengeTimer);
+        if (selected === correctEmoji) {
+          document.getElementById("game-status").textContent =
+            "أحسنت! إجابتك صحيحة.";
+          currentUser.score++;
+          // Advance level if appropriate; for example, if level==1, next becomes 2
+          if (currentUser.level === 1) {
+            currentUser.level = 2;
+            alert("تهانينا! لقد انتقلت إلى المرحلة الثانية.");
+          }
+          updateScore(true);
+          // Show a random key layout as additional feedback for correct answer
+          renderKeyLayout(getRandomStageKey());
+        } else {
+          document.getElementById("game-status").textContent =
+            "للأسف، إجابتك خاطئة.";
+          updateScore(false);
+          renderKeyLayout(getRandomStageKey());
+        }
+        document.getElementById("countdown").textContent = "";
+        document.getElementById("emoji-container").innerHTML = "";
+        document.getElementById("current-level").textContent =
+          currentUser.level || 1;
+      }
+  
+      function updateScore(correct) {
+        db.ref("users/" + currentUser.userId + "/score").set(currentUser.score);
+        db.ref("users/" + currentUser.userId + "/level").set(currentUser.level);
+        db.ref("leaderboard/" + currentUser.userId).set({
+          name: currentUser.name,
+          score: currentUser.score,
+          level: currentUser.level,
+        });
+      }
+  
+      // ----------------- Leaderboard Rendering -----------------
+      function renderLeaderboard() {
+        const lbBody = document.getElementById("leaderboard-body");
+        lbBody.innerHTML = "";
+        db.ref("leaderboard")
+          .orderByChild("score")
+          .once("value", (snapshot) => {
+            let leaderboard = [];
+            snapshot.forEach((child) => {
+              leaderboard.push(child.val());
+            });
+            leaderboard.sort((a, b) => b.score - a.score);
+            leaderboard.forEach((entry, index) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.score}</td><td>${
+                entry.level || 1
+              }</td>`;
+              lbBody.appendChild(row);
+            });
+          });
+      }
+  
+      // ----------------- Ban Handling -----------------
+      function checkBanStatus() {
+        if (!currentUser)
+          return Promise.resolve(null);
+        return db
+          .ref("bans/" + currentUser.userId)
+          .get()
+          .then((snapshot) => {
+            return snapshot.exists() ? snapshot.val() : null;
+          });
+      }
+  
+      // ----------------- Admin Panel -----------------
+      const ADMIN_CODE = "0000"; // رمز الدخول للوصول إلى لوحة الأدمن
+      function openAdminPanel() {
+        const code = prompt("أدخل الرمز للوصول إلى لوحة الأدمن:");
+        if (code === ADMIN_CODE) {
+          document.getElementById("admin-panel").style.display = "block";
+        } else {
+          alert("الرمز غير صحيح.");
+        }
+      }
+      function closeAdminPanel() {
+        document.getElementById("admin-panel").style.display = "none";
+      }
+      function adminAction(action) {
+        switch (action) {
+          case "ban":
+            const banUserId = prompt("أدخل معرف المستخدم لحظره:");
+            const banMinutes = parseInt(
+              prompt("أدخل مدة الحظر بالدقائق:"),
+              10
+            );
+            if (banUserId && banMinutes) {
+              const banUntil = Date.now() + banMinutes * 60000;
+              db.ref("bans/" + banUserId).set({ banUntil });
+              alert(
+                "تم حظر المستخدم " +
+                  banUserId +
+                  " لمدة " +
+                  banMinutes +
+                  " دقيقة."
+              );
+            }
+            break;
+          case "unban":
+            const unbanUserId = prompt("أدخل معرف المستخدم لفك الحظر:");
+            if (unbanUserId) {
+              db.ref("bans/" + unbanUserId).remove();
+              alert("تم فك الحظر عن المستخدم " + unbanUserId);
+            }
+            break;
+          case "stats":
+            db.ref("users")
+              .once("value")
+              .then((snapshot) => {
+                alert("عدد اللاعبين المسجلين: " + snapshot.numChildren());
+              });
+            break;
+          case "reset":
+            if (confirm("هل تريد إعادة تعيين جميع النقاط؟")) {
+              db.ref("leaderboard").remove();
+              db.ref("users").once("value", (snapshot) => {
+                snapshot.forEach((child) => {
+                  db.ref("users/" + child.key + "/score").set(0);
+                });
+              });
+              alert("تم إعادة تعيين النقاط.");
+            }
+            break;
+          default:
+            alert("أمر غير معروف");
+        }
+      }
+  
+      // ----------------- Settings -----------------
+      function openSettings() {
+        let newName = prompt("أدخل اسمك الجديد:", currentUser.name);
+        if (newName && newName !== currentUser.name) {
+          currentUser.name = newName;
+          localStorage.setItem("currentUser", JSON.stringify(currentUser));
+          db.ref("users/" + currentUser.userId + "/name").set(newName);
+          alert("تم تحديث الاسم!");
+        }
+        if (confirm("هل تريد نسخ معرفك؟")) {
+          navigator.clipboard.writeText(currentUser.userId).then(() => {
+            alert("تم نسخ المعرف!");
+          });
+        }
+      }
+    </script>
+  </body>
 </html>
