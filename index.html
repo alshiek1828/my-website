@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>بوابة الألعاب والاختبارات - تسجيل دخول</title>
+    <title>بوابة الألعاب والاختبارات</title>
     <style>
       /* إعادة تعيين الأنماط والأنماط الأساسية */
       *, *::before, *::after {
@@ -55,36 +55,7 @@
       .active {
         display: block;
       }
-      /* نمط شاشة التسجيل */
-      #registration {
-        max-width: 400px;
-        margin: 50px auto;
-        text-align: center;
-        padding: 20px;
-        background: #444;
-        border-radius: 10px;
-      }
-      #registration input {
-        width: 80%;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 5px;
-        border: none;
-      }
-      .btn {
-        background: #00aaff;
-        color: #fff;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        margin: 10px;
-        transition: background 0.3s;
-      }
-      .btn:hover {
-        background: #33bbff;
-      }
-      /* نمط لوحة الأدمن */
+      /* لوحة الأدمن */
       #admin-panel {
         display: none;
         position: fixed;
@@ -147,7 +118,7 @@
         margin: 15px;
         text-align: center;
       }
-      /* لوحة المفاتيح المضمنة (إن وجدت) */
+      /* لوحة المفاتيح المضمنة */
       .key-layout {
         display: inline-block;
         margin-top: 15px;
@@ -173,15 +144,8 @@
     </style>
   </head>
   <body>
-    <!-- شاشة التسجيل -->
-    <div id="registration" class="section active">
-      <h2>تسجيل الدخول</h2>
-      <input type="text" id="reg-name" placeholder="أدخل اسمك" />
-      <input type="text" id="reg-username" placeholder="اختر يوزرك الخاص" />
-      <button class="btn" onclick="registerUser()">تسجيل</button>
-    </div>
-    <!-- المحتوى الرئيسي -->
-    <div id="main-content" class="section">
+    <!-- المحتوى الرئيسي (يُعرض مباشرة بدون شاشة تسجيل) -->
+    <div id="main-content" class="section active">
       <header>
         <h1>بوابة الألعاب والاختبارات</h1>
       </header>
@@ -231,11 +195,11 @@
     <footer>
       &copy; 2025 - Made with madness by ツ 《👑》Ͳ３ 《شiek899》
     </footer>
-    <!-- تضمين مكتبة Firebase -->
+    <!-- تضمين Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
     <script>
-      // إعداد Firebase - تأكد من صحة القيم وعدم وجود نصوص إضافية
+      // إعداد Firebase - تأكد من استخدام القيم الصحيحة
       const firebaseConfig = {
         apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
         authDomain: "gmae-fae90.firebaseapp.com",
@@ -263,44 +227,20 @@
     </script>
     <!-- سكربت التطبيق الرئيسي -->
     <script>
-      // متغير لتخزين بيانات المستخدم الحالي
-      let currentUser = null; // { name, username, userId, score, level }
-  
-      // عند تحميل الصفحة: إذا كان هناك مستخدم مسجل في localStorage، نقوم بعرض المحتوى الرئيسي
-      window.onload = function () {
-        const storedUser = localStorage.getItem("currentUser");
-        if (storedUser) {
-          currentUser = JSON.parse(storedUser);
-          document.getElementById("registration").classList.remove("active");
-          document.getElementById("main-content").classList.add("active");
-          document.getElementById("current-level").textContent = currentUser.level || 1;
-          checkBanStatus();
-        }
+      // تعريف مستخدم افتراضي (يمكنك تغييره كما تريد)
+      let currentUser = {
+        name: "شيخ الأكواد",
+        username: "ShykCoder",
+        userId: "default_" + Math.random().toString(36).substr(2, 5),
+        score: 0,
+        level: 1
       };
-  
-      // دالة التسجيل: ندخل الاسم واليوزر ونخزنهم مع توليد معرف فريد
-      function registerUser() {
-        const name = document.getElementById("reg-name").value.trim();
-        const username = document.getElementById("reg-username").value.trim();
-        if (!name || !username) {
-          alert("الرجاء إدخال الاسم واليوزر الخاص بك");
-          return;
-        }
-        const userId =
-          username.toLowerCase() + "_" + Math.random().toString(36).substr(2, 5);
-        currentUser = { name, username, userId, score: 0, level: 1 };
-        // حفظ بيانات المستخدم على Firebase وفي localStorage
-        db.ref("users/" + userId).set(currentUser, (error) => {
-          if (error) {
-            alert("فشل التسجيل، حاول مرة أخرى");
-          } else {
-            localStorage.setItem("currentUser", JSON.stringify(currentUser));
-            document.getElementById("registration").classList.remove("active");
-            document.getElementById("main-content").classList.add("active");
-            checkBanStatus();
-          }
-        });
-      }
+      // تخزين المستخدم الافتراضي في localStorage
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("current-level").textContent = currentUser.level;
+        checkBanStatus();
+      });
   
       // دالة تبديل الأقسام
       function showSection(sectionId) {
