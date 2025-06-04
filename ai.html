@@ -1,27 +1,67 @@
 <!DOCTYPE html>
 <html lang="ar">
-  <head>
-    <meta charset="UTF-8" />
-    <title>بوت محمد المجنون 🤖🔥</title>
-    <style>
-      body {
-        font-family: Tahoma;
-        background: #f7f7f7;
-        text-align: center;
-        padding: 40px;
-      }
-      iframe {
-        width: 100%;
-        height: 600px;
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      }
-    </style>
-  </head>
-  <body>
-    <h1>🤖 بوت محمد المجنون</h1>
-    <p>اسأل أي شي وراح يرد عليك مثل الملوك 👑</p>
-    <iframe src="https://www.chatbase.co/chatbot-iframe/clw3j0yoi00dp0d0e6k7m2gbs" allow="clipboard-write; clipboard-read"></iframe>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>بوت محمد المجنون</title>
+  <style>
+    body { font-family: Tahoma; padding: 20px; max-width: 600px; margin: auto; }
+    #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; background: #f9f9f9; }
+    #inputArea { margin-top: 10px; display: flex; }
+    input[type="text"] { flex: 1; padding: 10px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; }
+    .user { color: blue; }
+    .bot { color: green; }
+  </style>
+</head>
+<body>
+
+  <h1>بوت محمد المجنون 🤖🔥</h1>
+  
+  <div id="chat"></div>
+
+  <div id="inputArea">
+    <input type="text" id="userInput" placeholder="اكتب سؤالك هنا..." />
+    <button onclick="sendMessage()">أرسل</button>
+  </div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('userInput');
+
+    function appendMessage(text, sender) {
+      const p = document.createElement('p');
+      p.textContent = text;
+      p.className = sender;
+      chat.appendChild(p);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return alert("اكتب شي يا محمد!");
+
+      appendMessage("أنت: " + message, 'user');
+
+      // هنا تكتب ردود البوت، بدل API
+      setTimeout(() => {
+        // ردود بسيطة ومجانية بدون API
+        let reply = "أنا ما بعرف هالسؤال، جرب تسألني شي تاني 😉";
+
+        if (message.includes("مرحبا") || message.includes("أهلًا")) {
+          reply = "أهلًا محمد! كيف فيني أساعدك اليوم؟";
+        } else if (message.includes("كيفك")) {
+          reply = "أنا تمام، شكراً لسؤالك 😊";
+        } else if (message.includes("شكراً")) {
+          reply = "على الرحب والسعة!";
+        }
+
+        appendMessage("بوت محمد: " + reply, 'bot');
+      }, 1000);
+
+      input.value = '';
+      input.focus();
+    }
+  </script>
+
+</body>
 </html>
