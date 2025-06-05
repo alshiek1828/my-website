@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>موقعي الأحلى في ملف واحد</title>
+  <!-- ======== استايلات الصفحة (CSS) ======== -->
+  <style>
+    /* ---------------- إعدادات عامة ---------------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    html, body {
+      background-color: #f0f2f5;
+      color: #333;
+      direction: rtl;
+      /* overflow-x: hidden; */
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    ul {
+      list-style: none;
+    }
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    /* ---------------- شريط التنقل (Navbar) ---------------- */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .navbar.scrolled {
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      padding: 5px 0;
+    }
+    .navbar .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 0;
+    }
+    .navbar .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #1e88e5;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .navbar .logo:hover {
+      color: #1565c0;
+    }
+    .navbar .menu {
+      display: flex;
+      gap: 30px;
+    }
+    .navbar .menu a {
+      font-size: 1rem;
+      color: #555;
+      position: relative;
+      padding: 5px;
+      transition: color 0.3s;
+    }
+    .navbar .menu a:after {
+      content: "";
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #1e88e5;
+      transition: width 0.3s;
+    }
+    .navbar .menu a:hover {
+      color: #1e88e5;
+    }
+    .navbar .menu a:hover:after {
+      width: 100%;
+    }
+    /* همبورجر للشاشات الصغيرة */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: #333;
+      border-radius: 3px;
+    }
+
+    /* ------------ قسم المقدمة (Hero Section) ------------ */
+    .hero {
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(135deg, #1e88e5, #42a5f5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    /* خلفية متحركة بسيطة بالـ CSS */
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.1), transparent 70%);
+      animation: rotateBg 20s linear infinite;
+    }
+    @keyframes rotateBg {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .hero .content {
+      position: relative;
+      max-width: 800px;
+      z-index: 1;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+    .hero .btn-primary {
+      display: inline-block;
+      padding: 12px 25px;
+      background: #fff;
+      color: #1e88e5;
+      font-size: 1rem;
+      border-radius: 30px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .hero .btn-primary:hover {
+      background: #e3f2fd;
+    }
+    /* تأثير الكتابة (Typewriter) */
+    .typewriter {
+      display: inline-block;
+      border-right: 4px solid #fff;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      animation: typing 4s steps(30, end), blink 0.75s step-end infinite;
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    @keyframes blink {
+      from, to { border-color: transparent; }
+      50% { border-color: #fff; }
+    }
+
+    /* ------------- قسم الخدمات (Features) ------------- */
+    .features {
+      padding: 80px 0;
+      background: #fff;
+    }
+    .features .container {
+      max-width: 1100px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+    }
+    .feature-card {
+      background: #f9f9f9;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .feature-card img {
+      width: 60px;
+      margin-bottom: 20px;
+    }
+    .feature-card h3 {
+      font-size: 1.2rem;
+      color: #1e88e5;
+      margin-bottom: 15px;
+    }
+    .feature-card p {
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* ------------ قسم المعرض (Gallery) ------------ */
+    .gallery {
+      padding: 80px 0;
+      background: #f0f2f5;
+    }
+    .gallery .container {
+      max-width: 1100px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.1);
+    }
+    .gallery-item .overlay {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: rgba(30, 136, 229, 0.6);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .gallery-item:hover .overlay {
+      opacity: 1;
+    }
+
+    /* ------------ قسم من أنا (About Me) ------------ */
+    .about {
+      padding: 80px 0;
+      background: #fff;
+    }
+    .about .container {
+      max-width: 900px;
+      margin: auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 40px;
+    }
+    .about .about-text {
+      flex: 1 1 300px;
+    }
+    .about .about-text h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #1e88e5;
+    }
+    .about .about-text p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #555;
+    }
+    .about .about-img {
+      flex: 1 1 300px;
+      text-align: center;
+    }
+    .about .about-img img {
+      width: 250px;
+      border-radius: 50%;
+      border: 5px solid #1e88e5;
+      transition: transform 0.3s;
+    }
+    .about .about-img img:hover {
+      transform: scale(1.05);
+    }
+
+    /* ------------ قسم تواصل معي (Contact) ------------ */
+    .contact {
+      padding: 80px 0;
+      background: #f0f2f5;
+    }
+    .contact .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    }
+    .contact h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #1e88e5;
+    }
+    .contact form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .contact label {
+      font-size: 1rem;
+      color: #333;
+    }
+    .contact input,
+    .contact textarea {
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: border-color 0.3s;
+    }
+    .contact input:focus,
+    .contact textarea:focus {
+      outline: none;
+      border-color: #1e88e5;
+    }
+    .contact button {
+      padding: 12px;
+      font-size: 1rem;
+      background: #1e88e5;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .contact button:hover {
+      background: #1565c0;
+    }
+    .contact .success-msg {
+      display: none;
+      text-align: center;
+      color: #388e3c;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    /* ------------ زر العودة للأعلى (Scroll To Top) ------------ */
+    .scroll-to-top {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      background: #1e88e5;
+      color: #fff;
+      padding: 12px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transition: background 0.3s;
+    }
+    .scroll-to-top:hover {
+      background: #1565c0;
+    }
+
+    /* ------------ اقسام Reveal لانهما Animation عند التمرير ------------ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ------------ Footer ------------ */
+    .footer {
+      background: #222;
+      color: #fff;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .footer p {
+      font-size: 0.9rem;
+    }
+
+    /* ------------ Responsive للشاشات الأصغر ------------ */
+    @media (max-width: 768px) {
+      .navbar .menu {
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        background: #fff;
+        height: calc(100% - 70px);
+        width: 200px;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+        transition: right 0.3s;
+      }
+      .navbar .menu.open {
+        right: 0;
+      }
+      .hamburger {
+        display: flex;
+      }
+      .features .container {
+        grid-template-columns: 1fr;
+      }
+      .gallery .container {
+        grid-template-columns: 1fr 1fr;
+      }
+      .about .container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= شريط التنقل ================= -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="logo" onclick="scrollToSection('hero')">موقعي</div>
+      <div class="menu">
+        <a href="#hero">الرئيسية</a>
+        <a href="#features">المميزات</a>
+        <a href="#gallery">المعرض</a>
+        <a href="#about">من أنا</a>
+        <a href="#contact">تواصل</a>
+      </div>
+      <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= Hero Section ================= -->
+  <section id="hero" class="hero">
+    <div class="content reveal">
+      <h1>أهلاً وسهلاً في<br /><span class="typewriter">موقعي الأحلى بملف واحد!</span></h1>
+      <p>كل شي في هذا الملف: ديزاين أنيق، أنيميشن، تفاعل، ومعرض صور متحرك🚀</p>
+      <a href="#features" class="btn-primary">اكتشف المزايا الآن</a>
+    </div>
+  </section>
+
+  <!-- ================= Features Section ================= -->
+  <section id="features" class="features">
+    <div class="container">
+      <div class="feature-card reveal">
+        <img src="https://img.icons8.com/clouds/100/000000/rocket.png" alt="Rocket Icon" />
+        <h3>تصميم احترافي</h3>
+        <p>ديزاين نظيف وأنيق يناسب جميع الشاشات والأجهزة بفضل CSS Grid و Flexbox.</p>
+      </div>
+      <div class="feature-card reveal">
+        <img src="https://img.icons8.com/clouds/100/000000/animation.png" alt="Animation Icon" />
+        <h3>حركات وانيميشن</h3>
+        <p>تأثيرات عند التمرير، تأثير كتابة، وخلفية متحركة CSS تخلي الموقع ينبض بالحياة.</p>
+      </div>
+      <div class="feature-card reveal">
+        <img src="https://img.icons8.com/clouds/100/000000/gallery.png" alt="Gallery Icon" />
+        <h3>معرض صور متفاعل</h3>
+        <p>صور تعرض تأثير زووم وفوق منها طبقة شفافة تكتب وصف لما تمرر الماوس.</p>
+      </div>
+      <div class="feature-card reveal">
+        <img src="https://img.icons8.com/clouds/100/000000/form.png" alt="Form Icon" />
+        <h3>نموذج تواصل فاخر</h3>
+        <p>نموذج لتواصل فقط للعرض؛ يرسل لك رسالة نجاح عند الضغط، ولينكّن تحطه على Firebase أو غيره لاحقاً.</p>
+      </div>
+      <div class="feature-card reveal">
+        <img src="https://img.icons8.com/clouds/100/000000/upward-arrow.png" alt="Scroll Up Icon" />
+        <h3>زر عودة للأعلى</h3>
+        <p>ما تحتاج ترجّع تصفح للجزء العلوي، بنقرة زر راح يوديك فوق 😉.</p>
+      </div>
+      <div class="feature-card reveal">
+        <img src="https://img.icons8.com/clouds/100/000000/responsive.png" alt="Responsive Icon" />
+        <h3>متجاوب 100%</h3>
+        <p>التصميم يشتغل على الموبايل والتابلت والكمبيوتر بدون مشاكل بفضل الاستجابة (Responsive).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Gallery Section ================= -->
+  <section id="gallery" class="gallery">
+    <div class="container">
+      <!-- صورة 1 -->
+      <div class="gallery-item reveal">
+        <img src="https://picsum.photos/400/300?random=1" alt="Gallery Image 1" />
+        <div class="overlay">صورة رقم 1</div>
+      </div>
+      <!-- صورة 2 -->
+      <div class="gallery-item reveal">
+        <img src="https://picsum.photos/400/300?random=2" alt="Gallery Image 2" />
+        <div class="overlay">صورة رقم 2</div>
+      </div>
+      <!-- صورة 3 -->
+      <div class="gallery-item reveal">
+        <img src="https://picsum.photos/400/300?random=3" alt="Gallery Image 3" />
+        <div class="overlay">صورة رقم 3</div>
+      </div>
+      <!-- صورة 4 -->
+      <div class="gallery-item reveal">
+        <img src="https://picsum.photos/400/300?random=4" alt="Gallery Image 4" />
+        <div class="overlay">صورة رقم 4</div>
+      </div>
+      <!-- صورة 5 -->
+      <div class="gallery-item reveal">
+        <img src="https://picsum.photos/400/300?random=5" alt="Gallery Image 5" />
+        <div class="overlay">صورة رقم 5</div>
+      </div>
+      <!-- صورة 6 -->
+      <div class="gallery-item reveal">
+        <img src="https://picsum.photos/400/300?random=6" alt="Gallery Image 6" />
+        <div class="overlay">صورة رقم 6</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= About Section ================= -->
+  <section id="about" class="about">
+    <div class="container">
+      <div class="about-text reveal">
+        <h2>من أنا؟</h2>
+        <p>
+          اسمي محمد، مبرمج ومهتم بالبرمجة العكسية وتهكير الألعاب، وطالب جامعي أسعى دائماً لتعلم كل جديد.  
+          أحب تصميم وتطوير الواجهات الجذابة والتفاعلية.  
+          هذا الموقع مثال على قدرة CSS و JavaScript لتحويل ملف واحد لموقع متكامل.
+        </p>
+      </div>
+      <div class="about-img reveal">
+        <img src="https://img.icons8.com/clouds/200/000000/user.png" alt="Profile Picture" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Contact Section ================= -->
+  <section id="contact" class="contact">
+    <div class="container">
+      <h2 class="reveal">تواصل معي</h2>
+      <form id="contactForm" class="reveal">
+        <label for="name">الاسم:</label>
+        <input type="text" id="name" placeholder="اكتب اسمك" required />
+
+        <label for="email">البريد الإلكتروني:</label>
+        <input type="email" id="email" placeholder="example@mail.com" required />
+
+        <label for="message">الرسالة:</label>
+        <textarea id="message" rows="4" placeholder="اكتب رسالتك هنا..." required></textarea>
+
+        <button type="submit">أرسل الرسالة</button>
+        <div class="success-msg" id="successMsg">تم إرسال الرسالة بنجاح! شكراً 😊</div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= Footer ================= -->
+  <footer class="footer reveal">
+    <p>© 2025 محمد. كل الحقوق محفوظة.</p>
+  </footer>
+
+  <!-- ================= زر العودة للأعلى ================= -->
+  <div class="scroll-to-top" id="scrollTopBtn" onclick="scrollToTop()">⬆️</div>
+
+  <!-- ======== السكربتات (JavaScript) ======== -->
+  <script>
+    /* --------------- فتح وإغلاق قائمة الهمبورجر --------------- */
+    function toggleMenu() {
+      const menu = document.querySelector(".navbar .menu");
+      menu.classList.toggle("open");
+    }
+
+    /* --------------- تغيير شريط التنقل عند التمرير --------------- */
+    window.addEventListener("scroll", () => {
+      const navbar = document.querySelector(".navbar");
+      if (window.scrollY > 50) {
+        navbar.classList.add("scrolled");
+      } else {
+        navbar.classList.remove("scrolled");
+      }
+
+      // زر العودة للأعلى
+      const scrollBtn = document.getElementById("scrollTopBtn");
+      if (window.scrollY > 300) {
+        scrollBtn.style.display = "block";
+      } else {
+        scrollBtn.style.display = "none";
+      }
+
+      // تفعيل reveal للعناصر
+      revealOnScroll();
+    });
+
+    /* --------------- دالة التمرير إلى القسم المطلوب --------------- */
+    function scrollToSection(id) {
+      const section = document.getElementById(id);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    /* --------------- دالة العودة للأعلى --------------- */
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* --------------- تفعيل تأثيرات reveal عند التمرير --------------- */
+    function revealOnScroll() {
+      const reveals = document.querySelectorAll(".reveal");
+      const windowHeight = window.innerHeight;
+      reveals.forEach((el) => {
+        const elementTop = el.getBoundingClientRect().top;
+        if (elementTop < windowHeight - 100) {
+          el.classList.add("active");
+        } else {
+          el.classList.remove("active");
+        }
+      });
+    }
+    // استدعاء مرة عند التحميل
+    window.addEventListener("load", revealOnScroll);
+
+    /* --------------- التعامل مع نموذج الاتصال (فقط Front-End) --------------- */
+    const contactForm = document.getElementById("contactForm");
+    const successMsg = document.getElementById("successMsg");
+    contactForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      // هنا ما فيه إرسال فعلي لأنه Front-End فقط؛ نعرض رسالة نجاح
+      successMsg.style.display = "block";
+      setTimeout(() => {
+        successMsg.style.display = "none";
+        contactForm.reset();
+      }, 3000);
+    });
+  </script>
+</body>
+          </html>
