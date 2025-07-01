@@ -1,8 +1,9 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Telegram Username Checker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Telegram Username Generator & Checker</title>
   <style>
     body {
       background-color: #0f172a;
@@ -53,13 +54,18 @@
 </head>
 <body>
   <h1>Telegram Username Generator & Checker</h1>
-  <p>Generate and check availability of 3, 4, or 5 letter usernames.</p>  <select id="lengthSelector">
+  <p>Generate and check availability of 3, 4, or 5 letter usernames.</p>
+
+  <select id="lengthSelector">
     <option value="3">Triple (A_B_C)</option>
     <option value="4">Quadruple (AB_CD)</option>
     <option value="5">Five letters (ABCDE)</option>
-  </select><button onclick="startGeneration()">Start Auto-Scan</button>
+  </select>
 
-  <div id="results"></div>  <script>
+  <button onclick="startGeneration()">Start Auto-Scan</button>
+  <div id="results"></div>
+
+  <script>
     const token = "7874593209:AAGHM7VDA7dr4yOfmE8RpgEXvh3R6WM8UwA";
     const chatId = "7124431342";
     let scanning = false;
@@ -82,12 +88,11 @@
 
     async function checkUsername(username) {
       try {
-        const response = await fetch(`https://t.me/${username}`, {
-          method: 'HEAD',
-        });
-        return response.status !== 200;
+        const imageUrl = `https://t.me/i/userpic/320/${username}.jpg`;
+        const response = await fetch(imageUrl, { method: "HEAD" });
+        return response.status === 404; // 404 يعني الصورة مش موجودة → اليوزر متاح
       } catch (e) {
-        return false;
+        return false; // خطأ يعني مش متاح
       }
     }
 
@@ -95,7 +100,7 @@
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text: message })
+        body: JSON.stringify({ chat_id: chatId, text: message }),
       });
     }
 
@@ -111,14 +116,15 @@
         const span = document.createElement("span");
         span.className = "username";
         span.textContent = username + (isAvailable ? " ✅" : " ❌");
-        results.prepend(span); // show newest on top
+        results.prepend(span); // يظهر الأحدث فوق
 
         if (isAvailable) {
           await sendToTelegram(`✅ Username Available: @${username}`);
         }
 
-        await new Promise(resolve => setTimeout(resolve, 2500));
+        await new Promise((resolve) => setTimeout(resolve, 2500)); // تأخير 2.5 ثانية
       }
     }
-  </script></body>
+  </script>
+</body>
 </html>
