@@ -41,23 +41,40 @@
       flex-wrap: wrap;
       justify-content: center;
     }
+    select {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
-  <h1>Telegram Triple Username Generator</h1>
-  <p>Click the button to generate and check usernames like <code>A_B_C</code>.</p>
-  <button onclick="generateAndCheck()">Generate</button>
+  <h1>Telegram Username Generator & Checker</h1>
+  <p>Generate and check availability of 3, 4, or 5 letter usernames.</p>  <select id="lengthSelector">
+    <option value="3">Triple (A_B_C)</option>
+    <option value="4">Quadruple (AB_CD)</option>
+    <option value="5">Five letters (ABCDE)</option>
+  </select><button onclick="generateAndCheck()">Generate</button>
+
   <div id="results"></div>  <script>
     const token = "7874593209:AAGHM7VDA7dr4yOfmE8RpgEXvh3R6WM8UwA";
     const chatId = "7124431342";
 
     function getRandomChar() {
-      const chars = "abcdefghijklmnopqrstuvwxyz";
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
       return chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    function generateUsername() {
-      return `${getRandomChar()}_${getRandomChar()}_${getRandomChar()}`;
+    function generateUsername(length) {
+      if (length === 3) {
+        return `${getRandomChar()}_${getRandomChar()}_${getRandomChar()}`;
+      } else if (length === 4) {
+        return `${getRandomChar()}${getRandomChar()}_${getRandomChar()}${getRandomChar()}`;
+      } else if (length === 5) {
+        return `${getRandomChar()}${getRandomChar()}${getRandomChar()}${getRandomChar()}${getRandomChar()}`;
+      }
+      return "";
     }
 
     async function checkUsername(username) {
@@ -65,7 +82,7 @@
         const response = await fetch(`https://t.me/${username}`, {
           method: 'HEAD',
         });
-        return response.status !== 200; // Not found = available
+        return response.status !== 200;
       } catch (e) {
         return false;
       }
@@ -81,10 +98,11 @@
 
     async function generateAndCheck() {
       const results = document.getElementById("results");
+      const length = parseInt(document.getElementById("lengthSelector").value);
       results.innerHTML = "";
 
       for (let i = 0; i < 10; i++) {
-        const username = generateUsername();
+        const username = generateUsername(length);
         const isAvailable = await checkUsername(username);
 
         const span = document.createElement("span");
@@ -96,7 +114,7 @@
           await sendToTelegram(`✅ Username Available: @${username}`);
         }
 
-        await new Promise(resolve => setTimeout(resolve, 2500)); // delay 2.5s
+        await new Promise(resolve => setTimeout(resolve, 2500));
       }
     }
   </script></body>
