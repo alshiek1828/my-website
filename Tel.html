@@ -1,0 +1,103 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telegram Username Checker</title>
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 {
+      color: #38bdf8;
+    }
+    button {
+      background-color: #38bdf8;
+      color: #0f172a;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    .username {
+      background: #1e293b;
+      margin: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      display: inline-block;
+    }
+    #results {
+      margin-top: 1rem;
+      max-width: 600px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Telegram Triple Username Generator</h1>
+  <p>Click the button to generate and check usernames like <code>A_B_C</code>.</p>
+  <button onclick="generateAndCheck()">Generate</button>
+  <div id="results"></div>  <script>
+    const token = "7874593209:AAGHM7VDA7dr4yOfmE8RpgEXvh3R6WM8UwA";
+    const chatId = "7124431342";
+
+    function getRandomChar() {
+      const chars = "abcdefghijklmnopqrstuvwxyz";
+      return chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    function generateUsername() {
+      return `${getRandomChar()}_${getRandomChar()}_${getRandomChar()}`;
+    }
+
+    async function checkUsername(username) {
+      try {
+        const response = await fetch(`https://t.me/${username}`, {
+          method: 'HEAD',
+        });
+        return response.status !== 200; // Not found = available
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function sendToTelegram(message) {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text: message })
+      });
+    }
+
+    async function generateAndCheck() {
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+
+      for (let i = 0; i < 10; i++) {
+        const username = generateUsername();
+        const isAvailable = await checkUsername(username);
+
+        const span = document.createElement("span");
+        span.className = "username";
+        span.textContent = username + (isAvailable ? " ✅" : " ❌");
+        results.appendChild(span);
+
+        if (isAvailable) {
+          await sendToTelegram(`✅ Username Available: @${username}`);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 2500)); // delay 2.5s
+      }
+    }
+  </script></body>
+</html>
