@@ -40,6 +40,8 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      overflow-y: auto;
+      max-height: 500px;
     }
     select {
       margin-top: 1rem;
@@ -55,11 +57,12 @@
     <option value="3">Triple (A_B_C)</option>
     <option value="4">Quadruple (AB_CD)</option>
     <option value="5">Five letters (ABCDE)</option>
-  </select><button onclick="generateAndCheck()">Generate</button>
+  </select><button onclick="startGeneration()">Start Auto-Scan</button>
 
   <div id="results"></div>  <script>
     const token = "7874593209:AAGHM7VDA7dr4yOfmE8RpgEXvh3R6WM8UwA";
     const chatId = "7124431342";
+    let scanning = false;
 
     function getRandomChar() {
       const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -96,19 +99,19 @@
       });
     }
 
-    async function generateAndCheck() {
+    async function startGeneration() {
       const results = document.getElementById("results");
       const length = parseInt(document.getElementById("lengthSelector").value);
-      results.innerHTML = "";
+      scanning = true;
 
-      for (let i = 0; i < 10; i++) {
+      while (scanning) {
         const username = generateUsername(length);
         const isAvailable = await checkUsername(username);
 
         const span = document.createElement("span");
         span.className = "username";
         span.textContent = username + (isAvailable ? " ✅" : " ❌");
-        results.appendChild(span);
+        results.prepend(span); // show newest on top
 
         if (isAvailable) {
           await sendToTelegram(`✅ Username Available: @${username}`);
