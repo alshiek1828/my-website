@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>محمد | السيرة الذاتية</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #121212;
+      color: white;
+      direction: rtl;
+      scroll-behavior: smooth;
+    }
+    header {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      padding: 100px 0;
+      text-align: center;
+    }
+    h1 { font-size: 2.5rem; }
+    .typed { color: yellow; }
+    p { font-size: 1.2rem; }
+    .btn {
+      margin-top: 20px;
+      display: inline-block;
+      background: white;
+      color: #121212;
+      padding: 10px 25px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .btn:hover { background: #ffeb3b; }
+    section {
+      padding: 50px 20px;
+      background: #1e1e1e;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
+    ul { list-style: none; padding: 0; }
+    li { padding: 8px 0; }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #000;
+      color: #888;
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>أنا <span class="typed" id="typed"></span></h1>
+      <p>مبرمج ✨ | طالب 📚 | عمري 18 سنة 🔥</p>
+      <a href="https://t.me/HNR55" target="_blank" class="btn">📩 تواصل معي</a>
+    </div>
+  </header>
+
+  <section class="about reveal">
+    <div class="container">
+      <h2>عنّي</h2>
+      <p>أنا محمد، مهووس بالبرمجة والتقنية، بشتغل على مشاريع بلغة Java و JavaScript، وبحب التطوير العكسي وتهكير الألعاب 😎</p>
+    </div>
+  </section>
+
+  <section class="skills reveal">
+    <div class="container">
+      <h2>مهاراتي</h2>
+      <ul>
+        <li>💻 Java / Kotlin</li>
+        <li>🌐 HTML / CSS / JS</li>
+        <li>🚀 Firebase</li>
+        <li>🎮 تهكير الألعاب و Sketchware</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 محمد | كل الحقوق محفوظة</p>
+  </footer>
+
+  <script>
+    // الكتابة المتحركة
+    var typed = new Typed("#typed", {
+      strings: ["محمد", "مبرمج محترف", "طالب تقني", "عاشق للبرمجة"],
+      typeSpeed: 80,
+      backSpeed: 50,
+      loop: true,
+    });
+
+    // تأثيرات الظهور
+    window.addEventListener("scroll", reveal);
+    function reveal() {
+      var reveals = document.querySelectorAll(".reveal");
+      for (var i = 0; i < reveals.length; i++) {
+        var windowHeight = window.innerHeight;
+        var revealTop = reveals[i].getBoundingClientRect().top;
+        var revealPoint = 150;
+        if (revealTop < windowHeight - revealPoint) {
+          reveals[i].classList.add("active");
+        }
+      }
+    }
+  </script>
+</body>
+</html>
