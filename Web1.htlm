@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SmartSite0 - تصميم مواقع احترافية</title>
+  <!-- خطوط عربية جميلة -->
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Reem Kufi', sans-serif; }
+    body {
+      background: #f7f7f7;
+      color: #333;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(90deg, #ff005a 0%, #ff73c8 100%);
+      padding: 20px;
+      text-align: center;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      animation: slideDown 0.8s ease;
+    }
+    @keyframes slideDown { from { transform: translateY(-50px); opacity: 0;} to { transform: translateY(0); opacity: 1;} }
+    header h1 { font-size: 2.5rem; }
+    nav { margin-top: 10px; }
+    nav a {
+      margin: 0 10px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: #ffe700; }
+    .hero {
+      padding: 60px 20px;
+      text-align: center;
+      background: url('https://source.unsplash.com/featured/?website,design') center/cover no-repeat;
+      color: #fff;
+      position: relative;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+    }
+    .hero .content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: auto;
+    }
+    .hero h2 { font-size: 2rem; margin-bottom: 15px; }
+    .hero p { font-size: 1.2rem; margin-bottom: 25px; }
+    .btn-primary {
+      background: #ffe700;
+      color: #333;
+      padding: 12px 30px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(255,231,0,0.5);
+      transition: transform 0.3s;
+    }
+    .btn-primary:hover { transform: scale(1.05); }
+    section { padding: 50px 20px; }
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+    }
+    .card h3 { margin-bottom: 10px; color: #ff005a; }
+    .card p { font-size: 0.95rem; }
+    .contact-area {
+      background: #333;
+      color: #fff;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .contact-area a {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 25px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: opacity 0.3s;
+    }
+    .contact-area a.telegram { background: #26a5de; color: #fff; }
+    .contact-area a.telegram:hover { opacity: 0.8; }
+    .contact-area a.tiktok { background: #000; color: #fff; }
+    .contact-area a.tiktok:hover { opacity: 0.8; }
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9rem;
+      color: #777;
+    }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.8rem; }
+      .hero h2 { font-size: 1.5rem; }
+      .hero p { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SmartSite0 🖥️ تصميم مواقع احترافية</h1>
+    <nav>
+      <a href="#services">الخدمات</a>
+      <a href="#contact">تواصل معي</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="content">
+      <h2>موقع يروي قصتك الرقمية</h2>
+      <p>أبتكر لك موقعًا يعكس شخصيتك ويزيد من مصداقيتك أمام عملائك.</p>
+      <a href="#contact" class="btn-primary">احصل على عرض مجاني</a>
+    </div>
+  </section>
+
+  <section id="services">
+    <h2 style="text-align:center; margin-bottom:30px; color:#ff005a;">💡 خدماتنا</h2>
+    <div class="services">
+      <div class="card">
+        <h3>سيرة ذاتية (CV)</h3>
+        <p>صفحة تعريفية أنيقة لعرض مهاراتك وخبراتك بشكل محترف.</p>
+      </div>
+      <div class="card">
+        <h3>متجر إلكتروني</h3>
+        <p>تصميم واجهة متجر جذابة وسهلة الاستخدام (بدون دفع مباشر).</p>
+      </div>
+      <div class="card">
+        <h3>موقع شركة</h3>
+        <p>موقع احترافي يعرض خدمات الشركة ووسائل التواصل بخطوات بسيطة.</p>
+      </div>
+      <div class="card">
+        <h3>بلوق/مدونة</h3>
+        <p>منصة لعرض مقالاتك وصورك بطريقة جذابة وسهلة التصفح.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-area" id="contact">
+    <h2>📱 تواصل الآن</h2>
+    <p>اختر الطريقة الأنسب لك:</p>
+    <a href="https://t.me/HNR55" target="_blank" rel="noopener noreferrer" class="telegram">Telegram</a>
+    <a href="https://tiktok.com/@smartsite0" target="_blank" rel="noopener noreferrer" class="tiktok">TikTok</a>
+  </section>
+
+  <footer>
+    &copy; 2025 SmartSite0. جميع الحقوق محفوظة.
+  </footer>
+</body>
+</html>
