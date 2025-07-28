@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>خدمات تصميم المواقع - احترافية وفخامة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1f2937, #4b5563);
+      color: #f9fafb;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    header {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      border-bottom: 2px solid #10b981;
+    }
+    header h1 {
+      font-size: 2.8rem;
+      color: #10b981;
+      margin-bottom: 0.3rem;
+    }
+    header p {
+      font-size: 1.2rem;
+      color: #d1d5db;
+    }
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    section {
+      background: rgba(31, 41, 55, 0.85);
+      padding: 2rem 2.5rem;
+      border-radius: 1rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+      transition: transform 0.3s ease;
+    }
+    section:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+    }
+    section h2 {
+      color: #34d399;
+      font-size: 1.9rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #34d399;
+      padding-bottom: 0.5rem;
+    }
+    section p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #d1d5db;
+    }
+    .contact {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .contact h2 {
+      color: #10b981;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      background-color: #10b981;
+      color: #fff;
+      padding: 0.9rem 2.2rem;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-decoration: none;
+      box-shadow: 0 6px 12px rgba(16, 185, 129, 0.5);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .btn:hover {
+      background-color: #059669;
+      box-shadow: 0 8px 18px rgba(5, 150, 105, 0.7);
+    }
+    .btn svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+    footer {
+      background-color: #111827;
+      text-align: center;
+      padding: 1rem 1rem;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      section h2 {
+        font-size: 1.5rem;
+      }
+      .btn {
+        font-size: 1rem;
+        padding: 0.7rem 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>خدمات تصميم المواقع الاحترافية</h1>
+    <p>مواقع أنيقة، سريعة، ومتوافقة مع جميع الأجهزة</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>موقع سيرة ذاتية</h2>
+      <p>صفحة تعريفية أنيقة تعرض خبراتك، مهاراتك، وشهاداتك بطريقة احترافية ومنظمة.</p>
+    </section>
+
+    <section>
+      <h2>موقع متجر إلكتروني</h2>
+      <p>واجهة متجر حديثة وجذابة لعرض منتجاتك، من دون نظام دفع مباشر، مع تصميم يلفت الانتباه.</p>
+    </section>
+
+    <section>
+      <h2>موقع شركة أو مؤسسة</h2>
+      <p>موقع رسمي يعرض خدمات شركتك، بيانات الاتصال، موقعك الجغرافي، ويعكس هوية شركتك بوضوح.</p>
+    </section>
+
+    <section>
+      <h2>موقع شخصي أو مدونة</h2>
+      <p>مناسب لصناع المحتوى والمدونين، تصميم بسيط وسهل الاستخدام يتيح للزوار تصفح المحتوى بسلاسة.</p>
+    </section>
+
+    <section>
+      <h2>بإمكاني تنفيذ أي موقع تريده</h2>
+      <p>سواءً كان موقع منتج، حملة تسويقية، معرض أعمال، أو أي فكرة خاصة، أقدم لك تصميم يناسب طلبك تماماً.</p>
+    </section>
+
+    <div class="contact">
+      <h2>تواصل معي الآن</h2>
+      <div class="buttons">
+        <a href="https://t.me/HNR55" target="_blank" class="btn" aria-label="Telegram">
+          <svg viewBox="0 0 24 24"><path d="M9.999 15.498l-.004 3.83c.02.01.028.016.042.022.238.106.373.106.59 0l2.85-2.796 5.917-5.705c.425-.406.717-.733.465-1.205-.198-.392-.697-.477-1.1-.312l-8.676 3.528zm-6.69-4.63c-.273.19-.283.444-.102.705l3.145 4.55 7.84-7.516-7.42 2.453-3.463.157zm-.998-3.312c-.034.32.1.53.262.726l10.204 6.5c.39.256.707.12.857-.405l1.903-6.862c.158-.57-.053-.865-.58-.746z"/></svg>
+          تيليجرام
+        </a>
+        <a href="https://tiktok.com/@smartsite0" target="_blank" class="btn" aria-label="TikTok">
+          <svg viewBox="0 0 24 24"><path d="M12 2v11.7a4.48 4.48 0 01-4.5-4.5H6a6 6 0 006 6v3a9 9 0 01-9-9h2.7A4.5 4.5 0 0012 13.7V2z"/></svg>
+          تيك توك
+        </a>
+        <a href="https://t.me/+dSxKEx3_yj4xNmNk" target="_blank" class="btn" aria-label="Telegram Channel">
+          <svg viewBox="0 0 24 24"><path d="M9.999 15.498l-.004 3.83c.02.01.028.016.042.022.238.106.373.106.59 0l2.85-2.796 5.917-5.705c.425-.406.717-.733.465-1.205-.198-.392-.697-.477-1.1-.312l-8.676 3.528zm-6.69-4.63c-.273.19-.283.444-.102.705l3.145 4.55 7.84-7.516-7.42 2.453-3.463.157zm-.998-3.312c-.034.32.1.53.262.726l10.204 6.5c.39.256.707.12.857-.405l1.903-6.862c.158-.57-.053-.865-.58-.746z"/></svg>
+          قناة التليجرام
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    جميع الحقوق محفوظة © 2025
+  </footer>
+</body>
+</html>
