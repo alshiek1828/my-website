@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>محادثة ذكاء اصطناعي - مطور</title>
+  <title>محادثة ذكاء اصطناعي</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
   <style>
@@ -97,21 +97,19 @@
 
     async function fetchAI(prompt) {
       try {
-        const res = await fetch("https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct", {
+        const res = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer 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"
+            "Authorization": "Bearer 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"
           },
           body: JSON.stringify({ inputs: prompt })
         });
         const data = await res.json();
-        if (Array.isArray(data) && data[0]?.generated_text) {
-          return data[0].generated_text;
-        }
-        return "ما في رد حالياً من الذكاء الاصطناعي.";
+        if (data?.error) return "⚠️ حدث خطأ في الرد من النموذج.";
+        return data?.generated_text || data[0]?.generated_text || "🤖 لا يوجد رد.";
       } catch (e) {
-        return "⚠️ حدث خطأ في الاتصال بالذكاء الاصطناعي.";
+        return "⚠️ فشل الاتصال بالذكاء الاصطناعي.";
       }
     }
 
@@ -130,7 +128,7 @@
 
       recognition.onerror = () => {
         recordingLabel.style.display = 'none';
-        alert('❌ لم يتم التعرف على الصوت.');
+        alert('لم يتم التعرف على الصوت.');
       };
     }
 
