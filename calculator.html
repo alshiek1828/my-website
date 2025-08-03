@@ -1,181 +1,264 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>آلة حاسبة علمية 2025</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700&display=swap" rel="stylesheet">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Cairo', sans-serif;
-    background: linear-gradient(135deg, #0f1023, #1c1c3c);
-    color: #fff;
-    display: flex; justify-content: center; align-items: center;
-    height: 100vh; padding: 20px;
-  }
-  .calculator {
-    width: 420px;
-    background: rgba(20,20,40,0.85);
-    border-radius: 30px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.7);
-    overflow: hidden;
-    display: flex; flex-direction: column;
-  }
-  .header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 20px;
-    background: rgba(255,255,255,0.08);
-  }
-  .title {
-    font-size: 1.6rem; font-weight: 700;
-  }
-  .lang-switch {
-    background: transparent;
-    border: 2px solid #4a63f0;
-    color: #4a63f0;
-    padding: 5px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s;
-  }
-  .lang-switch:hover {
-    background: #4a63f0;
-    color: #fff;
-  }
-  .display-container {
-    background: rgba(0,0,0,0.6);
-    padding: 25px;
-    font-size: 2.8rem;
-    text-align: right;
-    min-height: 90px;
-    line-height: 1.1;
-    overflow-x: auto;
-    color: #e0f7fa;
-  }
-  .history-container {
-    background: transparent;
-    padding: 10px 25px;
-    font-size: 0.9rem;
-    color: #aaa;
-    max-height: 100px;
-    overflow-y: auto;
-  }
-  .history-item { margin-bottom: 4px; cursor: pointer; }
-  .buttons {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 12px;
-    padding: 25px;
-    background: transparent;
-  }
-  button {
-    padding: 18px;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 15px;
-    color: #fff;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    background: rgba(255,255,255,0.05);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-  }
-  button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-  }
-  button.operator {
-    background: #4a63f0;
-    color: #fff;
-  }
-  button.operator:hover {
-    background: #5c78f1;
-  }
-  button.function {
-    background: #ff5722;
-  }
-  button.function:hover {
-    background: #ff6e40;
-  }
-  button.equals {
-    grid-column: span 2;
-    background: #00e676;
-    color: #000;
-  }
-  button.equals:hover {
-    background: #33eb91;
-  }
-  @media (max-width: 480px) {
-    .calculator { width: 100%; }
-    .buttons { gap: 8px; padding: 15px; }
-    button { padding: 14px; font-size: 1rem; }
-    .display-container { font-size: 2.2rem; padding: 20px; }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>آلة حاسبة علمية 2025</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #0f1023, #1c1c3c);
+      color: #fff;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh; padding: 20px;
+    }
+    .calculator {
+      width: 420px;
+      background: rgba(20,20,40,0.85);
+      border-radius: 30px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.75);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 25px; background: rgba(255,255,255,0.1);
+    }
+    .title { font-size: 1.7rem; font-weight: 700; }
+    .lang-switch {
+      background: transparent; border: 2px solid #4a63f0;
+      color: #4a63f0; padding: 7px 14px; border-radius: 10px;
+      cursor: pointer; font-weight: 600; transition: .3s;
+    }
+    .lang-switch:hover {
+      background: #4a63f0; color: #fff;
+    }
+    .display {
+      background: rgba(0,0,0,0.65);
+      padding: 25px 30px; font-size: 3rem;
+      text-align: right; min-height: 100px; color: #a0f0f7;
+      overflow-x: auto; user-select: none;
+    }
+    .history {
+      padding: 10px 25px; font-size: .9rem;
+      color: #888; max-height: 120px; overflow-y: auto;
+    }
+    .history-item {
+      margin-bottom: 6px; cursor: pointer; transition: .3s;
+    }
+    .history-item:hover { color: #4a63f0; }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px; padding: 25px;
+    }
+    button {
+      padding: 20px 0; font-size: 1.15rem;
+      border: none; border-radius: 18px; color: #fff;
+      background: rgba(255,255,255,0.07);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      cursor: pointer; transition: .15s; user-select: none;
+    }
+    button:active {
+      transform: scale(.95);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .operator { background: #4a63f0; }
+    .operator:hover { background: #5e74f3; }
+    .function { background: #ff5722; }
+    .function:hover { background: #ff6e40; }
+    .equals {
+      grid-column: span 2;
+      background: #00e676; color: #000; font-weight: 700;
+    }
+    .equals:hover { background: #33eb91; }
+    .zero { grid-column: span 2; }
+    @media (max-width:480px) {
+      .calculator { width: 100%; max-width: 420px; }
+      .buttons { gap:8px; padding:15px; grid-template-columns: repeat(5,1fr); }
+      button { padding:16px 0; font-size:1rem; border-radius:14px; }
+      .zero { grid-column: span 3 !important; }
+      .display { font-size:2.4rem; padding:20px; }
+    }
+  </style>
 </head>
-<body><div class="calculator" role="region" aria-label="آلة حاسبة متطورة 2025">
+<body>
+
+<div class="calculator" aria-label="آلة حاسبة متطورة 2025">
   <div class="header">
     <div class="title" id="title">آلة حاسبة علمية 2025</div>
     <button class="lang-switch" id="langBtn" onclick="toggleLanguage()">EN</button>
   </div>
-  <div class="display-container" id="display" aria-live="polite" tabindex="0">0</div>
-  <div class="history-container" id="history"></div>
+  <div class="display" id="display">0</div>
+  <div class="history" id="history"></div>
   <div class="buttons">
-    <!-- Row1 -->
     <button class="function" data-key="AC" onclick="clearAll()">AC</button>
     <button class="function" data-key="⌫" onclick="backspace()">⌫</button>
     <button class="function" data-key="±" onclick="toggleSign()">±</button>
     <button class="function" data-key="(" onclick="append('(')">(</button>
     <button class="function" data-key=")" onclick="append(')')">)</button>
     <button class="operator" data-key="/" onclick="append('/')">÷</button>
-    <!-- Row2 -->
+
     <button data-key="7" onclick="append('7')">7</button>
     <button data-key="8" onclick="append('8')">8</button>
     <button data-key="9" onclick="append('9')">9</button>
     <button class="operator" data-key="*" onclick="append('*')">×</button>
     <button class="function" data-key="sqrt" onclick="applyFunc('sqrt')">√</button>
     <button class="function" data-key="square" onclick="applyFunc('square')">x²</button>
-    <!-- Row3 -->
+
     <button data-key="4" onclick="append('4')">4</button>
     <button data-key="5" onclick="append('5')">5</button>
     <button data-key="6" onclick="append('6')">6</button>
     <button class="operator" data-key="-" onclick="append('-')">−</button>
     <button class="function" data-key="log" onclick="applyFunc('log')">log</button>
     <button class="function" data-key="ln" onclick="applyFunc('ln')">ln</button>
-    <!-- Row4 -->
+
     <button data-key="1" onclick="append('1')">1</button>
     <button data-key="2" onclick="append('2')">2</button>
     <button data-key="3" onclick="append('3')">3</button>
     <button class="operator" data-key="+" onclick="append('+')">+</button>
     <button class="function" data-key="sin" onclick="applyFunc('sin')">sin</button>
     <button class="function" data-key="cos" onclick="applyFunc('cos')">cos</button>
-    <!-- Row5 -->
-    <button data-key="0" style="grid-column: span 2;" onclick="append('0')">0</button>
+
+    <button class="zero" data-key="0" onclick="append('0')">0</button>
     <button data-key="." onclick="append('.')">.</button>
     <button class="equals" data-key="=" onclick="calculate()">=</button>
     <button class="function" data-key="tan" onclick="applyFunc('tan')">tan</button>
     <button class="function" data-key="atan" onclick="applyFunc('atan')">atan</button>
   </div>
-</div><script>
+</div>
+
+<script>
   let expr = '';
   let hist = [];
   let lastCalc = false;
   let lang = 'ar';
-  const trans = {
-    ar:{title:'آلة حاسبة علمية 2025',BTN:'EN',labels:{AC:'مسح الكل',⌫:'حذف',±:'±','(': '(',')':')','/':'÷','*':'×','-':'−','+':'+','=':'=' ,sqrt:'جذر',square:'تربيع',log:'لوغ10',ln:'لوغ',sin:'جيب',cos:'جيب تمام',tan:'ظل',atan:'ظل عكسي'}},
-    en:{title:'Scientific Calculator 2025',BTN:'AR',labels:{AC:'AC',⌫:'DEL',±:'±','(': '(',')':')','/':'/','*':'*','-':'-','+':'+','=':'=' ,sqrt:'√',square:'x²',log:'log10',ln:'ln',sin:'sin',cos:'cos',tan:'tan',atan:'atan'}}
+
+  const translations = {
+    ar: {
+      title: 'آلة حاسبة علمية 2025',
+      BTN: 'EN',
+      labels: {
+        AC: 'مسح الكل', '⌫':'حذف', '±':'±','(':'(',' )':')',
+        '/':'÷','*':'×','-':'−','+':'+','=':'=',
+        sqrt:'جذر', square:'تربيع', log:'لوغ10', ln:'لوغ',
+        sin:'جيب', cos:'جيب تمام', tan:'ظل', atan:'ظل عكسي'
+      }
+    },
+    en: {
+      title: 'Scientific Calculator 2025',
+      BTN: 'AR',
+      labels: {
+        AC:'AC','⌫':'DEL','±':'±','(':'(',')':')',
+        '/':'/','*':'*','-':'-','+':'+','=':'=',
+        sqrt:'√', square:'x²', log:'log10', ln:'ln',
+        sin:'sin', cos:'cos', tan:'tan', atan:'atan'
+      }
+    }
   };
-  const disp=document.getElementById('display'),histEl=document.getElementById('history'),titleEl=document.getElementById('title'),langBtn=document.getElementById('langBtn');
-  function update(){disp.textContent=expr||'0';}
-  function append(c){if(lastCalc){expr='';lastCalc=false;} expr+=c;update();}
-  function calculate(){try{let res=Function('return '+expr)();hist.unshift(expr+'='+res);if(hist.length>10)hist.pop();renderHist();expr=res;lastCalc=true;update();}catch{disp.textContent='خطأ';}}
-  function clearAll(){expr='';lastCalc=false;update();}
-  function backspace(){expr=expr.slice(0,-1);update();}
-  function toggleSign(){try{let v=Function('return '+expr)();expr=(-v).toString();update();lastCalc=true;}catch{disp.textContent='خطأ';}}
-  function applyFunc(fn){try{let v=Function('return '+expr)();let r;switch(fn){case'sqrt':r=Math.sqrt(v);break;case'square':r=v*v;break;case'log':r=Math.log10(v);break;case'ln':r=Math.log(v);break;case'sin':r=Math.sin(v*Math.PI/180);break;case'cos':r=Math.cos(v*Math.PI/180);break;case'tan':r=Math.tan(v*Math.PI/180);break;case'atan':r=Math.atan(v)*180/Math.PI;break;}hist.unshift(fn+'('+expr+')='+r);if(hist.length>10)hist.pop();renderHist();expr=r;lastCalc=true;update();}catch{disp.textContent='خطأ';}}
-  function renderHist(){histEl.innerHTML='';hist.forEach(i=>{let d=document.createElement('div');d.textContent=i;d.className='history-item';d.onclick=()=>{expr=i.split('=')[1];update();};histEl.appendChild(d);});}
-  function toggleLanguage(){lang=lang==='ar'?'en':'ar';let t=trans[lang];titleEl.textContent=t.title;langBtn.textContent=t.BTN;document.querySelectorAll('button').forEach(b=>{let k=b.getAttribute('data-key');if(k&&t.labels[k])b.textContent=t.labels[k];});}
-  update();toggleLanguage();
-</script></body>
+
+  const disp = document.getElementById('display');
+  const histEl = document.getElementById('history');
+  const titleEl = document.getElementById('title');
+  const langBtn = document.getElementById('langBtn');
+  const buttons = document.querySelectorAll('button[data-key]');
+
+  function updateDisplay() {
+    disp.textContent = expr || '0';
+  }
+
+  function append(ch) {
+    if (lastCalc) { expr = ''; lastCalc = false; }
+    expr += ch;
+    updateDisplay();
+  }
+
+  function calculate() {
+    if (!expr) return;
+    try {
+      let result = Function('return ' + expr)();
+      if (!isFinite(result)) throw '';
+      hist.unshift(expr + '=' + result);
+      if (hist.length > 10) hist.pop();
+      renderHistory();
+      expr = result.toString();
+      lastCalc = true;
+      updateDisplay();
+    } catch {
+      disp.textContent = lang==='ar'? 'خطأ':'Error';
+    }
+  }
+
+  function clearAll() { expr=''; lastCalc=false; updateDisplay(); }
+  function backspace() {
+    if (lastCalc) { expr=''; lastCalc=false; }
+    else expr = expr.slice(0,-1);
+    updateDisplay();
+  }
+  function toggleSign() {
+    try {
+      let v = Function('return ' + expr)();
+      expr = (-v).toString();
+      lastCalc = true;
+      updateDisplay();
+    } catch { disp.textContent = lang==='ar'? 'خطأ':'Error'; }
+  }
+
+  function applyFunc(fn) {
+    try {
+      let v = Function('return ' + expr)();
+      let r;
+      switch(fn){
+        case 'sqrt': r=Math.sqrt(v); break;
+        case 'square': r=v*v; break;
+        case 'log': r=Math.log10(v); break;
+        case 'ln': r=Math.log(v); break;
+        case 'sin': r=Math.sin(v*Math.PI/180); break;
+        case 'cos': r=Math.cos(v*Math.PI/180); break;
+        case 'tan': r=Math.tan(v*Math.PI/180); break;
+        case 'atan': r=Math.atan(v)*180/Math.PI; break;
+      }
+      if (!isFinite(r)) throw '';
+      hist.unshift(fn+'('+expr+')='+r);
+      if (hist.length>10) hist.pop();
+      renderHistory();
+      expr = r.toString();
+      lastCalc = true;
+      updateDisplay();
+    } catch {
+      disp.textContent = lang==='ar'? 'خطأ':'Error';
+    }
+  }
+
+  function renderHistory() {
+    histEl.innerHTML = '';
+    hist.forEach(item=>{
+      const d = document.createElement('div');
+      d.textContent = item;
+      d.className = 'history-item';
+      d.onclick = ()=>{ expr = item.split('=')[1]; updateDisplay(); };
+      histEl.appendChild(d);
+    });
+  }
+
+  function toggleLanguage() {
+    lang = lang==='ar'? 'en':'ar';
+    const t = translations[lang];
+    titleEl.textContent = t.title;
+    langBtn.textContent = t.BTN;
+    buttons.forEach(b=>{
+      const k = b.getAttribute('data-key');
+      if (t.labels[k]) b.textContent = t.labels[k];
+    });
+  }
+
+  //initialize
+  updateDisplay();
+  toggleLanguage();
+</script>
+
+</body>
 </html>
