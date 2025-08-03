@@ -76,6 +76,10 @@
     const msgInput = document.getElementById('message');
     const recordingLabel = document.getElementById('recording');
 
+    // غيّر هذا المتغيّر لأي موديل آخر لو حبيت
+    const MODEL_NAME = "mistralai/Mistral-1B-v0.2";
+    const HF_TOKEN = "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";
+
     function appendMessage(text, sender) {
       const msg = document.createElement('div');
       msg.className = `message ${sender}`;
@@ -97,18 +101,23 @@
 
     async function fetchAI(prompt) {
       try {
-        const res = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1", {
+        const res = await fetch(`https://api-inference.huggingface.co/models/${MODEL_NAME}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer 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"
+            "Authorization": `Bearer ${HF_TOKEN}`
           },
           body: JSON.stringify({ inputs: prompt })
         });
         const data = await res.json();
-        if (data?.error) return "⚠️ حدث خطأ في الرد من النموذج.";
+        if (data?.error) {
+          console.error("HuggingFace Error:", data.error);
+          return "⚠️ حدث خطأ في الرد من النموذج.";
+        }
+        // بعض الموديلات ترجع مصفوفة في data[0].generated_text
         return data?.generated_text || data[0]?.generated_text || "🤖 لا يوجد رد.";
       } catch (e) {
+        console.error(e);
         return "⚠️ فشل الاتصال بالذكاء الاصطناعي.";
       }
     }
