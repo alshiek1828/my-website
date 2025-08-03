@@ -2,162 +2,156 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>محادثة ذكاء اصطناعي</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+  <title>محادثة AI بتوكن مباشر</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Cairo', sans-serif;
-      background-color: #111;
-      color: #eee;
+      font-family: 'Cairo', sans-serif, Arial, sans-serif;
+      background: linear-gradient(135deg, #1e2a78, #4a63f0);
       margin: 0;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-    }
-    .chat-container {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-    }
-    .message {
-      margin: 10px 0;
-      padding: 10px 15px;
-      border-radius: 10px;
-      max-width: 70%;
-      line-height: 1.6;
-    }
-    .user { background: #4a63f0; color: white; margin-right: auto; }
-    .bot { background: #333; color: #fff; margin-left: auto; }
-    .input-container {
-      display: flex;
-      gap: 5px;
-      background: #1a1a1a;
-      padding: 10px;
       align-items: center;
+      padding: 40px 15px;
+      color: #eee;
     }
-    input[type="text"] {
-      flex: 1;
-      padding: 10px;
+
+    h2 {
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 2.2rem;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 600px;
+      min-height: 140px;
+      border-radius: 15px;
+      padding: 15px 20px;
+      font-size: 18px;
+      line-height: 1.4;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      resize: vertical;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      background: #2a3a90;
+      color: #eee;
+      transition: background 0.3s ease;
     }
+
+    textarea:focus {
+      outline: none;
+      background: #3c51b5;
+      box-shadow: 0 0 15px #a3b1ff;
+    }
+
     button {
-      background: #4a63f0;
+      margin-top: 20px;
+      padding: 15px 35px;
+      font-size: 20px;
+      background: #ff6a00;
       border: none;
       color: white;
-      padding: 10px;
-      border-radius: 10px;
+      border-radius: 25px;
       cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 106, 0, 0.6);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      font-weight: 700;
     }
-    #recording {
-      color: red;
-      display: none;
+
+    button:hover {
+      background: #ff7f27;
+      box-shadow: 0 8px 20px rgba(255, 127, 39, 0.8);
+    }
+
+    #response {
+      margin-top: 30px;
+      max-width: 600px;
+      width: 100%;
+      min-height: 120px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 20px 25px;
+      font-size: 18px;
+      line-height: 1.5;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      white-space: pre-wrap;
+      backdrop-filter: blur(6px);
+      color: #fff;
+      user-select: text;
+      transition: background 0.3s ease;
+    }
+
+    #response.loading {
+      color: #ffcc00;
+      font-style: italic;
+    }
+
+    @media (max-width: 650px) {
+      body {
+        padding: 30px 10px;
+      }
+      textarea, #response {
+        font-size: 16px;
+      }
+      button {
+        font-size: 18px;
+        padding: 12px 25px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="chat-container" id="chat"></div>
 
-  <div class="input-container">
-    <span id="recording">● جاري التسجيل...</span>
-    <input type="text" id="message" placeholder="أدخل رسالتك..." />
-    <button onclick="sendMessage()">إرسال</button>
-    <button onclick="startVoice()">🎤</button>
-    <button onclick="clearChat()">🧹</button>
-    <button onclick="exportPDF()">📄</button>
-  </div>
+  <h2>محادثة AI بتوكن مباشر</h2>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <textarea id="input" placeholder="اكتب رسالتك هنا..."></textarea>
+  <button onclick="sendMessage()">أرسل</button>
+
+  <div id="response">الرد سيظهر هنا...</div>
 
   <script>
-    const HF_TOKEN = "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";
-    const MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.1";
-
-    const chat = document.getElementById('chat');
-    const msgInput = document.getElementById('message');
-    const recordingLabel = document.getElementById('recording');
-
-    function appendMessage(text, sender) {
-      const msg = document.createElement('div');
-      msg.className = `message ${sender}`;
-      msg.textContent = text;
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
-      if (sender === 'bot') speak(text);
-    }
-
-    async function sendMessage() {
-      const text = msgInput.value.trim();
-      if (!text) return;
-      appendMessage(text, 'user');
-      msgInput.value = '';
-      appendMessage('...', 'bot');
-      const response = await fetchAI(text);
-      document.querySelector('.bot:last-child').textContent = response;
-    }
+    const API_KEY = "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";
 
     async function fetchAI(prompt) {
       try {
-        const res = await fetch(`https://api-inference.huggingface.co/models/${MODEL_NAME}`, {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${HF_TOKEN}`
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type": "application/json"
           },
-          body: JSON.stringify({ inputs: prompt })
+          body: JSON.stringify({
+            model: "mistralai/mistral-7b-instruct",
+            messages: [{ role: "user", content: prompt }]
+          })
         });
-
         const data = await res.json();
-        if (data?.error) return `⚠️ خطأ: ${data.error}`;
-        if (Array.isArray(data)) return data[0]?.generated_text || "🤖 لا يوجد رد.";
-        return data?.generated_text || "🤖 لا يوجد رد.";
-      } catch (e) {
-        return "⚠️ فشل الاتصال بالخادم.";
+        return data.choices?.[0]?.message?.content || "⚠️ لا يوجد رد.";
+      } catch {
+        return "⚠️ خطأ في الاتصال بالذكاء الاصطناعي.";
       }
     }
 
-    function startVoice() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'ar-SA';
-      recognition.start();
-      recordingLabel.style.display = 'inline';
-
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        msgInput.value = transcript;
-        recordingLabel.style.display = 'none';
-        sendMessage();
-      };
-
-      recognition.onerror = () => {
-        recordingLabel.style.display = 'none';
-        alert('لم يتم التعرف على الصوت.');
-      };
-    }
-
-    function clearChat() {
-      chat.innerHTML = '';
-    }
-
-    function exportPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const messages = document.querySelectorAll('.message');
-      let y = 10;
-      messages.forEach(msg => {
-        doc.text(msg.textContent, 10, y);
-        y += 10;
-      });
-      doc.save("chat.pdf");
-    }
-
-    function speak(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ar-SA';
-      speechSynthesis.speak(utterance);
+    async function sendMessage() {
+      const input = document.getElementById("input");
+      const responseDiv = document.getElementById("response");
+      const userText = input.value.trim();
+      if (!userText) return;
+      responseDiv.textContent = "";
+      responseDiv.classList.add('loading');
+      responseDiv.textContent = "جاري الانتظار...";
+      const reply = await fetchAI(userText);
+      responseDiv.classList.remove('loading');
+      responseDiv.textContent = reply;
     }
   </script>
+
 </body>
 </html>
