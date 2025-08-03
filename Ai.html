@@ -1,204 +1,136 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html><html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>AI Chat - Advanced</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>محادثة ذكاء اصطناعي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-light: #f9f9f9;
-      --bg-dark: #1e1e1e;
-      --text-light: #333;
-      --text-dark: #eee;
-      --accent: #4f46e5;
-    }
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Cairo', sans-serif;
+      background: #111;
+      color: #eee;
       margin: 0;
-      background: var(--bg-light);
-      color: var(--text-light);
-      transition: all 0.3s ease;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
-    .dark body {
-      background: var(--bg-dark);
-      color: var(--text-dark);
-    }
-    #chat {
-      max-width: 800px;
-      margin: auto;
+    .chat-container {
+      flex: 1;
       padding: 20px;
-      height: 80vh;
       overflow-y: auto;
-      border-radius: 12px;
-      background: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
     }
-    .dark #chat {
-      background: #2a2a2a;
-    }
-    .msg {
-      padding: 12px 16px;
-      margin: 12px;
-      border-radius: 12px;
-      max-width: 80%;
-      line-height: 1.5;
+    .message {
+      padding: 10px 15px;
+      margin: 10px;
+      border-radius: 10px;
+      max-width: 70%;
     }
     .user {
-      background: #dbeafe;
-      margin-left: auto;
-      text-align: right;
+      background: #4a63f0;
+      color: white;
+      align-self: flex-end;
     }
     .bot {
-      background: #e5e7eb;
-      margin-right: auto;
+      background: #2c2c2c;
+      align-self: flex-start;
     }
-    .dark .user {
-      background: #3b82f6;
-      color: white;
-    }
-    .dark .bot {
-      background: #444;
-    }
-    #form {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: white;
-      padding: 10px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    .input-container {
       display: flex;
-      justify-content: center;
+      padding: 10px;
+      background: #1a1a1a;
+      align-items: center;
       gap: 5px;
     }
-    .dark #form {
-      background: #111;
-    }
-    #input {
+    input[type="text"] {
       flex: 1;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
     }
     button {
-      padding: 12px;
-      background: var(--accent);
-      color: white;
+      padding: 10px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      background: #4a63f0;
+      color: white;
       cursor: pointer;
     }
     #recording {
       color: red;
-      font-weight: bold;
-      margin-left: 10px;
+      margin-right: 10px;
       display: none;
-      align-self: center;
     }
-    #controls { display: flex; gap: 5px; }
-    #toggle { position: fixed; top: 10px; right: 10px; cursor: pointer; background: #eee; padding: 6px 10px; border-radius: 6px; }
-    .dark #toggle { background: #333; color: white; }
   </style>
 </head>
-<body><div id="chat"></div><form id="form">
-  <input id="input" placeholder="أدخل رسالتك..." />
-  <div id="controls">
-    <button type="button" onclick="startVoice()">🎤</button>
-    <button type="submit">📨</button>
-    <button type="button" onclick="document.getElementById('file').click()">📷</button>
-    <button type="button" onclick="clearChat()">🗑️</button>
-  </div>
-  <span id="recording">● تسجيل...</span>
-  <input type="file" id="file" accept="image/*" style="display:none" />
-</form><button id="toggle" onclick="toggleTheme()">🌓 الوضع</button>
+<body>
+  <div class="chat-container" id="chat"></div>
+  <div class="input-container">
+    <span id="recording">● جاري التسجيل...</span>
+    <input type="text" id="message" placeholder="أدخل رسالتك..." />
+    <button onclick="sendMessage()">إرسال</button>
+    <button onclick="startVoice()">🎤</button>
+  </div>  <script>
+    const chat = document.getElementById('chat');
+    const msgInput = document.getElementById('message');
+    const recordingLabel = document.getElementById('recording');
 
-<script>
-  const chat = document.getElementById('chat');
-  const input = document.getElementById('input');
-  const file = document.getElementById('file');
-  const recordingIndicator = document.getElementById('recording');
-  let recognition;
-  let history = JSON.parse(localStorage.getItem('chat-history') || '[]');
-
-  if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'ar-SA';
-  }
-
-  const render = () => {
-    chat.innerHTML = '';
-    history.forEach(m => {
-      const div = document.createElement('div');
-      div.className = 'msg ' + m.role;
-      div.textContent = m.content;
-      chat.appendChild(div);
-    });
-    chat.scrollTop = chat.scrollHeight;
-    localStorage.setItem('chat-history', JSON.stringify(history));
-  };
-
-  render();
-
-  document.getElementById('form').onsubmit = async (e) => {
-    e.preventDefault();
-    const msg = input.value.trim();
-    if (!msg) return;
-    history.push({ role: 'user', content: msg });
-    render();
-    input.value = '';
-
-    const reply = await fetchAI(msg);
-    history.push({ role: 'bot', content: reply });
-    render();
-  };
-
-  async function fetchAI(prompt) {
-    try {
-      const response = await fetch("https://api-inference.huggingface.co/models/google/flan-t5-small", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer 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"
-        },
-        body: JSON.stringify({ inputs: prompt })
-      });
-      const data = await response.json();
-      return data[0]?.generated_text || "🤖 ما عندي رد حالياً.";
-    } catch (err) {
-      return "❌ خطأ في الاتصال بـ API";
+    function appendMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.className = `message ${sender}`;
+      msg.textContent = text;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
     }
-  }
 
-  function startVoice() {
-    if (!recognition) return alert("🎤 الميزة غير مدعومة في متصفحك");
-    recognition.start();
-    recordingIndicator.style.display = 'inline';
-    recognition.onresult = e => {
-      input.value = e.results[0][0].transcript;
-    };
-    recognition.onend = () => {
-      recordingIndicator.style.display = 'none';
-    };
-  }
+    async function sendMessage() {
+      const text = msgInput.value.trim();
+      if (!text) return;
+      appendMessage(text, 'user');
+      msgInput.value = '';
 
-  function toggleTheme() {
-    document.documentElement.classList.toggle('dark');
-  }
-
-  function clearChat() {
-    if (confirm("هل تريد حذف كل المحادثة؟")) {
-      history = [];
-      localStorage.removeItem('chat-history');
-      render();
+      appendMessage('...', 'bot');
+      const botRes = await fetchAI(text);
+      document.querySelector('.bot:last-child').textContent = botRes;
     }
-  }
 
-  file.onchange = () => {
-    const imgName = file.files[0]?.name;
-    if (imgName) {
-      history.push({ role: 'user', content: `[📷 صورة تم رفعها: ${imgName}]` });
-      render();
+    async function fetchAI(prompt) {
+      try {
+        const res = await fetch("https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
+          },
+          body: JSON.stringify({ inputs: prompt })
+        });
+        const data = await res.json();
+        return data.generated_text || "ما عندي رد حالياً";
+      } catch (e) {
+        return "حدث خطأ في الاتصال بالذكاء الاصطناعي.";
+      }
     }
-  };
-</script></body>
+
+    function startVoice() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'ar-SA';
+      recognition.start();
+      recordingLabel.style.display = 'inline';
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        msgInput.value = transcript;
+        recordingLabel.style.display = 'none';
+        sendMessage();
+      };
+
+      recognition.onerror = function () {
+        recordingLabel.style.display = 'none';
+        alert('لم يتم التعرف على الصوت.');
+      };
+    }
+  </script></body>
 </html>
