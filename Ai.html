@@ -72,13 +72,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
+    const HF_TOKEN = "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";
+    const MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.1";
+
     const chat = document.getElementById('chat');
     const msgInput = document.getElementById('message');
     const recordingLabel = document.getElementById('recording');
-
-    // غيّر هذا المتغيّر لأي موديل آخر لو حبيت
-    const MODEL_NAME = "mistralai/Mistral-1B-v0.2";
-    const HF_TOKEN = "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";
 
     function appendMessage(text, sender) {
       const msg = document.createElement('div');
@@ -109,16 +108,13 @@
           },
           body: JSON.stringify({ inputs: prompt })
         });
+
         const data = await res.json();
-        if (data?.error) {
-          console.error("HuggingFace Error:", data.error);
-          return "⚠️ حدث خطأ في الرد من النموذج.";
-        }
-        // بعض الموديلات ترجع مصفوفة في data[0].generated_text
-        return data?.generated_text || data[0]?.generated_text || "🤖 لا يوجد رد.";
+        if (data?.error) return `⚠️ خطأ: ${data.error}`;
+        if (Array.isArray(data)) return data[0]?.generated_text || "🤖 لا يوجد رد.";
+        return data?.generated_text || "🤖 لا يوجد رد.";
       } catch (e) {
-        console.error(e);
-        return "⚠️ فشل الاتصال بالذكاء الاصطناعي.";
+        return "⚠️ فشل الاتصال بالخادم.";
       }
     }
 
