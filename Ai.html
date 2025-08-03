@@ -1,79 +1,77 @@
-<!DOCTYPE html><html lang="ar">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
+  <title>محادثة ذكاء اصطناعي - مطور</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>محادثة ذكاء اصطناعي</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background: #111;
+      background-color: #111;
       color: #eee;
       margin: 0;
-      padding: 0;
       display: flex;
       flex-direction: column;
       height: 100vh;
     }
     .chat-container {
       flex: 1;
-      padding: 20px;
+      padding: 15px;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
     }
     .message {
+      margin: 10px 0;
       padding: 10px 15px;
-      margin: 10px;
       border-radius: 10px;
       max-width: 70%;
+      line-height: 1.6;
     }
-    .user {
-      background: #4a63f0;
-      color: white;
-      align-self: flex-end;
-    }
-    .bot {
-      background: #2c2c2c;
-      align-self: flex-start;
-    }
+    .user { background: #4a63f0; color: white; margin-right: auto; }
+    .bot { background: #333; color: #fff; margin-left: auto; }
     .input-container {
       display: flex;
-      padding: 10px;
-      background: #1a1a1a;
-      align-items: center;
       gap: 5px;
+      background: #1a1a1a;
+      padding: 10px;
+      align-items: center;
     }
     input[type="text"] {
       flex: 1;
       padding: 10px;
-      border-radius: 10px;
       border: none;
+      border-radius: 10px;
       font-size: 16px;
     }
     button {
-      padding: 10px;
-      border: none;
-      border-radius: 10px;
       background: #4a63f0;
+      border: none;
       color: white;
+      padding: 10px;
+      border-radius: 10px;
       cursor: pointer;
     }
     #recording {
       color: red;
-      margin-right: 10px;
       display: none;
     }
   </style>
 </head>
 <body>
   <div class="chat-container" id="chat"></div>
+
   <div class="input-container">
     <span id="recording">● جاري التسجيل...</span>
     <input type="text" id="message" placeholder="أدخل رسالتك..." />
     <button onclick="sendMessage()">إرسال</button>
     <button onclick="startVoice()">🎤</button>
-  </div>  <script>
+    <button onclick="clearChat()">🧹</button>
+    <button onclick="exportPDF()">📄</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
     const chat = document.getElementById('chat');
     const msgInput = document.getElementById('message');
     const recordingLabel = document.getElementById('recording');
@@ -84,6 +82,7 @@
       msg.textContent = text;
       chat.appendChild(msg);
       chat.scrollTop = chat.scrollHeight;
+      if (sender === 'bot') speak(text);
     }
 
     async function sendMessage() {
@@ -91,15 +90,14 @@
       if (!text) return;
       appendMessage(text, 'user');
       msgInput.value = '';
-
       appendMessage('...', 'bot');
-      const botRes = await fetchAI(text);
-      document.querySelector('.bot:last-child').textContent = botRes;
+      const response = await fetchAI(text);
+      document.querySelector('.bot:last-child').textContent = response;
     }
 
     async function fetchAI(prompt) {
       try {
-        const res = await fetch("https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium", {
+        const res = await fetch("https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -108,9 +106,9 @@
           body: JSON.stringify({ inputs: prompt })
         });
         const data = await res.json();
-        return data.generated_text || "ما عندي رد حالياً";
+        return data.generated_text || data[0]?.generated_text || "ما عندي رد حالياً";
       } catch (e) {
-        return "حدث خطأ في الاتصال بالذكاء الاصطناعي.";
+        return "حدث خطأ في الاتصال.";
       }
     }
 
@@ -120,17 +118,40 @@
       recognition.start();
       recordingLabel.style.display = 'inline';
 
-      recognition.onresult = function (event) {
+      recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         msgInput.value = transcript;
         recordingLabel.style.display = 'none';
         sendMessage();
       };
 
-      recognition.onerror = function () {
+      recognition.onerror = () => {
         recordingLabel.style.display = 'none';
         alert('لم يتم التعرف على الصوت.');
       };
     }
-  </script></body>
+
+    function clearChat() {
+      chat.innerHTML = '';
+    }
+
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const messages = document.querySelectorAll('.message');
+      let y = 10;
+      messages.forEach(msg => {
+        doc.text(msg.textContent, 10, y);
+        y += 10;
+      });
+      doc.save("chat.pdf");
+    }
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ar-SA';
+      speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
 </html>
