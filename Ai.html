@@ -101,14 +101,17 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer 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"
+            "Authorization": "Bearer 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"
           },
           body: JSON.stringify({ inputs: prompt })
         });
         const data = await res.json();
-        return data.generated_text || data[0]?.generated_text || "ما عندي رد حالياً";
+        if (Array.isArray(data) && data[0]?.generated_text) {
+          return data[0].generated_text;
+        }
+        return "ما في رد حالياً من الذكاء الاصطناعي.";
       } catch (e) {
-        return "حدث خطأ في الاتصال.";
+        return "⚠️ حدث خطأ في الاتصال بالذكاء الاصطناعي.";
       }
     }
 
@@ -127,7 +130,7 @@
 
       recognition.onerror = () => {
         recordingLabel.style.display = 'none';
-        alert('لم يتم التعرف على الصوت.');
+        alert('❌ لم يتم التعرف على الصوت.');
       };
     }
 
