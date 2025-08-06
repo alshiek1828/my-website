@@ -1,5 +1,4 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
-<head>
+<!DOCTYPE html><html lang="ar" dir="rtl"><head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>سوق إلكتروني</title>
@@ -8,14 +7,19 @@
     body { padding: 20px; background-color: #f8f9fa; }
     .admin-panel, .add-product-form, #cart-section { display: none; }
     .product { border: 1px solid #ddd; padding: 10px; border-radius: 5px; margin: 10px 0; background-color: #fff; }
+    #auth-section { position: fixed; top: 20px; left: 20px; z-index: 999; }
   </style>
 </head>
-<body>  <h1 class="text-center">سوق إلكتروني</h1>  <!-- تسجيل دخول / تسجيل خروج -->  <div id="auth-section" class="text-center mb-4">
-    <input type="email" id="email" placeholder="البريد الإلكتروني" class="form-control mb-2" style="max-width: 300px; margin: auto;">
-    <input type="password" id="password" placeholder="كلمة السر" class="form-control mb-2" style="max-width: 300px; margin: auto;">
-    <button onclick="login()" class="btn btn-primary">تسجيل دخول</button>
-    <button onclick="logout()" class="btn btn-secondary">تسجيل خروج</button>
-  </div>  <!-- لوحة الأدمن -->  <div class="admin-panel">
+<body>
+  <h1 class="text-center">سوق إلكتروني</h1>  <!-- زر تسجيل الدخول -->  <div id="auth-section">
+    <button class="btn btn-outline-primary" onclick="toggleLoginForm()">تسجيل دخول</button>
+    <div id="login-form" style="display: none; margin-top: 10px;">
+      <input type="email" id="email" placeholder="البريد الإلكتروني" class="form-control mb-2">
+      <input type="password" id="password" placeholder="كلمة السر" class="form-control mb-2">
+      <button onclick="login()" class="btn btn-primary w-100">تسجيل دخول</button>
+      <button onclick="logout()" class="btn btn-secondary w-100 mt-2">تسجيل خروج</button>
+    </div>
+  </div>  <!-- لوحة الأدمن -->  <div class="admin-panel mt-5">
     <h2>لوحة التحكم (أدمن)</h2>
     <form class="add-product-form mb-3">
       <input type="text" id="product-name" placeholder="اسم المنتج" class="form-control mb-2">
@@ -30,8 +34,8 @@
   </div>  <!-- Firebase SDKs -->  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set, push, onValue, get, child, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
     import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const firebaseConfig = {
@@ -54,6 +58,12 @@
     let currentUser = null;
     let cart = [];
 
+    // عرض/إخفاء نموذج تسجيل الدخول
+    window.toggleLoginForm = () => {
+      const form = document.getElementById("login-form");
+      form.style.display = form.style.display === "none" ? "block" : "none";
+    };
+
     // تسجيل الدخول
     window.login = async () => {
       const email = document.getElementById("email").value;
@@ -71,15 +81,19 @@
       document.querySelector(".admin-panel").style.display = "none";
     };
 
-    // التحقق من تسجيل الدخول
+    // المستخدم الضيف
     onAuthStateChanged(auth, async (user) => {
-      currentUser = user;
-      if (user) {
-        const roleSnap = await get(ref(db, 'users/' + user.uid + '/role'));
-        if (roleSnap.exists() && roleSnap.val() === 'admin') {
-          document.querySelector(".admin-panel").style.display = "block";
-        } else {
-          document.querySelector(".admin-panel").style.display = "none";
+      if (!user) {
+        await signInAnonymously(auth);
+      } else {
+        currentUser = user;
+        if (!user.isAnonymous) {
+          const roleSnap = await get(ref(db, 'users/' + user.uid + '/role'));
+          if (roleSnap.exists() && roleSnap.val() === 'admin') {
+            document.querySelector(".admin-panel").style.display = "block";
+          } else {
+            document.querySelector(".admin-panel").style.display = "none";
+          }
         }
       }
       loadProducts();
@@ -90,20 +104,15 @@
       const name = document.getElementById("product-name").value;
       const price = document.getElementById("product-price").value;
       const imageFile = document.getElementById("product-image").files[0];
-
       if (!name || !price || !imageFile) return alert("يرجى ملء كل الحقول");
-
       const imageRef = storageRef(storage, 'images/' + imageFile.name);
       await uploadBytes(imageRef, imageFile);
       const imageUrl = await getDownloadURL(imageRef);
-
       const productRef = push(ref(db, 'products'));
       await set(productRef, { name, price, imageUrl });
-
       document.getElementById("product-name").value = "";
       document.getElementById("product-price").value = "";
       document.getElementById("product-image").value = "";
-
       loadProducts();
     };
 
@@ -159,6 +168,5 @@
       updateCart();
       document.getElementById("cart-section").style.display = "none";
     };
-
   </script></body>
 </html>
