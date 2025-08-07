@@ -19,7 +19,7 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
     <div class="container">
       <a class="navbar-brand" href="#">سوقنا</a>
-      <button class="btn btn-outline-primary ms-auto" data-bs-toggle="modal" data-bs-target="#loginModal">تسجيل دخول / حساب جديد</button>
+      <button class="btn btn-outline-primary ms-auto" data-bs-toggle="modal" data-bs-target="#loginModal" id="authBtn">تسجيل دخول / حساب جديد</button>
     </div>
   </nav>  <div class="container mt-5">
     <div class="row" id="products-list">
@@ -73,11 +73,11 @@
         </div>
       </div>
     </div>
-  </div>  <!-- Firebase SDKs -->  <script type="module">
+  </div>  <!-- Firebase & Logic -->  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
@@ -89,6 +89,7 @@
       appId: "1:768482186329:web:ae3b54ed2aaaf89d4e0d48",
       measurementId: "G-KGQ0RQ33XS"
     };
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
@@ -96,14 +97,18 @@
     const provider = new GoogleAuthProvider();
     let cart = [];
 
-    // Auth
     document.getElementById('signinForm').onsubmit = async e => {
       e.preventDefault();
       const email = document.getElementById('signin-email').value;
       const password = document.getElementById('signin-password').value;
-      try { await signInWithEmailAndPassword(auth, email, password); $('#loginModal').modal('hide'); } 
-      catch (e) { document.getElementById('signInStatus').innerText = e.message; }
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+      } catch (e) {
+        document.getElementById('signInStatus').innerText = e.message;
+      }
     };
+
     document.getElementById('signupForm').onsubmit = async e => {
       e.preventDefault();
       const email = document.getElementById('signup-email').value;
@@ -111,9 +116,12 @@
       try {
         const uc = await createUserWithEmailAndPassword(auth, email, password);
         await set(ref(db, 'users/' + uc.user.uid), { email, role: 'user' });
-        $('#loginModal').modal('hide');
-      } catch (e) { document.getElementById('signUpStatus').innerText = e.message; }
+        bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+      } catch (e) {
+        document.getElementById('signUpStatus').innerText = e.message;
+      }
     };
+
     async function googleSignIn() {
       try {
         const res = await signInWithPopup(auth, provider);
@@ -122,23 +130,35 @@
         if (!snap.exists()) await set(ref(db, 'users/' + user.uid), { email: user.email, role: 'user' });
         document.getElementById('signInStatus').innerText = '';
         document.getElementById('signUpStatus').innerText = '';
-        new bootstrap.Modal(document.getElementById('loginModal')).hide();
+        bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
       } catch (e) {
         document.getElementById('signInStatus').innerText = e.message;
       }
     }
 
-    // Track auth
-    onAuthStateChanged(auth, user => { loadProducts(); document.querySelector('.navbar .btn').innerText = user ? 'مرحبًا، ' + (user.email||'ضيف') : 'تسجيل دخول / حساب جديد'; });
+    onAuthStateChanged(auth, user => {
+      loadProducts();
+      const btn = document.getElementById('authBtn');
+      btn.innerText = user ? 'مرحبًا، ' + (user.email || 'ضيف') : 'تسجيل دخول / حساب جديد';
+    });
 
-    // Products
     function loadProducts() {
       onValue(ref(db, 'products'), snap => {
-        const list = document.getElementById('products-list'); list.innerHTML = '';
+        const list = document.getElementById('products-list');
+        list.innerHTML = '';
         snap.forEach(c => {
           const p = c.val();
-          const col = document.createElement('div'); col.className = 'col-md-4 mb-4';
-          col.innerHTML = `<div class="card product-card"><img src="${p.imageUrl}" class="card-img-top"><div class="card-body"><h5 class="card-title">${p.name}</h5><p class="card-text">السعر: ${p.price} ريال</p><button class="btn btn-primary w-100" onclick='addToCart(${JSON.stringify(p)})'>أضف للسلة</button></div></div>`;
+          const col = document.createElement('div');
+          col.className = 'col-md-4 mb-4';
+          col.innerHTML = `
+            <div class="card product-card">
+              <img src="${p.imageUrl}" class="card-img-top">
+              <div class="card-body">
+                <h5 class="card-title">${p.name}</h5>
+                <p class="card-text">السعر: ${p.price} ريال</p>
+                <button class="btn btn-primary w-100" onclick='addToCart(${JSON.stringify(p)})'>أضف للسلة</button>
+              </div>
+            </div>`;
           list.appendChild(col);
         });
       });
@@ -149,16 +169,28 @@
       document.getElementById('cart-section').style.display = 'block';
       updateCart();
     };
+
     function updateCart() {
-      const ul = document.getElementById('cart-items'); ul.innerHTML = '';
+      const ul = document.getElementById('cart-items');
+      ul.innerHTML = '';
       cart.forEach((i, idx) => {
-        const li = document.createElement('li'); li.className = 'list-group-item d-flex justify-content-between';
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between';
         li.textContent = `${i.name} - ${i.price} ريال`;
-        const btn = document.createElement('button'); btn.textContent = 'حذف'; btn.className = 'btn btn-sm btn-danger';
-        btn.onclick = () => { cart.splice(idx,1); updateCart(); };
-        li.appendChild(btn); ul.appendChild(li);
+        const btn = document.createElement('button');
+        btn.textContent = 'حذف';
+        btn.className = 'btn btn-sm btn-danger';
+        btn.onclick = () => { cart.splice(idx, 1); updateCart(); };
+        li.appendChild(btn);
+        ul.appendChild(li);
       });
     }
-    window.checkout = () => { alert('تم تأكيد الطلب ✅'); cart=[]; updateCart(); document.getElementById('cart-section').style.display='none'; };
+
+    window.checkout = () => {
+      alert('تم تأكيد الطلب ✅');
+      cart = [];
+      updateCart();
+      document.getElementById('cart-section').style.display = 'none';
+    };
   </script>  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script></body>
 </html>
