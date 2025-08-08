@@ -67,7 +67,7 @@
 
     <!-- Products Grid -->
     <div class="row" id="productsList">
-      <!-- سيُملأ ديناميكياً -->
+      <!-- يُملأ ديناميكياً -->
     </div>
 
     <!-- Cart Section -->
@@ -121,141 +121,122 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // ضع هنا إعدادات Firebase الخاصة بك
+    // إعدادات Firebase
     const firebaseConfig = {
-      // ضع بياناتك هنا
+      // apiKey, authDomain, databaseURL, projectId, storageBucket, messagingSenderId, appId
     };
-
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db   = getDatabase(app);
 
     // عناصر DOM
-    const authBtn = document.getElementById('authBtn');
-    const authTitle = document.getElementById('authTitle');
-    const nameGroup = document.getElementById('nameGroup');
-    const switchAuthBtn = document.getElementById('switchAuth');
-    const authSubmit = document.getElementById('authSubmit');
-    const authForm = document.getElementById('authForm');
-    const authModalEl = document.getElementById('authModal');
-    const adminPanel = document.getElementById('adminPanel');
-    const productsList = document.getElementById('productsList');
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
+    const authBtn        = document.getElementById('authBtn');
+    const authTitle      = document.getElementById('authTitle');
+    const nameGroup      = document.getElementById('nameGroup');
+    const switchAuthBtn  = document.getElementById('switchAuth');
+    const authSubmitBtn  = document.getElementById('authSubmit');
+    const authForm       = document.getElementById('authForm');
+    const authModalEl    = document.getElementById('authModal');
+    const adminPanel     = document.getElementById('adminPanel');
+    const productsList   = document.getElementById('productsList');
+    const lightbox       = document.getElementById('lightbox');
+    const lightboxImg    = document.getElementById('lightbox-img');
 
-    // متغير لتتبع وضع المصادقة: false = إنشاء حساب، true = تسجيل دخول
-    let isLoginMode = false;
+    // وضع المصادقة: false = إنشاء حساب، true = تسجيل دخول
+    let loginMode = false;
 
-    // زر التبديل بين إنشاء حساب وتسجيل دخول
+    // الوضع الابتدائي: إنشاء حساب
+    nameGroup.style.display     = 'block';
+    authTitle.textContent       = 'إنشاء حساب';
+    authSubmitBtn.textContent   = 'إنشاء';
+    document.getElementById('userName').required = true;
+
+    // تبديل بين إنشاء حساب وتسجيل دخول
     switchAuthBtn.addEventListener('click', () => {
-      isLoginMode = !isLoginMode;
-      if (isLoginMode) {
-        authSubmit.textContent = 'دخول';
-        authTitle.textContent = 'تسجيل دخول';
-        nameGroup.style.display = 'none';
+      loginMode = !loginMode;
+      if (loginMode) {
+        authTitle.textContent     = 'تسجيل دخول';
+        authSubmitBtn.textContent = 'دخول';
+        nameGroup.style.display   = 'none';
         document.getElementById('userName').required = false;
       } else {
-        authSubmit.textContent = 'إنشاء';
-        authTitle.textContent = 'إنشاء حساب';
-        nameGroup.style.display = 'block';
+        authTitle.textContent     = 'إنشاء حساب';
+        authSubmitBtn.textContent = 'إنشاء';
+        nameGroup.style.display   = 'block';
         document.getElementById('userName').required = true;
       }
     });
 
-    // حدث إرسال نموذج المصادقة
+    // معالجة المصادقة
     authForm.addEventListener('submit', async e => {
       e.preventDefault();
-
-      const email = document.getElementById('userEmail').value.trim();
+      const email    = document.getElementById('userEmail').value.trim();
       const password = document.getElementById('userPass').value.trim();
-      const name = document.getElementById('userName').value.trim();
-
+      const name     = document.getElementById('userName').value.trim();
       try {
-        if (isLoginMode) {
+        if (loginMode) {
           // تسجيل دخول
           await signInWithEmailAndPassword(auth, email, password);
         } else {
           // إنشاء حساب
-          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          // حفظ بيانات المستخدم في قاعدة البيانات
-          await set(ref(db, 'users/' + userCredential.user.uid), {
-            name,
-            email,
-            role: 'user'
-          });
+          const { user } = await createUserWithEmailAndPassword(auth, email, password);
+          await set(ref(db, 'users/' + user.uid), { name, email, role: 'user' });
         }
-
         // إغلاق المودال
-        const modalInstance = bootstrap.Modal.getInstance(authModalEl);
-        if (modalInstance) modalInstance.hide();
-
-        // إعادة تعيين النموذج
+        const modal = bootstrap.Modal.getInstance(authModalEl);
+        if (modal) modal.hide();
         authForm.reset();
-
-      } catch (error) {
-        alert('حدث خطأ: ' + error.message);
+      } catch (err) {
+        alert('حدث خطأ: ' + err.message);
       }
     });
 
-    // تحديث واجهة المستخدم عند تغير حالة المصادقة
+    // حالة المصادقة
     onAuthStateChanged(auth, async user => {
       if (user) {
-        const snapshot = await get(ref(db, 'users/' + user.uid));
-        const userData = snapshot.val();
-
-        authBtn.textContent = userData?.name || 'مستخدم';
-        adminPanel.style.display = (userData?.role === 'admin') ? 'block' : 'none';
+        const snap = await get(ref(db, 'users/' + user.uid));
+        const data = snap.val() || {};
+        authBtn.textContent = data.name || 'مستخدم';
+        adminPanel.style.display = (data.role === 'admin') ? 'block' : 'none';
       } else {
         authBtn.textContent = 'تسجيل / دخول';
         adminPanel.style.display = 'none';
       }
     });
 
-    // إضافة منتج جديد
+    // إضافة منتج
     window.addProduct = () => {
-      const name = document.getElementById('productName').value.trim();
-      const desc = document.getElementById('productDesc').value.trim();
-      const price = document.getElementById('productPrice').value.trim();
-      const filesInput = document.getElementById('productImages');
-      const files = Array.from(filesInput.files);
-
-      if (!name || !desc || !price || files.length === 0) {
-        alert('يرجى ملء جميع الحقول وتحميل الصور.');
+      const name    = document.getElementById('productName').value.trim();
+      const desc    = document.getElementById('productDesc').value.trim();
+      const price   = document.getElementById('productPrice').value.trim();
+      const files   = Array.from(document.getElementById('productImages').files);
+      if (!name || !desc || !price || !files.length) {
+        alert('املأ جميع الحقول وحمّل الصور.');
         return;
       }
-
-      // قراءة الصور وتحويلها إلى Base64
-      Promise.all(files.map(file => new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = e => resolve(e.target.result);
-        reader.readAsDataURL(file);
+      Promise.all(files.map(f => new Promise(res => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result);
+        r.readAsDataURL(f);
       }))).then(images => {
-        push(ref(db, 'products'), {
-          name,
-          desc,
-          price,
-          images
-        });
-
-        // إعادة تعيين الحقول
+        push(ref(db, 'products'), { name, desc, price, images });
         document.getElementById('productName').value = '';
         document.getElementById('productDesc').value = '';
         document.getElementById('productPrice').value = '';
-        filesInput.value = '';
+        document.getElementById('productImages').value = '';
       });
     };
 
-    // عرض المنتجات من قاعدة البيانات
+    // عرض المنتجات
     onValue(ref(db, 'products'), snapshot => {
       productsList.innerHTML = '';
-      snapshot.forEach(childSnapshot => {
-        const p = childSnapshot.val();
-
+      snapshot.forEach(ch => {
+        const p = ch.val();
         const col = document.createElement('div');
         col.className = 'col-md-4 mb-4';
         col.innerHTML = `
           <div class="card product-card h-100">
-            <img src="${p.images[0]}" class="card-img-top" alt="${p.name}" onclick='openLightbox(${JSON.stringify(p.images)})'>
+            <img src="${p.images[0]}" class="card-img-top" onclick='openLightbox(${JSON.stringify(p.images)})'>
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">${p.name}</h5>
               <p class="card-text flex-grow-1">${p.desc}</p>
@@ -265,41 +246,29 @@
                 <button class="btn btn-outline-secondary" onclick="requestProduct('${p.name}')">📩 طلب</button>
               </div>
             </div>
-          </div>
-        `;
+          </div>`;
         productsList.appendChild(col);
       });
     });
 
-    // وظائف Lightbox
+    // Lightbox
     window.openLightbox = images => {
       let idx = 0;
       lightboxImg.src = images[idx];
       lightbox.style.display = 'flex';
-
       lightboxImg.onclick = () => {
         idx = (idx + 1) % images.length;
         lightboxImg.src = images[idx];
       };
     };
-    window.closeLightbox = () => {
-      lightbox.style.display = 'none';
-    };
+    window.closeLightbox = () => lightbox.style.display = 'none';
 
-    // دوال إضافية للسلة وطلب المنتج (تعديلها حسب حاجتك)
-    window.addToCart = (name, price) => {
-      alert(`تمت إضافة المنتج "${name}" إلى السلة (السعر: $${price})`);
-    };
+    // سلة وطلب
+    window.addToCart = (name, price) => alert(`أضيف "${name}" إلى السلة ($${price})`);
+    window.requestProduct = name => alert(`تم طلب: ${name}`);
+    window.checkout = () => alert('تم إتمام الشراء! شكرًا لك.');
 
-    window.requestProduct = (name) => {
-      alert(`تم طلب المنتج: ${name}\nسيتم التواصل معك قريباً.`);
-    };
-
-    window.checkout = () => {
-      alert('تم إتمام الشراء! شكرًا لك.');
-    };
   </script>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
