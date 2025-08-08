@@ -3,42 +3,22 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>سوق إلكتروني متطور</title>
+  <title>سوق إلكتروني متكامل</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <style>
-    body { background: #f8f9fa; }
-    .navbar-brand { font-size: 1.8rem; font-weight: bold; }
-    #addProductForm {
-      background: #fff; padding: 1.5rem;
-      border-radius: .75rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-      display: none; /* يظهر للمشرف فقط */
-    }
-    .product-card {
-      transition: transform .2s;
-      border: none; border-radius: 1rem;
-      overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      height: 100%;
-      display: flex; flex-direction: column;
-    }
+    body { background: #f2f2f2; }
+    .navbar-brand { font-size: 1.6rem; font-weight: bold; }
+    #adminPanel, #cart-section { display: none; }
+    .product-card { border: none; border-radius: 1rem; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: transform .2s; }
     .product-card:hover { transform: translateY(-5px); }
     .product-card img { height: 180px; object-fit: cover; }
-    .rating span { cursor: pointer; font-size: 1.2rem; color: #ccc; }
-    .rating span.checked { color: gold; }
-    footer { background: #343a40; color: #fff; padding: 1.5rem 0; }
-    footer .social a {
-      color: #fff; margin: 0 .5rem;
-      font-size: 1.2rem; text-decoration: none;
-    }
   </style>
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
-    <div class="container">
-      <a class="navbar-brand" href="#">سوقنا المتطور</a>
+  <nav class="navbar navbar-light bg-white shadow-sm mb-4">
+    <div class="container d-flex justify-content-between">
+      <a class="navbar-brand" href="#">سوقنا المتكامل</a>
       <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#authModal" id="authBtn">
         تسجيل / دخول
       </button>
@@ -46,26 +26,21 @@
   </nav>
 
   <div class="container">
-
-    <!-- Add Product Form (Admin only) -->
-    <div id="addProductForm">
-      <h4 class="mb-3">➕ إضافة منتج جديد</h4>
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="mb-4 p-4 bg-white rounded shadow-sm">
+      <h5 class="mb-3">➕ إضافة منتج جديد</h5>
       <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label" for="productName">اسم المنتج</label>
-          <input type="text" id="productName" class="form-control" placeholder="مثلاً: هاتف ذكي">
+        <div class="col-md-6">
+          <input type="text" id="productName" class="form-control" placeholder="اسم المنتج">
         </div>
-        <div class="col-md-4">
-          <label class="form-label" for="productPrice">$ السعر</label>
-          <input type="number" id="productPrice" class="form-control" placeholder="مثلاً: 499">
+        <div class="col-md-6">
+          <input type="url" id="productImageUrl" class="form-control" placeholder="رابط صورة المنتج">
         </div>
-        <div class="col-md-4">
-          <label class="form-label" for="productImage">صورة المنتج</label>
-          <input type="file" id="productImage" class="form-control" accept="image/*">
+        <div class="col-md-6">
+          <input type="number" id="productPrice" class="form-control" placeholder="السعر بالدولار">
         </div>
         <div class="col-12">
-          <label class="form-label" for="productDesc">وصف المنتج</label>
-          <textarea id="productDesc" class="form-control" rows="2" placeholder="أضف وصفًا مختصرًا"></textarea>
+          <textarea id="productDesc" class="form-control" rows="2" placeholder="وصف المنتج"></textarea>
         </div>
         <div class="col-12 text-end">
           <button class="btn btn-success" onclick="addProduct()">إضافة المنتج</button>
@@ -74,10 +49,14 @@
     </div>
 
     <!-- Products Grid -->
-    <div class="row" id="productsList">
-      <!-- بطاقات المنتجات تظهر هنا -->
-    </div>
+    <div class="row" id="productsList"></div>
 
+    <!-- Cart Section -->
+    <div id="cart-section" class="mt-5 p-4 bg-white rounded shadow-sm">
+      <h5>🛒 سلة المشتريات</h5>
+      <ul id="cart-items" class="list-group mb-3"></ul>
+      <button class="btn btn-success" onclick="checkout()">إتمام الشراء</button>
+    </div>
   </div>
 
   <!-- Auth Modal -->
@@ -86,20 +65,17 @@
       <div class="modal-content p-4">
         <h5 class="modal-title text-center mb-3" id="authTitle">إنشاء حساب</h5>
         <form id="authForm">
-          <div class="mb-3">
-            <label class="form-label" for="userName">الاسم الكامل</label>
-            <input type="text" id="userName" class="form-control" placeholder="أدخل اسمك" required>
+          <div class="mb-3" id="nameGroup">
+            <input type="text" id="userName" class="form-control" placeholder="اسمك الكامل" required>
           </div>
           <div class="mb-3">
-            <label class="form-label" for="userEmail">البريد الإلكتروني</label>
-            <input type="email" id="userEmail" class="form-control" placeholder="example@domain.com" required>
+            <input type="email" id="userEmail" class="form-control" placeholder="البريد الإلكتروني" required>
           </div>
           <div class="mb-3">
-            <label class="form-label" for="userPass">كلمة المرور (6+ أحرف)</label>
-            <input type="password" id="userPass" class="form-control" minlength="6" required>
+            <input type="password" id="userPass" class="form-control" placeholder="كلمة المرور (6+ أحرف)" minlength="6" required>
           </div>
           <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-link" id="switchAuth">لدي حساب</button>
+            <button type="button" class="btn btn-link" id="switchAuth">لديّ حساب</button>
             <button type="submit" class="btn btn-primary" id="authSubmit">إنشاء</button>
           </div>
         </form>
@@ -107,123 +83,137 @@
     </div>
   </div>
 
-  <!-- Footer & Social -->
-  <footer class="mt-5">
-    <div class="container text-center">
-      <p>📱 تواصل معنا عبر:</p>
-      <div class="social">
-        <a href="https://instagram.com/" target="_blank">Instagram</a>|
-        <a href="https://t.me/" target="_blank">Telegram</a>|
-        <a href="https://tiktok.com/@smartsite0" target="_blank">TikTok</a>|
-        <a href="https://youtube.com/@smartsite0" target="_blank">YouTube</a>
-      </div>
-      <small class="d-block mt-3">&copy; 2025 جميع الحقوق محفوظة</small>
-    </div>
-  </footer>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-  <script>
-    let currentUser = null;
-    const adminEmail = "admin@site.com"; // عدّل للإيميل المخصص للمشرف
-    const products = [];
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
+      authDomain: "gmae-fae90.firebaseapp.com",
+      databaseURL: "https://gmae-fae90-default-rtdb.firebaseio.com",
+      projectId: "gmae-fae90",
+      storageBucket: "gmae-fae90.appspot.com",
+      messagingSenderId: "768482186329",
+      appId: "1:768482186329:web:ae3b54ed2aaaf89d4e0d48"
+    };
 
-    // تبديل بين تسجيل ودخول
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // Toggle auth form between signup/login
     document.getElementById("switchAuth").onclick = () => {
       const isLogin = document.getElementById("authSubmit").innerText === "دخول";
       document.getElementById("authTitle").innerText = isLogin ? "إنشاء حساب" : "تسجيل دخول";
       document.getElementById("authSubmit").innerText = isLogin ? "إنشاء" : "دخول";
-      document.getElementById("userName").parentElement.style.display = isLogin ? "block" : "none";
+      document.getElementById("nameGroup").style.display = isLogin ? "block" : "none";
     };
 
-    // معالجة نموذج التسجيل/الدخول
+    // Handle signup/login
     document.getElementById("authForm").onsubmit = e => {
       e.preventDefault();
-      const email = document.getElementById("userEmail").value.trim();
+      const email = document.getElementById("userEmail").value;
       const pass  = document.getElementById("userPass").value;
-      const name  = document.getElementById("userName").value.trim();
-      const btn   = document.getElementById("authSubmit").innerText;
+      const name  = document.getElementById("userName").value;
+      const mode  = document.getElementById("authSubmit").innerText;
 
-      if (btn === "إنشاء") {
-        // تسجيل جديد
-        currentUser = { name, email };
-        alert(`مرحباً ${name}! حسابك تم إنشاؤه.`);
+      if (mode === "إنشاء") {
+        createUserWithEmailAndPassword(auth, email, pass)
+          .then(({ user }) => {
+            // store profile
+            set(ref(db, 'users/' + user.uid), { name, email, role: 'user' });
+          })
+          .catch(console.error);
       } else {
-        // تسجيل دخول (محاكاة)
-        if (currentUser && currentUser.email === email && pass) {
-          alert(`أهلاً مجدداً ${currentUser.name}!`);
-        } else {
-          return alert("بيانات خطأ أو حساب غير موجود.");
-        }
+        signInWithEmailAndPassword(auth, email, pass).catch(console.error);
       }
-      // إخفاء المودال
+      // hide modal
       bootstrap.Modal.getInstance(document.getElementById("authModal")).hide();
-      document.getElementById("authBtn").innerText = currentUser.name;
-      if (currentUser.email === adminEmail) {
-        document.getElementById("addProductForm").style.display = "block";
-      }
     };
 
-    // إضافة منتج (للمشرف فقط)
-    function addProduct() {
-      const name  = document.getElementById("productName").value.trim();
-      const price = document.getElementById("productPrice").value.trim();
-      const desc  = document.getElementById("productDesc").value.trim();
-      const imgF  = document.getElementById("productImage").files[0];
-      if (!name||!price||!desc||!imgF) return alert("يرجى تعبئة جميع الحقول وتحميل صورة");
-      const reader = new FileReader();
-      reader.onload = e => {
-        products.push({ name, price, desc, image: e.target.result, rating:0, rated:false });
-        renderProducts();
-      };
-      reader.readAsDataURL(imgF);
-      clearForm();
-    }
+    // On auth state change
+    onAuthStateChanged(auth, user => {
+      const btn = document.getElementById("authBtn");
+      const panel = document.getElementById("adminPanel");
+      if (user) {
+        // fetch profile
+        onValue(ref(db, 'users/' + user.uid), snap => {
+          const { name, email, role } = snap.val();
+          btn.innerText = name;
+          panel.style.display = role === 'admin' ? 'block' : 'none';
+        }, { onlyOnce: true });
+      } else {
+        btn.innerText = "تسجيل / دخول";
+        panel.style.display = 'none';
+      }
+    });
 
-    function renderProducts() {
-      const container = document.getElementById("productsList");
-      container.innerHTML = "";
-      products.forEach((p,i)=>{
+    // Add product
+    window.addProduct = () => {
+      const name  = document.getElementById("productName").value;
+      const img   = document.getElementById("productImageUrl").value;
+      const price = document.getElementById("productPrice").value;
+      const desc  = document.getElementById("productDesc").value;
+      push(ref(db, 'products'), { name, imageUrl: img, price, desc });
+      // clear
+      ["productName","productImageUrl","productPrice","productDesc"].forEach(id => document.getElementById(id).value = "");
+    };
+
+    // Load and render products
+    const cart = [];
+    onValue(ref(db, 'products'), snap => {
+      const list = document.getElementById("productsList");
+      list.innerHTML = "";
+      snap.forEach(child => {
+        const { name, imageUrl, price, desc } = child.val();
         const col = document.createElement("div");
         col.className = "col-md-4 mb-4";
         col.innerHTML = `
           <div class="card product-card h-100">
-            <img src="${p.image}" class="card-img-top">
+            <img src="${imageUrl}" class="card-img-top">
             <div class="card-body d-flex flex-column">
-              <h5 class="card-title">${p.name}</h5>
-              <p class="card-text flex-grow-1">${p.desc}</p>
-              <p class="fw-bold mb-2">$ ${p.price}</p>
-              <div class="rating mb-3">
-                ⭐ تقييم:
-                ${[...Array(5)].map((_,idx)=>
-                  `<span class="${idx<p.rating?'checked':''}" onclick="rate(${i},${idx+1})">★</span>`
-                ).join("")}
-              </div>
-              <button class="btn btn-primary mt-auto" onclick="addToCart(${i})">🛒 أضف للسلة</button>
+              <h5 class="card-title">${name}</h5>
+              <p class="card-text flex-grow-1">${desc}</p>
+              <p class="fw-bold mb-2">$ ${price}</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('${name}', ${price})">🛒 أضف للسلة</button>
             </div>
           </div>`;
-        container.appendChild(col);
+        list.appendChild(col);
       });
-    }
+    });
 
-    function rate(index,val) {
-      if (!products[index].rated) {
-        products[index].rating=val;
-        products[index].rated=true;
-        renderProducts();
-      }
-    }
-
-    const cart=[];
-    function addToCart(i){
-      cart.push(products[i]);
-      alert(`تمت إضافة "${products[i].name}" إلى سلة التسوق.`);
-    }
-
-    function clearForm(){
-      ["productName","productPrice","productDesc","productImage"].forEach(id=>{
-        const el=document.getElementById(id);
-        el.value="";
+    window.addToCart = (name, price) => {
+      cart.push({ name, price });
+      document.getElementById("cart-section").style.display = "block";
+      const ul = document.getElementById("cart-items");
+      ul.innerHTML = "";
+      let total = 0;
+      cart.forEach((p,i) => {
+        total += +p.price;
+        const li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between";
+        li.textContent = `${p.name} - $${p.price}`;
+        const btn = document.createElement("button");
+        btn.className = "btn btn-sm btn-danger";
+        btn.innerText = "حذف";
+        btn.onclick = () => { cart.splice(i,1); addToCart(); };
+        li.appendChild(btn);
+        ul.appendChild(li);
       });
-    }
+      // add total
+      const totLi = document.createElement("li");
+      totLi.className = "list-group-item fw-bold text-end";
+      totLi.innerText = `الإجمالي: $${total.toFixed(2)}`;
+      ul.appendChild(totLi);
+    };
+
+    window.checkout = () => {
+      alert("تم تأكيد الطلب ✅");
+      cart.length = 0;
+      document.getElementById("cart-section").style.display = "none";
+    };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
