@@ -16,7 +16,7 @@
       position: relative;
     }
     .product-card:hover { transform: translateY(-5px); }
-    .product-card img { height: 180px; object-fit: cover; cursor: pointer; } /* تم اضافة cursor:pointer */
+    .product-card img { height: 180px; object-fit: cover; cursor: pointer; }
     footer { background: #343a40; color: #fff; padding: 1rem 0; }
     footer a { color: #fff; margin: 0 .5rem; text-decoration: none; }
     .contact-links { margin-top: 2rem; text-align: center; }
@@ -46,10 +46,10 @@
       transition: background-color 0.3s;
     }
     #topContactBar a.whatsapp { background-color: #25D366; }
-    #topContactBar a.telegram { background-color: #0088cc; }
+    #topContactBar a.telegram  { background-color: #0088cc; }
     #topContactBar a.instagram { background-color: #C13584; }
-    #topContactBar a.tiktok { background-color: #000000; }
-    #topContactBar a:hover { opacity: 0.8; }
+    #topContactBar a.tiktok     { background-color: #000000; }
+    #topContactBar a:hover      { opacity: 0.8; }
 
     .contact-buttons {
       display: flex; justify-content: space-around; margin-top: 0.8rem;
@@ -61,40 +61,45 @@
       transition: background-color 0.3s;
     }
     .contact-buttons a.whatsapp { background-color: #25D366; }
-    .contact-buttons a.telegram { background-color: #0088cc; }
+    .contact-buttons a.telegram  { background-color: #0088cc; }
     .contact-buttons a.instagram { background-color: #C13584; }
-    .contact-buttons a.tiktok { background-color: #000000; }
-    .contact-buttons a:hover { opacity: 0.8; }
+    .contact-buttons a.tiktok     { background-color: #000000; }
+    .contact-buttons a:hover      { opacity: 0.8; }
+
     .btn-delete {
       position: absolute; bottom: 10px; left: 10px;
-      background-color: #dc3545;
-      border: none;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 0.3rem;
-      font-size: 0.85rem;
-      cursor: pointer;
-      z-index: 10;
+      background-color: #dc3545; border: none; color: white;
+      padding: 5px 10px; border-radius: 0.3rem; font-size: 0.85rem;
+      cursor: pointer; z-index: 10;
     }
 
     /* رسالة تم النشر */
     #publishMessage {
-      position: fixed;
-      top: 10px;
-      left: 50%;
+      position: fixed; top: 10px; left: 50%;
       transform: translateX(-50%);
-      background-color: #198754;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 0.5rem;
-      font-weight: bold;
-      display: none;
-      z-index: 1050;
+      background-color: #198754; color: white;
+      padding: 10px 20px; border-radius: 0.5rem;
+      font-weight: bold; display: none; z-index: 1050;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    /* Modal عارض الصورة */
+    #imageModal {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+      justify-content: center; align-items: center; z-index: 2000;
+    }
+    #imageModal img {
+      max-width: 90%; max-height: 90%; border-radius: 10px;
+    }
+    #imageModal .close-btn {
+      position: absolute; top: 20px; right: 30px;
+      font-size: 40px; color: white; cursor: pointer;
     }
   </style>
 </head>
 <body>
+
   <!-- Navbar -->
   <nav class="navbar navbar-light bg-white shadow-sm mb-4">
     <div class="container d-flex justify-content-between">
@@ -105,17 +110,16 @@
     </div>
   </nav>
 
-  <div id="publishMessage">✅ تم نشر المنتج بنجاح!</div> <!-- رسالة تم النشر -->
+  <div id="publishMessage">✅ تم نشر المنتج بنجاح!</div>
 
   <div class="container">
-
     <!-- شريط تواصل فوق المنتجات -->
     <div id="topContactBar">
-      تواصل معنا للشراء: 
-      <a href="https://wa.me/رقم_التاجر" target="_blank" class="whatsapp">واتساب</a>
-      <a href="https://t.me/اسم_التاجر" target="_blank" class="telegram">تيليجرام</a>
-      <a href="https://instagram.com/اسم_التاجر" target="_blank" class="instagram">إنستا</a>
-      <a href="https://tiktok.com/@اسم_التاجر" target="_blank" class="tiktok">تيك توك</a>
+      تواصل معنا للشراء:
+      <a href="https://wa.me/رقم_التاجر" class="whatsapp" target="_blank">واتساب</a>
+      <a href="https://t.me/اسم_التاجر" class="telegram" target="_blank">تيليجرام</a>
+      <a href="https://instagram.com/اسم_التاجر" class="instagram" target="_blank">إنستا</a>
+      <a href="https://tiktok.com/@اسم_التاجر" class="tiktok" target="_blank">تيك توك</a>
     </div>
 
     <!-- Admin Panel -->
@@ -143,7 +147,7 @@
     <!-- Products Grid -->
     <div class="row" id="productsList"></div>
 
-    <!-- Contact Links -->
+    <!-- روابط التواصل العامة -->
     <div class="contact-links">
       <h6>للاستفسار أكثر تواصل معنا عبر:</h6>
       <a href="https://instagram.com/smartsite0" target="_blank">Instagram</a>|
@@ -151,6 +155,12 @@
       <a href="https://tiktok.com/@smartsite0" target="_blank">TikTok</a>|
       <a href="https://youtube.com/@smartsite0" target="_blank">YouTube</a>
     </div>
+  </div>
+
+  <!-- عارض الصورة Modal -->
+  <div id="imageModal" onclick="closeImageModal()">
+    <span class="close-btn" onclick="closeImageModal()">&times;</span>
+    <img id="modalImage" src="" alt="صورة مكبرة">
   </div>
 
   <!-- Auth Modal -->
@@ -177,11 +187,13 @@
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase + Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set, push, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set, push, get, remove }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
@@ -196,9 +208,8 @@
     const auth = getAuth(app);
     const db   = getDatabase(app);
 
-    let currentUserRole = null; // لتحديد دور المستخدم (admin/user/null)
+    let currentUserRole = null;
 
-    // Toggle auth form
     document.getElementById("switchAuth").onclick = () => {
       const isLogin = document.getElementById("authSubmit").innerText === "دخول";
       document.getElementById("authTitle").innerText = isLogin ? "إنشاء حساب" : "تسجيل دخول";
@@ -206,7 +217,6 @@
       document.getElementById("nameGroup").style.display = isLogin ? "block" : "none";
     };
 
-    // Handle signup/login
     document.getElementById("authForm").onsubmit = async e => {
       e.preventDefault();
       const email = document.getElementById("userEmail").value;
@@ -221,7 +231,6 @@
       bootstrap.Modal.getInstance(document.getElementById("authModal")).hide();
     };
 
-    // Auth state change
     onAuthStateChanged(auth, async user => {
       const btn   = document.getElementById("authBtn");
       const panel = document.getElementById("adminPanel");
@@ -231,100 +240,86 @@
           const { name, role } = snap.val();
           btn.innerText = name;
           currentUserRole = role;
-          panel.style.display = role === 'admin' ? 'block' : 'none';
-        } else {
-          btn.innerText = "تسجيل / دخول";
-          panel.style.display = 'none';
-          currentUserRole = null;
+          panel.style.display = role==='admin' ? 'block' : 'none';
         }
       } else {
         btn.innerText = "تسجيل / دخول";
         panel.style.display = 'none';
         currentUserRole = null;
       }
-      loadProducts(); // نعيد تحميل المنتجات بعد تحديد الدور لعرض زر الحذف لو admin
+      loadProducts();
     });
 
-    // Add product with image file
     window.addProduct = () => {
-      const name = document.getElementById("productName").value;
-      const file = document.getElementById("productImageFile").files[0];
-      const price= document.getElementById("productPrice").value;
-      const desc = document.getElementById("productDesc").value;
-      if (!name||!file||!price||!desc) { return alert("املأ جميع الحقول وحمّل الصورة."); }
+      const name  = document.getElementById("productName").value;
+      const file  = document.getElementById("productImageFile").files[0];
+      const price = document.getElementById("productPrice").value;
+      const desc  = document.getElementById("productDesc").value;
+      if (!name||!file||!price||!desc) return alert("املأ جميع الحقول.");
       const reader = new FileReader();
       reader.onload = async e => {
         const imageUrl = e.target.result;
         await push(ref(db,'products'), { name, imageUrl, price, desc });
         ["productName","productPrice","productDesc"].forEach(id=>document.getElementById(id).value='');
         document.getElementById("productImageFile").value = '';
-        
-        // رسالة تم النشر تظهر 3 ثواني
         const msg = document.getElementById("publishMessage");
         msg.style.display = 'block';
-        setTimeout(() => { msg.style.display = 'none'; }, 3000);
+        setTimeout(() => msg.style.display='none', 3000);
       };
       reader.readAsDataURL(file);
     };
 
-    // Load products with admin delete button if role=admin
     async function loadProducts() {
-      const productsRef = ref(db,'products');
-      const snap = await get(productsRef);
+      const snap = await get(ref(db,'products'));
       const list = document.getElementById("productsList");
       list.innerHTML = '';
-
       if (!snap.exists()) return;
-
       snap.forEach(child => {
-        const p = child.val();
-        const key = child.key;
+        const p = child.val(), key = child.key;
         const col = document.createElement("div");
         col.className = "col-md-4 mb-4";
-
-        let deleteBtnHtml = '';
-        if (currentUserRole === 'admin') {
-          deleteBtnHtml = `<button class="btn-delete" onclick="deleteProduct('${key}')">حذف</button>`;
-        }
-
+        const delBtn = currentUserRole==='admin'
+          ? `<button class="btn-delete" onclick="deleteProduct('${key}')">حذف</button>`
+          : '';
         col.innerHTML = `
           <div class="card product-card h-100">
-            ${deleteBtnHtml}
-            <img src="${p.imageUrl}" class="card-img-top" alt="صورة المنتج" onclick="openImageFull('${p.imageUrl}')">
+            ${delBtn}
+            <img src="${p.imageUrl}" class="card-img-top" alt="صورة المنتج"
+                 onclick="openImageFull('${p.imageUrl}')">
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">${p.name}</h5>
               <p class="card-text flex-grow-1">${p.desc}</p>
               <p class="fw-bold mb-2">$ ${p.price}</p>
               <div class="contact-buttons">
-                <a href="https://wa.me/رقم_التاجر?text=مرحبا، أريد الاستفسار عن المنتج ${encodeURIComponent(p.name)}" target="_blank" class="whatsapp">واتساب</a>
+                <a href="https://wa.me/رقم_التاجر?text=${encodeURIComponent('أريد الاستفسار عن '+p.name)}"
+                   target="_blank" class="whatsapp">واتساب</a>
                 <a href="https://t.me/اسم_التاجر" target="_blank" class="telegram">تيليجرام</a>
                 <a href="https://instagram.com/اسم_التاجر" target="_blank" class="instagram">إنستا</a>
                 <a href="https://tiktok.com/@اسم_التاجر" target="_blank" class="tiktok">تيك توك</a>
               </div>
             </div>
-          </div>
-        `;
+          </div>`;
         list.appendChild(col);
       });
     }
-
     window.loadProducts = loadProducts;
 
-    // Delete product function
-    window.deleteProduct = async (key) => {
-      if (!confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
-      await remove(ref(db, 'products/' + key));
+    window.deleteProduct = async key => {
+      if (!confirm("هل تريد حذف هذا المنتج؟")) return;
+      await remove(ref(db,'products/'+key));
       loadProducts();
     };
 
-    // فتح الصورة بحجم كامل في تاب جديد
-    window.openImageFull = (url) => {
-      window.open(url, '_blank');
+    window.openImageFull = url => {
+      const modal = document.getElementById("imageModal");
+      document.getElementById("modalImage").src = url;
+      modal.style.display = 'flex';
+    };
+    window.closeImageModal = () => {
+      document.getElementById("imageModal").style.display = 'none';
     };
 
-    // في البداية حمل المنتجات حتى لو ما في تسجيل دخول
     loadProducts();
-
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
