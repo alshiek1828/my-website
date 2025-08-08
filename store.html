@@ -121,15 +121,9 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // ضع هنا إعدادات Firebase الخاصة بك (انقل الإعدادات من مشروعك)
+    // ضع هنا إعدادات Firebase الخاصة بك
     const firebaseConfig = {
-      // apiKey: "...",
-      // authDomain: "...",
-      // databaseURL: "...",
-      // projectId: "...",
-      // storageBucket: "...",
-      // messagingSenderId: "...",
-      // appId: "..."
+      // ضع بياناتك هنا
     };
 
     const app  = initializeApp(firebaseConfig);
@@ -149,24 +143,26 @@
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
 
-    // متغير لتتبع نوع العملية: تسجيل دخول أو إنشاء حساب
+    // متغير لتتبع وضع المصادقة: false = إنشاء حساب، true = تسجيل دخول
     let isLoginMode = false;
 
-    // تبديل بين إنشاء حساب وتسجيل دخول
+    // زر التبديل بين إنشاء حساب وتسجيل دخول
     switchAuthBtn.addEventListener('click', () => {
       isLoginMode = !isLoginMode;
       if (isLoginMode) {
         authSubmit.textContent = 'دخول';
         authTitle.textContent = 'تسجيل دخول';
         nameGroup.style.display = 'none';
+        document.getElementById('userName').required = false;
       } else {
         authSubmit.textContent = 'إنشاء';
         authTitle.textContent = 'إنشاء حساب';
         nameGroup.style.display = 'block';
+        document.getElementById('userName').required = true;
       }
     });
 
-    // تنفيذ تسجيل دخول أو إنشاء حساب
+    // حدث إرسال نموذج المصادقة
     authForm.addEventListener('submit', async e => {
       e.preventDefault();
 
@@ -189,7 +185,7 @@
           });
         }
 
-        // إغلاق مودال التسجيل / الدخول
+        // إغلاق المودال
         const modalInstance = bootstrap.Modal.getInstance(authModalEl);
         if (modalInstance) modalInstance.hide();
 
@@ -201,7 +197,7 @@
       }
     });
 
-    // تحديث الواجهة عند تغير حالة المصادقة
+    // تحديث واجهة المستخدم عند تغير حالة المصادقة
     onAuthStateChanged(auth, async user => {
       if (user) {
         const snapshot = await get(ref(db, 'users/' + user.uid));
@@ -209,14 +205,13 @@
 
         authBtn.textContent = userData?.name || 'مستخدم';
         adminPanel.style.display = (userData?.role === 'admin') ? 'block' : 'none';
-
       } else {
         authBtn.textContent = 'تسجيل / دخول';
         adminPanel.style.display = 'none';
       }
     });
 
-    // إضافة منتج جديد (للمشرف)
+    // إضافة منتج جديد
     window.addProduct = () => {
       const name = document.getElementById('productName').value.trim();
       const desc = document.getElementById('productDesc').value.trim();
@@ -250,7 +245,7 @@
       });
     };
 
-    // تحميل وعرض المنتجات
+    // عرض المنتجات من قاعدة البيانات
     onValue(ref(db, 'products'), snapshot => {
       productsList.innerHTML = '';
       snapshot.forEach(childSnapshot => {
@@ -291,7 +286,7 @@
       lightbox.style.display = 'none';
     };
 
-    // (هذه الدوال بحاجة تعريف حسب متطلباتك)
+    // دوال إضافية للسلة وطلب المنتج (تعديلها حسب حاجتك)
     window.addToCart = (name, price) => {
       alert(`تمت إضافة المنتج "${name}" إلى السلة (السعر: $${price})`);
     };
@@ -303,7 +298,6 @@
     window.checkout = () => {
       alert('تم إتمام الشراء! شكرًا لك.');
     };
-
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
