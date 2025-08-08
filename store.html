@@ -66,7 +66,9 @@
     </div>
 
     <!-- Products Grid -->
-    <div class="row" id="productsList"></div>
+    <div class="row" id="productsList">
+      <!-- سيُملأ ديناميكياً -->
+    </div>
 
     <!-- Cart Section -->
     <div id="cart-section" class="mt-5 p-4 bg-white rounded shadow-sm">
@@ -77,9 +79,9 @@
   </div>
 
   <!-- Lightbox -->
-  <div class="lightbox d-flex" id="lightbox">
+  <div class="lightbox" id="lightbox">
     <span class="close-btn" onclick="closeLightbox()">×</span>
-    <img id="lightbox-img" src="" alt="Product Image">
+    <img id="lightbox-img" src="" alt="صورة المنتج">
   </div>
 
   <!-- Auth Modal -->
@@ -106,41 +108,36 @@
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
+  <footer class="mt-5">
+    <p>للاستفسار أكثر تواصل معنا عبر:</p>
+    <a href="#" target="_blank">Instagram</a> |
+    <a href="#" target="_blank">Telegram</a> |
+    <a href="#" target="_blank">WhatsApp</a> |
+    <a href="#" target="_blank">TikTok</a>
+  </footer>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
-      authDomain: "gmae-fae90.firebaseapp.com",
-      databaseURL: "https://gmae-fae90-default-rtdb.firebaseio.com",
-      projectId: "gmae-fae90",
-      storageBucket: "gmae-fae90.appspot.com",
-      messagingSenderId: "768482186329",
-      appId: "1:768482186329:web:ae3b54ed2aaaf89d4e0d48"
-    };
+    const firebaseConfig = { /* ... */ };
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db   = getDatabase(app);
 
-    // Toggle signup/login
-    document.getElementById("switchAuth").onclick = () => {
-      const btn   = document.getElementById("authSubmit");
-      const title = document.getElementById("authTitle");
-      const login = btn.innerText === "دخول";
-      btn.innerText   = login ? "إنشاء" : "دخول";
-      title.innerText = login ? "إنشاء حساب" : "تسجيل دخول";
-      document.getElementById("nameGroup").style.display = login ? "block" : "none";
+    // Auth toggle
+    switchAuth.onclick = () => {
+      const btn = authSubmit, title = authTitle;
+      const loginMode = btn.innerText === "دخول";
+      btn.innerText   = loginMode ? "إنشاء" : "دخول";
+      title.innerText = loginMode ? "إنشاء حساب" : "تسجيل دخول";
+      nameGroup.style.display = loginMode ? "block" : "none";
     };
 
-    // Handle signup/login
-    document.getElementById("authForm").onsubmit = async e => {
+    authForm.onsubmit = async e => {
       e.preventDefault();
-      const email = userEmail.value.trim();
-      const pass  = userPass.value;
-      const name  = userName.value.trim();
+      const email = userEmail.value, pass = userPass.value, name = userName.value;
       if (authSubmit.innerText === "إنشاء") {
         const { user } = await createUserWithEmailAndPassword(auth, email, pass);
         await set(ref(db, `users/${user.uid}`), { name, email, role: 'user' });
@@ -150,40 +147,33 @@
       bootstrap.Modal.getInstance(authModal).hide();
     };
 
-    // Show admin panel if role = admin
     onAuthStateChanged(auth, async user => {
-      const btn   = document.getElementById("authBtn");
-      const panel = document.getElementById("adminPanel");
-      if (user) {
-        const snap = await get(ref(db, `users/${user.uid}`));
-        const { name, role } = snap.val();
-        btn.innerText = name;
-        panel.style.display = role === 'admin' ? 'block' : 'none';
-      } else {
-        btn.innerText = "تسجيل / دخول";
-        panel.style.display = 'none';
-      }
+      authBtn.innerText = user
+        ? (await get(ref(db, `users/${user.uid}`))).val().name
+        : "تسجيل / دخول";
+      adminPanel.style.display = user && (await get(ref(db, `users/${user.uid}`))).val().role === 'admin'
+        ? 'block' : 'none';
     });
 
-    // Add product with multiple images
+    // Add product
     window.addProduct = () => {
-      const name   = productName.value.trim();
-      const desc   = productDesc.value.trim();
-      const price  = productPrice.value.trim();
-      const files  = Array.from(productImages.files);
+      const name = productName.value.trim();
+      const desc = productDesc.value.trim();
+      const price = productPrice.value.trim();
+      const files = Array.from(productImages.files);
       if (!name || !desc || !price || !files.length) return alert("املأ جميع الحقول وحمّل الصور.");
       Promise.all(files.map(f => new Promise(res => {
         const r = new FileReader();
         r.onload = e => res(e.target.result);
         r.readAsDataURL(f);
       }))).then(images => {
-        push(ref(db, 'products'), { name, images, desc, price });
+        push(ref(db, 'products'), { name, desc, price, images });
         [productName, productDesc, productPrice].forEach(i => i.value = '');
         productImages.value = '';
       });
     };
 
-    // Load products
+    // Render products
     onValue(ref(db, 'products'), snap => {
       productsList.innerHTML = '';
       snap.forEach(ch => {
@@ -207,7 +197,7 @@
       });
     });
 
-    // Lightbox
+    // Lightbox functions
     window.openLightbox = images => {
       let idx = 0;
       lightboxImg.src = images[idx];
@@ -219,9 +209,10 @@
     };
     window.closeLightbox = () => lightbox.style.display = 'none';
 
-    // Request product: setup your links manually
+    // Request product
     window.requestProduct = name => {
       const text = encodeURIComponent(`أريد طلب المنتج: ${name}`);
+      // ضع روابطك هنا
       waLink.href = `https://wa.me/YOUR_NUMBER?text=${text}`;
       tgLink.href = `https://t.me/YOUR_USERNAME?text=${text}`;
       igLink.href = `https://instagram.com/YOUR_USERNAME`;
@@ -229,7 +220,7 @@
       new bootstrap.Modal(requestModal).show();
     };
 
-    // Cart & checkout (similar to above)...
+    // Cart omitted for brevity
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
