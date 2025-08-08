@@ -3,25 +3,21 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>سوق إلكتروني متطور</title>
+  <title>سوق إلكتروني متكامل</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <style>
     body { background: #f2f2f2; }
     .navbar-brand { font-size: 1.6rem; font-weight: bold; }
     #adminPanel, #cart-section { display: none; }
-    .product-card { border: none; border-radius: 1rem; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: transform .2s; }
+    .product-card {
+      border: none; border-radius: 1rem;
+      overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: transform .2s;
+    }
     .product-card:hover { transform: translateY(-5px); }
-    .product-card img { height: 180px; object-fit: cover; cursor: pointer; }
-    .lightbox {
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center;
-      z-index: 1050;
-    }
-    .lightbox img { max-width:90%; max-height:90%; border-radius: .5rem; }
-    .lightbox .close-btn {
-      position: absolute; top:20px; right:30px;
-      font-size:2rem; color:#fff; cursor:pointer;
-    }
+    .product-card img { height: 180px; object-fit: cover; }
+    footer { background: #343a40; color: #fff; padding: 1rem 0; }
+    footer a { color: #fff; margin: 0 .5rem; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -44,7 +40,7 @@
           <input type="text" id="productName" class="form-control" placeholder="اسم المنتج">
         </div>
         <div class="col-md-6">
-          <input type="file" id="productImages" class="form-control" accept="image/*" multiple>
+          <input type="file" id="productImageFile" class="form-control" accept="image/*">
         </div>
         <div class="col-md-6">
           <input type="number" id="productPrice" class="form-control" placeholder="السعر بالدولار">
@@ -67,22 +63,33 @@
       <ul id="cart-items" class="list-group mb-3"></ul>
       <button class="btn btn-success" onclick="checkout()">إتمام الشراء</button>
     </div>
+  </div>
 
-    <!-- Contact Links -->
-    <div class="contact-links text-center mt-4">
-      <h6>للاستفسار أكثر تواصل معنا عبر:</h6>
-      <a href="https://instagram.com/smartsite0" target="_blank">Instagram</a> |
-      <a href="https://t.me/HNR55" target="_blank">Telegram</a> |
-      <a href="https://wa.me/your_number" target="_blank">WhatsApp</a> |
-      <a href="https://tiktok.com/@smartsite0" target="_blank">TikTok</a>
+  <!-- Request Modal -->
+  <div class="modal fade" id="requestModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-4 text-center">
+        <h5 class="mb-3">كيف تريد طلب هذا المنتج؟</h5>
+        <div class="d-grid gap-2">
+          <a id="waLink" class="btn btn-success" href="#" target="_blank">WhatsApp</a>
+          <a id="tgLink" class="btn btn-primary" href="#" target="_blank">Telegram</a>
+          <a id="igLink" class="btn btn-danger" href="#" target="_blank">Instagram</a>
+          <a id="ttLink" class="btn btn-dark" href="#" target="_blank">TikTok</a>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Lightbox -->
-  <div class="lightbox d-flex" id="lightbox">
-    <span class="close-btn" onclick="closeLightbox()">×</span>
-    <img id="lightbox-img" src="" alt="Product Image">
-  </div>
+  <!-- Contact Links at Bottom -->
+  <footer class="mt-5">
+    <div class="container text-center">
+      <p>للاستفسار أو الدعم عبر:</p>
+      <a href="https://instagram.com/your_admin" target="_blank">Instagram</a>|
+      <a href="https://t.me/your_admin" target="_blank">Telegram</a>|
+      <a href="https://wa.me/your_number" target="_blank">WhatsApp</a>|
+      <a href="https://tiktok.com/@your_admin" target="_blank">TikTok</a>
+    </div>
+  </footer>
 
   <!-- Auth Modal -->
   <div class="modal fade" id="authModal" tabindex="-1">
@@ -123,10 +130,10 @@
     document.getElementById("switchAuth").onclick = () => {
       const btn = document.getElementById("authSubmit");
       const title = document.getElementById("authTitle");
-      const loginMode = btn.innerText === "دخول";
-      btn.innerText = loginMode ? "إنشاء" : "دخول";
-      title.innerText = loginMode ? "إنشاء حساب" : "تسجيل دخول";
-      document.getElementById("nameGroup").style.display = loginMode ? "block" : "none";
+      const showingLogin = btn.innerText === "دخول";
+      btn.innerText = showingLogin ? "إنشاء" : "دخول";
+      title.innerText = showingLogin ? "إنشاء حساب" : "تسجيل دخول";
+      document.getElementById("nameGroup").style.display = showingLogin ? "block" : "none";
     };
 
     // Signup/login
@@ -144,59 +151,47 @@
 
     // Auth state
     onAuthStateChanged(auth, async user => {
-      authBtn.innerText = user
-        ? (await get(ref(db,'users/'+user.uid))).val().name
-        : "تسجيل / دخول";
-      adminPanel.style.display = user 
-        ? ((await get(ref(db,'users/'+user.uid))).val().role==='admin'?'block':'none')
-        : 'none';
+      authBtn.innerText = user ? (await get(ref(db,'users/'+user.uid))).val().name : "تسجيل / دخول";
+      adminPanel.style.display = user && (await get(ref(db,'users/'+user.uid))).val().role==='admin'?'block':'none';
     });
 
-    // Add product with multiple images
+    // Add product
     window.addProduct = () => {
-      const fileInput = productImagesFile;
-      const files = Array.from(fileInput.files);
-      if (!productName.value||!productPrice.value||!productDesc.value||!files.length) 
-        return alert("املأ جميع الحقول وحمّل الصور.");
-      const readers = files.map(f=> {
-        return new Promise(res=>{
-          const r = new FileReader();
-          r.onload = e => res(e.target.result);
-          r.readAsDataURL(f);
-        });
-      });
-      Promise.all(readers).then(images=>{
-        push(ref(db,'products'), {
+      const file = productImageFile.files[0];
+      const reader = new FileReader();
+      reader.onload = async e => {
+        await push(ref(db,'products'), {
           name:productName.value,
-          images,
+          imageUrl:e.target.result,
           price:productPrice.value,
           desc:productDesc.value
         });
-        // reset
-        productName.value=productPrice.value=productDesc.value='';
-        fileInput.value='';
-      });
+        [productName,productPrice,productDesc].forEach(i=>i.value='');
+        productImageFile.value='';
+      };
+      reader.readAsDataURL(file);
     };
 
     // Load products
     onValue(ref(db,'products'), snap=>{
       productsList.innerHTML='';
       snap.forEach(ch=>{
-        const p = ch.val();
-        const col = document.createElement('div');
-        col.className='col-md-4 mb-4';
-        // show first thumbnail
-        const thumb = p.images[0];
+        const p=ch.val();
+        const col=document.createElement('div'); col.className='col-md-4 mb-4';
         col.innerHTML=`
           <div class="card product-card h-100">
-            <img src="${thumb}" class="card-img-top" onclick="openLightbox(${JSON.stringify(p.images)})">
+            <img src="${p.imageUrl}" class="card-img-top">
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">${p.name}</h5>
               <p class="card-text flex-grow-1">${p.desc}</p>
               <p class="fw-bold mb-2">$ ${p.price}</p>
-              <div class="d-grid gap-2 mt-auto">
-                <button class="btn btn-primary" onclick="addToCart('${p.name}',${p.price})">🛒 سلة</button>
-                <button class="btn btn-outline-secondary" onclick="requestProduct('${p.name}')">📩 طلب</button>
+              <div class="d-flex gap-2 mt-auto">
+                <button class="btn btn-primary w-50" onclick="addToCart('${p.name}',${p.price})">
+                  🛒 سلة
+                </button>
+                <button class="btn btn-outline-secondary w-50" onclick="requestProduct('${p.name}')">
+                  📩 طلب المنتج
+                </button>
               </div>
             </div>
           </div>`;
@@ -204,31 +199,23 @@
       });
     });
 
-    // Lightbox
-    window.openLightbox = images => {
-      const imgEl = document.getElementById('lightbox-img');
-      let idx=0;
-      imgEl.src=images[idx];
-      document.getElementById('lightbox').style.display='flex';
-      // click cycles images
-      imgEl.onclick = ()=> {
-        idx=(idx+1)%images.length;
-        imgEl.src=images[idx];
-      };
-    };
-    window.closeLightbox = ()=> document.getElementById('lightbox').style.display='none';
-
     // Request product
-    window.requestProduct = name => {
-      const text=encodeURIComponent(`أريد طلب المنتج: ${name}`);
-      waLink.href=`https://wa.me/your_number?text=${text}`;
-      tgLink.href=`https://t.me/your_admin?text=${text}`;
-      igLink.href=`https://instagram.com/your_admin`;
-      ttLink.href=`https://tiktok.com/@your_admin`;
+    window.requestProduct = name=>{
+      const text = encodeURIComponent(`أريد طلب المنتج: ${name}`);
+      waLink.href = `https://wa.me/your_number?text=${text}`;
+      tgLink.href = `https://t.me/your_admin?text=${text}`;
+      igLink.href = `https://instagram.com/your_admin`;
+      ttLink.href = `https://tiktok.com/@your_admin`;
       new bootstrap.Modal(requestModal).show();
     };
 
-    // Cart & checkout omitted for brevity
+    // Cart
+    const cart=[]; window.addToCart=(n,p)=>{
+      cart.push({n,p}); checkout();
+    };
+    function checkout(){
+      alert('السلة مؤقتة – سيتم تنفيذ الطلب عبر تواصل.');
+    }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
