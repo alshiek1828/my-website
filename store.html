@@ -16,7 +16,7 @@
       position: relative;
     }
     .product-card:hover { transform: translateY(-5px); }
-    .product-card img { height: 180px; object-fit: cover; }
+    .product-card img { height: 180px; object-fit: cover; cursor: pointer; } /* تم اضافة cursor:pointer */
     footer { background: #343a40; color: #fff; padding: 1rem 0; }
     footer a { color: #fff; margin: 0 .5rem; text-decoration: none; }
     .contact-links { margin-top: 2rem; text-align: center; }
@@ -76,6 +76,22 @@
       cursor: pointer;
       z-index: 10;
     }
+
+    /* رسالة تم النشر */
+    #publishMessage {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #198754;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      display: none;
+      z-index: 1050;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
@@ -88,6 +104,8 @@
       </button>
     </div>
   </nav>
+
+  <div id="publishMessage">✅ تم نشر المنتج بنجاح!</div> <!-- رسالة تم النشر -->
 
   <div class="container">
 
@@ -240,6 +258,11 @@
         await push(ref(db,'products'), { name, imageUrl, price, desc });
         ["productName","productPrice","productDesc"].forEach(id=>document.getElementById(id).value='');
         document.getElementById("productImageFile").value = '';
+        
+        // رسالة تم النشر تظهر 3 ثواني
+        const msg = document.getElementById("publishMessage");
+        msg.style.display = 'block';
+        setTimeout(() => { msg.style.display = 'none'; }, 3000);
       };
       reader.readAsDataURL(file);
     };
@@ -267,7 +290,7 @@
         col.innerHTML = `
           <div class="card product-card h-100">
             ${deleteBtnHtml}
-            <img src="${p.imageUrl}" class="card-img-top" alt="صورة المنتج">
+            <img src="${p.imageUrl}" class="card-img-top" alt="صورة المنتج" onclick="openImageFull('${p.imageUrl}')">
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">${p.name}</h5>
               <p class="card-text flex-grow-1">${p.desc}</p>
@@ -292,6 +315,11 @@
       if (!confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
       await remove(ref(db, 'products/' + key));
       loadProducts();
+    };
+
+    // فتح الصورة بحجم كامل في تاب جديد
+    window.openImageFull = (url) => {
+      window.open(url, '_blank');
     };
 
     // في البداية حمل المنتجات حتى لو ما في تسجيل دخول
