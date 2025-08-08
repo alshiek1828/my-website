@@ -1,50 +1,70 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>سوق إلكتروني متطور</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <style>
     body { background: #f8f9fa; }
     .navbar-brand { font-size: 1.8rem; font-weight: bold; }
-    #addProductForm { background: #fff; padding: 1.5rem; border-radius: .75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-    #addProductForm .form-label { text-align: right; }
-    .product-card { transition: transform .2s; border: none; border-radius: 1rem; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    #addProductForm {
+      background: #fff; padding: 1.5rem;
+      border-radius: .75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      display: none; /* يظهر للمشرف فقط */
+    }
+    .product-card {
+      transition: transform .2s;
+      border: none; border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      height: 100%;
+      display: flex; flex-direction: column;
+    }
     .product-card:hover { transform: translateY(-5px); }
     .product-card img { height: 180px; object-fit: cover; }
     .rating span { cursor: pointer; font-size: 1.2rem; color: #ccc; }
     .rating span.checked { color: gold; }
     footer { background: #343a40; color: #fff; padding: 1.5rem 0; }
-    footer .social a { color: #fff; margin: 0 .5rem; font-size: 1.2rem; text-decoration: none; }
+    footer .social a {
+      color: #fff; margin: 0 .5rem;
+      font-size: 1.2rem; text-decoration: none;
+    }
   </style>
 </head>
 <body>
-
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
     <div class="container">
-      <a class="navbar-brand" href="#">سوقنا الفخم</a>
-      <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">تسجيل دخول / حساب جديد</button>
+      <a class="navbar-brand" href="#">سوقنا المتطور</a>
+      <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#authModal" id="authBtn">
+        تسجيل / دخول
+      </button>
     </div>
   </nav>
 
   <div class="container">
 
-    <!-- Add Product Form -->
+    <!-- Add Product Form (Admin only) -->
     <div id="addProductForm">
       <h4 class="mb-3">➕ إضافة منتج جديد</h4>
       <div class="row g-3">
         <div class="col-md-4">
-          <label for="productName" class="form-label">اسم المنتج</label>
+          <label class="form-label" for="productName">اسم المنتج</label>
           <input type="text" id="productName" class="form-control" placeholder="مثلاً: هاتف ذكي">
         </div>
         <div class="col-md-4">
-          <label for="productPrice" class="form-label">السعر (ريال)</label>
+          <label class="form-label" for="productPrice">$ السعر</label>
           <input type="number" id="productPrice" class="form-control" placeholder="مثلاً: 499">
         </div>
         <div class="col-md-4">
-          <label for="productDesc" class="form-label">وصف المنتج</label>
+          <label class="form-label" for="productImage">صورة المنتج</label>
+          <input type="file" id="productImage" class="form-control" accept="image/*">
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="productDesc">وصف المنتج</label>
           <textarea id="productDesc" class="form-control" rows="2" placeholder="أضف وصفًا مختصرًا"></textarea>
         </div>
         <div class="col-12 text-end">
@@ -55,40 +75,34 @@
 
     <!-- Products Grid -->
     <div class="row" id="productsList">
-      <!-- ستظهر هنا بطاقات المنتجات -->
+      <!-- بطاقات المنتجات تظهر هنا -->
     </div>
 
   </div>
 
-  <!-- Login/Register Modal -->
-  <div class="modal fade" id="loginModal" tabindex="-1">
+  <!-- Auth Modal -->
+  <div class="modal fade" id="authModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content p-4">
-        <h5 class="modal-title text-center mb-3">تسجيل / إنشاء حساب</h5>
-        <ul class="nav nav-tabs mb-3">
-          <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#signIn">دخول</button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#signUp">تسجيل</button>
-          </li>
-        </ul>
-        <div class="tab-content">
-          <div id="signIn" class="tab-pane fade show active">
-            <form id="signinForm">
-              <input type="email" id="signinEmail" class="form-control mb-2" placeholder="البريد الإلكتروني" required>
-              <input type="password" id="signinPass" class="form-control mb-3" placeholder="كلمة المرور" required>
-              <button type="submit" class="btn btn-primary w-100">دخول</button>
-            </form>
+        <h5 class="modal-title text-center mb-3" id="authTitle">إنشاء حساب</h5>
+        <form id="authForm">
+          <div class="mb-3">
+            <label class="form-label" for="userName">الاسم الكامل</label>
+            <input type="text" id="userName" class="form-control" placeholder="أدخل اسمك" required>
           </div>
-          <div id="signUp" class="tab-pane fade">
-            <form id="signupForm">
-              <input type="email" id="signupEmail" class="form-control mb-2" placeholder="البريد الإلكتروني" required>
-              <input type="password" id="signupPass" class="form-control mb-3" placeholder="كلمة المرور (6+ أحرف)" minlength="6" required>
-              <button type="submit" class="btn btn-success w-100">إنشاء حساب</button>
-            </form>
+          <div class="mb-3">
+            <label class="form-label" for="userEmail">البريد الإلكتروني</label>
+            <input type="email" id="userEmail" class="form-control" placeholder="example@domain.com" required>
           </div>
-        </div>
+          <div class="mb-3">
+            <label class="form-label" for="userPass">كلمة المرور (6+ أحرف)</label>
+            <input type="password" id="userPass" class="form-control" minlength="6" required>
+          </div>
+          <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-link" id="switchAuth">لدي حساب</button>
+            <button type="submit" class="btn btn-primary" id="authSubmit">إنشاء</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -100,72 +114,116 @@
       <div class="social">
         <a href="https://instagram.com/" target="_blank">Instagram</a>|
         <a href="https://t.me/" target="_blank">Telegram</a>|
-        <a href="https://tiktok.com/" target="_blank">TikTok</a>|
-        <a href="https://youtube.com/" target="_blank">YouTube</a>
+        <a href="https://tiktok.com/@smartsite0" target="_blank">TikTok</a>|
+        <a href="https://youtube.com/@smartsite0" target="_blank">YouTube</a>
       </div>
       <small class="d-block mt-3">&copy; 2025 جميع الحقوق محفوظة</small>
     </div>
   </footer>
 
   <script>
+    let currentUser = null;
+    const adminEmail = "admin@site.com"; // عدّل للإيميل المخصص للمشرف
     const products = [];
-    const cart = [];
 
+    // تبديل بين تسجيل ودخول
+    document.getElementById("switchAuth").onclick = () => {
+      const isLogin = document.getElementById("authSubmit").innerText === "دخول";
+      document.getElementById("authTitle").innerText = isLogin ? "إنشاء حساب" : "تسجيل دخول";
+      document.getElementById("authSubmit").innerText = isLogin ? "إنشاء" : "دخول";
+      document.getElementById("userName").parentElement.style.display = isLogin ? "block" : "none";
+    };
+
+    // معالجة نموذج التسجيل/الدخول
+    document.getElementById("authForm").onsubmit = e => {
+      e.preventDefault();
+      const email = document.getElementById("userEmail").value.trim();
+      const pass  = document.getElementById("userPass").value;
+      const name  = document.getElementById("userName").value.trim();
+      const btn   = document.getElementById("authSubmit").innerText;
+
+      if (btn === "إنشاء") {
+        // تسجيل جديد
+        currentUser = { name, email };
+        alert(`مرحباً ${name}! حسابك تم إنشاؤه.`);
+      } else {
+        // تسجيل دخول (محاكاة)
+        if (currentUser && currentUser.email === email && pass) {
+          alert(`أهلاً مجدداً ${currentUser.name}!`);
+        } else {
+          return alert("بيانات خطأ أو حساب غير موجود.");
+        }
+      }
+      // إخفاء المودال
+      bootstrap.Modal.getInstance(document.getElementById("authModal")).hide();
+      document.getElementById("authBtn").innerText = currentUser.name;
+      if (currentUser.email === adminEmail) {
+        document.getElementById("addProductForm").style.display = "block";
+      }
+    };
+
+    // إضافة منتج (للمشرف فقط)
     function addProduct() {
       const name  = document.getElementById("productName").value.trim();
       const price = document.getElementById("productPrice").value.trim();
       const desc  = document.getElementById("productDesc").value.trim();
-      if (!name || !price || !desc) {
-        return alert("يرجى تعبئة جميع الحقول!");
-      }
-      products.push({ name, price, desc, rating: 0, rated: false });
-      renderProducts();
+      const imgF  = document.getElementById("productImage").files[0];
+      if (!name||!price||!desc||!imgF) return alert("يرجى تعبئة جميع الحقول وتحميل صورة");
+      const reader = new FileReader();
+      reader.onload = e => {
+        products.push({ name, price, desc, image: e.target.result, rating:0, rated:false });
+        renderProducts();
+      };
+      reader.readAsDataURL(imgF);
       clearForm();
     }
 
     function renderProducts() {
-      const list = document.getElementById("productsList");
-      list.innerHTML = "";
-      products.forEach((p, i) => {
+      const container = document.getElementById("productsList");
+      container.innerHTML = "";
+      products.forEach((p,i)=>{
         const col = document.createElement("div");
         col.className = "col-md-4 mb-4";
         col.innerHTML = `
           <div class="card product-card h-100">
+            <img src="${p.image}" class="card-img-top">
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">${p.name}</h5>
               <p class="card-text flex-grow-1">${p.desc}</p>
-              <p class="fw-bold mb-2">السعر: ${p.price} ريال</p>
+              <p class="fw-bold mb-2">$ ${p.price}</p>
               <div class="rating mb-3">
                 ⭐ تقييم:
-                ${[...Array(5)].map((_, idx) =>
-                  `<span class="${idx < p.rating ? 'checked' : ''}" onclick="rate(${i},${idx+1})">★</span>`
+                ${[...Array(5)].map((_,idx)=>
+                  `<span class="${idx<p.rating?'checked':''}" onclick="rate(${i},${idx+1})">★</span>`
                 ).join("")}
               </div>
               <button class="btn btn-primary mt-auto" onclick="addToCart(${i})">🛒 أضف للسلة</button>
             </div>
           </div>`;
-        list.appendChild(col);
+        container.appendChild(col);
       });
     }
 
-    function rate(index, value) {
+    function rate(index,val) {
       if (!products[index].rated) {
-        products[index].rating = value;
-        products[index].rated = true;
+        products[index].rating=val;
+        products[index].rated=true;
         renderProducts();
       }
     }
 
-    function addToCart(i) {
+    const cart=[];
+    function addToCart(i){
       cart.push(products[i]);
-      alert(`تمت إضافة "${products[i].name}" إلى سلة المشتريات.`);
+      alert(`تمت إضافة "${products[i].name}" إلى سلة التسوق.`);
     }
 
-    function clearForm() {
-      ["productName","productPrice","productDesc"].forEach(id => document.getElementById(id).value = "");
+    function clearForm(){
+      ["productName","productPrice","productDesc","productImage"].forEach(id=>{
+        const el=document.getElementById(id);
+        el.value="";
+      });
     }
-
-    // ربط نماذج التسجيل بالدوال المناسبة أو Firebase لاحقاً...
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
