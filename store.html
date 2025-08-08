@@ -21,6 +21,36 @@
     footer a { color: #fff; margin: 0 .5rem; text-decoration: none; }
     .contact-links { margin-top: 2rem; text-align: center; }
     .contact-links a { display: inline-block; margin: .5rem; }
+
+    /* شريط تواصل فوق المنتجات */
+    #topContactBar {
+      background-color: #343a40;
+      color: white;
+      padding: 0.8rem 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    #topContactBar a {
+      color: white;
+      text-decoration: none;
+      padding: 0.3rem 0.7rem;
+      border-radius: 0.3rem;
+      font-size: 0.9rem;
+      transition: background-color 0.3s;
+    }
+    #topContactBar a.whatsapp { background-color: #25D366; }
+    #topContactBar a.telegram { background-color: #0088cc; }
+    #topContactBar a.instagram { background-color: #C13584; }
+    #topContactBar a.tiktok { background-color: #000000; }
+    #topContactBar a:hover { opacity: 0.8; }
+
     .contact-buttons {
       display: flex; justify-content: space-around; margin-top: 0.8rem;
     }
@@ -60,6 +90,16 @@
   </nav>
 
   <div class="container">
+
+    <!-- شريط تواصل فوق المنتجات -->
+    <div id="topContactBar">
+      تواصل معنا للشراء: 
+      <a href="https://wa.me/رقم_التاجر" target="_blank" class="whatsapp">واتساب</a>
+      <a href="https://t.me/اسم_التاجر" target="_blank" class="telegram">تيليجرام</a>
+      <a href="https://instagram.com/اسم_التاجر" target="_blank" class="instagram">إنستا</a>
+      <a href="https://tiktok.com/@اسم_التاجر" target="_blank" class="tiktok">تيك توك</a>
+    </div>
+
     <!-- Admin Panel -->
     <div id="adminPanel" class="mb-4 p-4 bg-white rounded shadow-sm">
       <h5 class="mb-3">➕ إضافة منتج جديد</h5>
