@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,35 +20,41 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
     <div class="container">
       <a class="navbar-brand" href="#">سوقنا</a>
-      <button class="btn btn-outline-primary ms-auto" data-bs-toggle="modal" data-bs-target="#loginModal" id="authBtn">تسجيل دخول / حساب جديد</button>
+      <div class="d-flex align-items-center">
+        <!-- زر لوحة المشرف سيظهر ديناميكيًا -->
+        <button class="btn btn-outline-primary ms-auto" data-bs-toggle="modal" data-bs-target="#loginModal" id="authBtn">
+          تسجيل دخول / حساب جديد
+        </button>
+      </div>
     </div>
-  </nav>  <div class="container mt-5">
-    <div class="row" id="products-list">
-      <!-- cards will be injected here -->
-    </div><!-- Cart Section -->
-<div id="cart-section" class="mt-5" style="display:none;">
-  <h3>سلة المشتريات</h3>
-  <ul id="cart-items" class="list-group mb-3"></ul>
-  <button onclick="checkout()" class="btn btn-success">إتمام الشراء</button>
-</div>
+  </nav>
 
-  </div>  <!-- Login/Register Modal -->  <div class="modal fade" id="loginModal" tabindex="-1">
+  <div class="container mt-5">
+    <!-- Products List -->
+    <div class="row" id="products-list"></div>
+
+    <!-- Cart Section -->
+    <div id="cart-section" class="mt-5" style="display:none;">
+      <h3>سلة المشتريات</h3>
+      <ul id="cart-items" class="list-group mb-3"></ul>
+      <button onclick="checkout()" class="btn btn-success">إتمام الشراء</button>
+    </div>
+  </div>
+
+  <!-- Login/Register Modal -->
+  <div class="modal fade" id="loginModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content p-4">
         <h5 class="modal-title mb-3 text-center">تسجيل / إنشاء حساب</h5>
         <ul class="nav nav-tabs mb-3" id="authTabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="signIn-tab" data-bs-toggle="tab" data-bs-target="#signIn" type="button">دخول</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="signUp-tab" data-bs-toggle="tab" data-bs-target="#signUp" type="button">تسجيل</button>
-          </li>
+          <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#signIn">دخول</button></li>
+          <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#signUp">تسجيل</button></li>
         </ul>
-        <div class="tab-content" id="authTabsContent">
+        <div class="tab-content">
           <!-- Sign In -->
           <div class="tab-pane fade show active" id="signIn">
-            <div class="d-grid gap-2">
-              <button class="btn btn-google mb-2" onclick="googleSignIn()">تسجيل بجوجل</button>
+            <div class="d-grid gap-2 mb-2">
+              <button class="btn btn-google" onclick="googleSignIn()">تسجيل بجوجل</button>
             </div>
             <div class="text-center my-2">أو</div>
             <form id="signinForm">
@@ -59,13 +66,13 @@
           </div>
           <!-- Sign Up -->
           <div class="tab-pane fade" id="signUp">
-            <div class="d-grid gap-2">
-              <button class="btn btn-google mb-2" onclick="googleSignIn()">إنشاء حساب بجوجل</button>
+            <div class="d-grid gap-2 mb-2">
+              <button class="btn btn-google" onclick="googleSignIn()">إنشاء حساب بجوجل</button>
             </div>
             <div class="text-center my-2">أو</div>
             <form id="signupForm">
               <input type="email" id="signup-email" class="form-control mb-2" placeholder="البريد الإلكتروني" required>
-              <input type="password" id="signup-password" class="form-control mb-3" placeholder="كلمة المرور (6 أحرف على الأقل)" required>
+              <input type="password" id="signup-password" class="form-control mb-3" placeholder="كلمة المرور (6 أحرف على الأقل)" minlength="6" required>
               <button type="submit" class="btn btn-success w-100">إنشاء حساب</button>
             </form>
             <div id="signUpStatus" class="mt-2 text-danger"></div>
@@ -73,12 +80,18 @@
         </div>
       </div>
     </div>
-  </div>  <!-- Firebase & Logic -->  <script type="module">
+  </div>
+
+  <!-- Firebase & Logic -->
+  <script type="module">
+    // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, set, onValue, get, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
     import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
+    // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDZt1RSz5d9wyn-C5S3kF8XVYjEldtSZss",
       authDomain: "gmae-fae90.firebaseapp.com",
@@ -90,64 +103,96 @@
       measurementId: "G-KGQ0RQ33XS"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const db = getDatabase(app);
     const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
     let cart = [];
 
+    // Sign In Form
     document.getElementById('signinForm').onsubmit = async e => {
       e.preventDefault();
-      const email = document.getElementById('signin-email').value;
-      const password = document.getElementById('signin-password').value;
       try {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth,
+          document.getElementById('signin-email').value,
+          document.getElementById('signin-password').value
+        );
         bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
-      } catch (e) {
-        document.getElementById('signInStatus').innerText = e.message;
+      } catch (err) {
+        document.getElementById('signInStatus').innerText = err.message;
       }
     };
 
+    // Sign Up Form
     document.getElementById('signupForm').onsubmit = async e => {
       e.preventDefault();
-      const email = document.getElementById('signup-email').value;
-      const password = document.getElementById('signup-password').value;
       try {
-        const uc = await createUserWithEmailAndPassword(auth, email, password);
-        await set(ref(db, 'users/' + uc.user.uid), { email, role: 'user' });
+        const res = await createUserWithEmailAndPassword(auth,
+          document.getElementById('signup-email').value,
+          document.getElementById('signup-password').value
+        );
+        await set(ref(db, 'users/' + res.user.uid), { email: res.user.email, role: 'user' });
         bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
-      } catch (e) {
-        document.getElementById('signUpStatus').innerText = e.message;
+      } catch (err) {
+        document.getElementById('signUpStatus').innerText = err.message;
       }
     };
 
+    // Google Sign-In
     async function googleSignIn() {
       try {
         const res = await signInWithPopup(auth, provider);
         const user = res.user;
         const snap = await get(ref(db, 'users/' + user.uid));
-        if (!snap.exists()) await set(ref(db, 'users/' + user.uid), { email: user.email, role: 'user' });
-        document.getElementById('signInStatus').innerText = '';
-        document.getElementById('signUpStatus').innerText = '';
+        if (!snap.exists()) {
+          await set(ref(db, 'users/' + user.uid), { email: user.email, role: 'user' });
+        }
         bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
-      } catch (e) {
-        document.getElementById('signInStatus').innerText = e.message;
+      } catch (err) {
+        document.getElementById('signInStatus').innerText = err.message;
       }
     }
 
-    onAuthStateChanged(auth, user => {
-      loadProducts();
+    // Auth State & Admin Check
+    onAuthStateChanged(auth, async user => {
       const btn = document.getElementById('authBtn');
-      btn.innerText = user ? 'مرحبًا، ' + (user.email || 'ضيف') : 'تسجيل دخول / حساب جديد';
+      // نظف أزرار admin إذا كانت موجودة
+      document.querySelectorAll('.btn-admin').forEach(el => el.remove());
+
+      if (user) {
+        btn.innerText = `مرحبًا، ${user.email}`;
+        // جلب دور المستخدم
+        const snap = await get(ref(db, 'users/' + user.uid));
+        const role = snap.val()?.role || 'user';
+        const isAdmin = role === 'admin';
+
+        if (isAdmin) {
+          const adminBtn = document.createElement('button');
+          adminBtn.className = 'btn btn-warning me-2 btn-admin';
+          adminBtn.innerText = 'لوحة المشرف';
+          adminBtn.onclick = () => window.location.href = 'admin.html';
+          btn.parentNode.insertBefore(adminBtn, btn);
+        }
+      } else {
+        btn.innerText = 'تسجيل دخول / حساب جديد';
+      }
+      loadProducts();
     });
 
+    // Load Products
     function loadProducts() {
       onValue(ref(db, 'products'), snap => {
         const list = document.getElementById('products-list');
         list.innerHTML = '';
-        snap.forEach(c => {
-          const p = c.val();
+        if (!snap.exists()) {
+          list.innerHTML = '<p class="text-center">لا توجد منتجات حاليًا.</p>';
+          return;
+        }
+        snap.forEach(child => {
+          const p = child.val();
           const col = document.createElement('div');
           col.className = 'col-md-4 mb-4';
           col.innerHTML = `
@@ -156,7 +201,9 @@
               <div class="card-body">
                 <h5 class="card-title">${p.name}</h5>
                 <p class="card-text">السعر: ${p.price} ريال</p>
-                <button class="btn btn-primary w-100" onclick='addToCart(${JSON.stringify(p)})'>أضف للسلة</button>
+                <button class="btn btn-primary w-100" onclick='addToCart(${JSON.stringify(p)})'>
+                  أضف للسلة
+                </button>
               </div>
             </div>`;
           list.appendChild(col);
@@ -164,6 +211,7 @@
       });
     }
 
+    // Cart
     window.addToCart = p => {
       cart.push(p);
       document.getElementById('cart-section').style.display = 'block';
@@ -173,24 +221,42 @@
     function updateCart() {
       const ul = document.getElementById('cart-items');
       ul.innerHTML = '';
-      cart.forEach((i, idx) => {
+      let total = 0;
+      cart.forEach((item, i) => {
+        total += parseFloat(item.price);
         const li = document.createElement('li');
         li.className = 'list-group-item d-flex justify-content-between';
-        li.textContent = `${i.name} - ${i.price} ريال`;
+        li.textContent = `${item.name} - ${item.price} ريال`;
         const btn = document.createElement('button');
-        btn.textContent = 'حذف';
         btn.className = 'btn btn-sm btn-danger';
-        btn.onclick = () => { cart.splice(idx, 1); updateCart(); };
+        btn.textContent = 'حذف';
+        btn.onclick = () => { cart.splice(i,1); updateCart(); };
         li.appendChild(btn);
         ul.appendChild(li);
       });
+      const totalLi = document.createElement('li');
+      totalLi.className = 'list-group-item fw-bold text-end';
+      totalLi.textContent = `الإجمالي: ${total.toFixed(2)} ريال`;
+      ul.appendChild(totalLi);
     }
 
-    window.checkout = () => {
+    // Checkout
+    window.checkout = async () => {
+      const user = auth.currentUser;
+      if (!user) return alert('يجب تسجيل الدخول أولاً');
+      const order = {
+        items: cart,
+        total: cart.reduce((sum, p)=> sum + parseFloat(p.price), 0),
+        userEmail: user.email,
+        timestamp: Date.now()
+      };
+      await push(ref(db, 'orders'), order);
       alert('تم تأكيد الطلب ✅');
       cart = [];
       updateCart();
       document.getElementById('cart-section').style.display = 'none';
     };
-  </script>  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script></body>
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
