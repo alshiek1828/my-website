@@ -1,29 +1,38 @@
-from flask import Flask, request
 from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import MessageHandler, filters
+import logging
+import os
 
+# التوكن اللي أخدته من BotFather
 TOKEN = "8049186197:AAEO9KWbs9V6wxSLUe1ByAdjhRB25ZbPzzA"
 
-flask_app = Flask(__name__)
-application = Application.builder().token(TOKEN).build()
+# رابط موقعك على Render + مسار Webhook
+WEBHOOK_URL = f"https://my-website-flmq.onrender.com/webhook"
 
-# أمر /start
+# Logging عشان تشوف الأخطاء
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
+
+# دالة start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"مرحبا يا {update.effective_user.first_name} 👋")
 
-application.add_handler(CommandHandler("start", start))
+# دالة echo للرد على أي رسالة
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(f"رسالتك: {update.message.text}")
 
-# Webhook endpoint (Telegram يبعت له التحديثات)
-@flask_app.route("/webhook", methods=["POST"])
-def webhook():
-    update = Update.de_json(request.get_json(force=True), application.bot)
-    application.update_queue.put_nowait(update)
-    return "ok", 200
+# إنشاء التطبيق
+app = ApplicationBuilder().token(TOKEN).build()
 
-# Health check (Render يستعملها للتأكد إن السيرفر شغال)
-@flask_app.route("/healthz")
-def healthz():
-    return "ok", 200
+# إضافة الهاندلرز
+app.add_handler(CommandHandler("start", start))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
-if __name__ == "__main__":
-    flask_app.run(host="0.0.0.0", port=10000)
+# ضبط Webhook
+app.run_webhook(
+    listen="0.0.0.0",       # يستمع لكل الطلبات الواردة
+    port=int(os.environ.get("PORT", 10000)),  # Render يعطي PORT تلقائي
+    webhook_url=WEBHOOK_URL
+)
