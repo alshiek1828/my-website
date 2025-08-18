@@ -2,7 +2,7 @@ from flask import Flask, request
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-TOKEN = "توكن_البوت_تبعك"
+TOKEN = "8049186197:AAEO9KWbs9V6wxSLUe1ByAdjhRB25ZbPzzA"
 
 flask_app = Flask(__name__)
 application = Application.builder().token(TOKEN).build()
