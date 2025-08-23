@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Background Remover — Remove BG & Resize</title>
+
+  <!-- Cropper.css -->
+  <link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --accent:#ff6b6b;
+      --bg:#061025;
+      --card:#0b1220;
+      --muted:#9aa4b2;
+      --white:#eef2f7;
+      --glass: rgba(255,255,255,0.03);
+      --max-width:1100px;
+    }
+    html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Roboto, Arial; background:linear-gradient(180deg,#061025,#071428); color:var(--white); -webkit-font-smoothing:antialiased;}
+    .wrap{max-width:var(--max-width);margin:28px auto;padding:22px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 6px 30px rgba(2,6,23,0.6);}
+    h1{margin:0 0 6px;font-size:20px}
+    p.lead{margin:0 0 16px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:360px 1fr;gap:18px}
+    .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+    .uploader{border:2px dashed rgba(255,255,255,0.04);padding:18px;border-radius:8px;text-align:center;cursor:pointer;transition:all .18s}
+    .uploader.dragover{transform:scale(1.01)}
+    input[type=file]{display:none}
+    button, .btn{background:var(--accent);border:none;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .small{font-size:13px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.02)}
+    label.opt{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
+    .preview{display:flex;flex-direction:column;gap:10px;align-items:center}
+    img.preview-img{max-width:100%;border-radius:8px;border:1px solid rgba(255,255,255,0.03)}
+    .status{font-size:13px;color:var(--muted)}
+    .row{display:flex;gap:8px}
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+    @media (max-width:900px){ .grid{grid-template-columns:1fr;gap:12px} }
+    canvas{display:block;max-width:100%}
+    .meta{font-size:12px;color:var(--muted);margin-top:6px}
+    .muted-pill{background:rgba(255,255,255,0.02);padding:6px;border-radius:8px;font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Background Remover + Resize</h1>
+    <p class="lead">Upload image → remove background locally → crop/resize → download PNG/JPG. No server required.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div id="dropZone" class="uploader" tabindex="0">
+          <p style="margin:0;font-weight:700">اسحب الصورة هنا أو اضغط للرفع</p>
+          <p style="margin:6px 0 0;color:var(--muted);font-size:13px">PNG / JPG / JPEG — الصور الكبيرة قد تحتاج جهاز أقوى</p>
+          <input id="fileInput" type="file" accept="image/*" />
+        </div>
+
+        <div class="controls" style="margin-top:12px">
+          <button id="btnRemove" class="btn small" disabled>🪄 إزالة الخلفية</button>
+          <button id="btnCropToggle" class="small" disabled>✂️ تفعيل القص</button>
+          <button id="btnApplyCrop" class="small" disabled>✅ تطبيق القص</button>
+          <button id="btnReset" class="small">🔁 إعادة تعيين</button>
+        </div>
+
+        <div style="margin-top:12px">
+          <div style="display:flex;gap:8px;align-items:center">
+            <label class="opt"><input id="keepRatio" type="checkbox" checked /> الحفاظ على النسبة</label>
+            <label class="opt"><input id="previewCircle" type="checkbox" /> قص دائري</label>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+            <input id="wInput" type="number" placeholder="العرض px" class="small" style="width:110px" />
+            <input id="hInput" type="number" placeholder="الارتفاع px" class="small" style="width:110px" />
+            <button id="btnResize" class="small">📐 تغيير الأبعاد</button>
+            <button id="btnFit" class="small">🔎 تناسب المحتوى</button>
+          </div>
+
+          <div class="meta" id="metaInfo">لم تُحمّل صورة بعد</div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+          <div style="flex:1;min-width:260px">
+            <div class="preview">
+              <div style="width:100%;text-align:left;margin-bottom:6px"><strong>الصورة الأصلية</strong></div>
+              <div style="width:100%;display:flex;justify-content:center;align-items:center;">
+                <img id="origImg" class="preview-img" alt="original" />
+              </div>
+              <div class="meta" id="origSize"></div>
+            </div>
+          </div>
+
+          <div style="width:16px"></div>
+
+          <div style="flex:1;min-width:260px">
+            <div class="preview">
+              <div style="width:100%;text-align:left;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+                <strong>النتيجة</strong>
+                <div style="display:flex;gap:8px">
+                  <button id="btnDownload" class="small" disabled>⬇️ PNG</button>
+                  <button id="btnDownloadJpg" class="small" disabled>⬇️ JPG</button>
+                </div>
+              </div>
+
+              <div style="width:100%;display:flex;justify-content:center;align-items:center;min-height:220px;background:var(--glass);border-radius:8px;padding:8px;overflow:hidden">
+                <div id="resultContainer" style="position:relative;display:inline-block">
+                  <canvas id="resultCanvas" style="display:none"></canvas>
+                  <img id="resultImg" class="preview-img" alt="result" />
+                </div>
+              </div>
+
+              <div class="meta" id="resultSize"></div>
+            </div>
+          </div>
+        </div>
+
+        <canvas id="workCanvas" style="display:none"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- External libs -->
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+  <script src="https://unpkg.com/cropperjs/dist/cropper.min.js"></script>
+
+  <script type="module">
+  // ملف واحد: كل اللوجيك هنا
+  let imglyRemoveBackground = null;
+  (async () => {
+    try {
+      const mod = await import('https://unpkg.com/@imgly/background-removal@latest/dist/index.js');
+      imglyRemoveBackground = mod?.default ?? mod;
+      console.log('background-removal lib loaded');
+    } catch (err) {
+      console.error('failed to load background-removal lib', err);
+      alert('فشل تحميل مكتبة إزالة الخلفية من CDN. تأكد من اتصال الإنترنت أو افتح الملف في متصفح حديث.');
+    }
+  })();
+
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const origImg = document.getElementById('origImg');
+  const resultImg = document.getElementById('resultImg');
+  const resultCanvas = document.getElementById('resultCanvas');
+  const workCanvas = document.getElementById('workCanvas');
+  const btnRemove = document.getElementById('btnRemove');
+  const btnDownload = document.getElementById('btnDownload');
+  const btnDownloadJpg = document.getElementById('btnDownloadJpg');
+  const btnCropToggle = document.getElementById('btnCropToggle');
+  const btnApplyCrop = document.getElementById('btnApplyCrop');
+  const btnReset = document.getElementById('btnReset');
+  const btnResize = document.getElementById('btnResize');
+  const btnFit = document.getElementById('btnFit');
+  const metaInfo = document.getElementById('metaInfo');
+  const origSize = document.getElementById('origSize');
+  const resultSize = document.getElementById('resultSize');
+  const keepRatio = document.getElementById('keepRatio');
+  const previewCircle = document.getElementById('previewCircle');
+  const wInput = document.getElementById('wInput');
+  const hInput = document.getElementById('hInput');
+
+  let currentFile = null;
+  let currentResultBlob = null;
+  let cropper = null;
+  let lastOrigImage = null;
+
+  function loadImageFromFile(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve({img, url});
+      img.onerror = e => reject(e);
+      img.src = url;
+    });
+  }
+
+  async function handleFile(file) {
+    currentFile = file;
+    metaInfo.textContent = 'جارٍ تحميل الصورة...';
+    try {
+      const {img, url} = await loadImageFromFile(file);
+      lastOrigImage = img;
+      origImg.src = url;
+      origImg.style.maxHeight = '320px';
+      origSize.textContent = `أبعاد: ${img.naturalWidth}×${img.naturalHeight}px — ${(file.size/1024/1024).toFixed(2)} MB`;
+      resultImg.src = ''; resultImg.style.display = 'none';
+      resultSize.textContent = '';
+      btnRemove.disabled = false;
+      btnCropToggle.disabled = true;
+      btnApplyCrop.disabled = true;
+      btnDownload.disabled = true;
+      btnDownloadJpg.disabled = true;
+      metaInfo.textContent = 'جاهز: اضغط "إزالة الخلفية"';
+    } catch (e) {
+      console.error(e);
+      metaInfo.textContent = 'فشل قراءة الصورة';
+    }
+  }
+
+  ;['dragenter','dragover'].forEach(ev => {
+    dropZone.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); dropZone.classList.add('dragover'); });
+  });
+  ;['dragleave','drop'].forEach(ev => {
+    dropZone.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); dropZone.classList.remove('dragover'); });
+  });
+  dropZone.addEventListener('drop', (e)=>{
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if(f) fileInput.files = e.dataTransfer.files;
+    if(f) handleFile(f);
+  });
+  dropZone.addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', ()=> {
+    if(fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
+
+  btnReset.addEventListener('click', ()=> {
+    currentFile = null;
+    currentResultBlob = null;
+    lastOrigImage = null;
+    origImg.src = '';
+    resultImg.src = '';
+    resultImg.style.display = 'none';
+    resultCanvas.style.display = 'none';
+    origSize.textContent = '';
+    resultSize.textContent = '';
+    metaInfo.textContent = 'تمت إعادة التعيين';
+    btnRemove.disabled = true;
+    btnCropToggle.disabled = true;
+    btnApplyCrop.disabled = true;
+    btnDownload.disabled = true;
+    btnDownloadJpg.disabled = true;
+    if(cropper){ cropper.destroy(); cropper = null; }
+  });
+
+  async function doRemoveBackground(fileBlob) {
+    if(!imglyRemoveBackground){
+      throw new Error('مكتبة إزالة الخلفية لم تُحمّل بعد.');
+    }
+    metaInfo.textContent = 'جاري إزالة الخلفية...';
+    const resultBlob = await imglyRemoveBackground(fileBlob);
+    return resultBlob;
+  }
+
+  btnRemove.addEventListener('click', async ()=> {
+    if(!currentFile){ alert('حمّل صورة أولاً'); return; }
+    btnRemove.disabled = true;
+    try {
+      const blob = await doRemoveBackground(currentFile);
+      currentResultBlob = blob;
+      const url = URL.createObjectURL(blob);
+      resultImg.src = url;
+      resultImg.style.display = 'block';
+      resultImg.onload = () => {
+        resultCanvas.style.display = 'none';
+        resultSize.textContent = `أبعاد: ${resultImg.naturalWidth}×${resultImg.naturalHeight}px — ${(blob.size/1024/1024).toFixed(2)} MB`;
+        btnCropToggle.disabled = false;
+        btnDownload.disabled = false;
+        btnDownloadJpg.disabled = false;
+        metaInfo.textContent = 'تمت إزالة الخلفية.';
+        wInput.value = resultImg.naturalWidth;
+        hInput.value = resultImg.naturalHeight;
+      };
+    } catch (err) {
+      console.error(err);
+      alert('خطأ أثناء إزالة الخلفية: ' + (err.message || err));
+      metaInfo.textContent = 'فشل إزالة الخلفية';
+    } finally {
+      btnRemove.disabled = false;
+    }
+  });
+
+  btnCropToggle.addEventListener('click', ()=> {
+    if(!currentResultBlob){ alert('لا توجد نتيجة للقص — اضغط إزالة الخلفية أولاً'); return; }
+    if(cropper){
+      cropper.destroy(); cropper = null;
+      btnCropToggle.textContent = '✂️ تفعيل القص';
+      btnApplyCrop.disabled = true;
+      metaInfo.textContent = 'تم إيقاف القص';
+    } else {
+      cropper = new Cropper(resultImg, {
+        viewMode:1, autoCropArea:0.9, background:false, movable:true, zoomable:true, scalable:true, rotatable:false
+      });
+      btnCropToggle.textContent = '✖ إيقاف القص';
+      btnApplyCrop.disabled = false;
+      metaInfo.textContent = 'نمّ الحركة والقص ثم اضغط "تطبيق القص"';
+    }
+  });
+
+  btnApplyCrop.addEventListener('click', async ()=> {
+    if(!cropper) return;
+    const cropCanvas = cropper.getCroppedCanvas({imageSmoothingEnabled:true, imageSmoothingQuality:'high'});
+    cropCanvas.toBlob((blob) => {
+      if(!blob) { alert('خطأ أثناء إنشاء النتيجة'); return; }
+      currentResultBlob = blob;
+      const url = URL.createObjectURL(blob);
+      resultImg.src = url;
+      cropper.destroy(); cropper = null;
+      btnCropToggle.textContent = '✂️ تفعيل القص';
+      btnApplyCrop.disabled = true;
+      btnCropToggle.disabled = false;
+      metaInfo.textContent = 'تم تطبيق القص.';
+      resultSize.textContent = `أبعاد: ${cropCanvas.width}×${cropCanvas.height}px — ${(blob.size/1024/1024).toFixed(2)} MB`;
+      wInput.value = cropCanvas.width;
+      hInput.value = cropCanvas.height;
+    }, 'image/png');
+  });
+
+  btnResize.addEventListener('click', ()=> {
+    if(!currentResultBlob){ alert('لا توجد نتيجة للتعديل'); return; }
+    const w = parseInt(wInput.value);
+    const h = parseInt(hInput.value);
+    if(!w || !h){ alert('ضع أبعاد صحيحة'); return; }
+    resizeResultTo(w,h);
+  });
+
+  btnFit.addEventListener('click', ()=> {
+    if(!resultImg.src){ alert('لا توجد نتيجة'); return; }
+    const w = resultImg.naturalWidth;
+    const h = resultImg.naturalHeight;
+    wInput.value = w; hInput.value = h;
+    metaInfo.textContent = 'تم تعبئة الحقول بأبعاد الصورة الحالية';
+  });
+
+  function resizeResultTo(targetW, targetH) {
+    const canvas = workCanvas;
+    const ctx = canvas.getContext('2d');
+    const url = URL.createObjectURL(currentResultBlob);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      if(keepRatio.checked){
+        const ratio = Math.min(targetW / img.naturalWidth, targetH / img.naturalHeight);
+        targetW = Math.round(img.naturalWidth * ratio);
+        targetH = Math.round(img.naturalHeight * ratio);
+      }
+      canvas.width = targetW;
+      canvas.height = targetH;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, targetW, targetH);
+
+      if(previewCircle.checked){
+        const circ = document.createElement('canvas');
+        circ.width = targetW; circ.height = targetH;
+        const cctx = circ.getContext('2d');
+        cctx.clearRect(0,0,targetW,targetH);
+        cctx.beginPath();
+        const r = Math.min(targetW, targetH)/2;
+        cctx.arc(targetW/2, targetH/2, r, 0, Math.PI*2);
+        cctx.closePath();
+        cctx.fillStyle = 'white';
+        cctx.fill();
+        cctx.globalCompositeOperation = 'source-in';
+        cctx.drawImage(canvas, 0, 0);
+        circ.toBlob(b => {
+          currentResultBlob = b;
+          resultImg.src = URL.createObjectURL(b);
+          resultSize.textContent = `أبعاد: ${targetW}×${targetH}px — ${(b.size/1024/1024).toFixed(2)} MB`;
+          metaInfo.textContent = 'تم تطبيق التغيير';
+          wInput.value = targetW; hInput.value = targetH;
+        }, 'image/png');
+      } else {
+        canvas.toBlob(b => {
+          currentResultBlob = b;
+          resultImg.src = URL.createObjectURL(b);
+          resultSize.textContent = `أبعاد: ${targetW}×${targetH}px — ${(b.size/1024/1024).toFixed(2)} MB`;
+          metaInfo.textContent = 'تم تغيير الأبعاد';
+          wInput.value = targetW; hInput.value = targetH;
+        }, 'image/png');
+      }
+    };
+    img.onerror = (e)=> { alert('فشل تحميل الصورة للتعديل'); console.error(e); };
+    img.src = url;
+  }
+
+  btnDownload.addEventListener('click', ()=> {
+    if(!currentResultBlob){ alert('لا توجد نتيجة'); return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(currentResultBlob);
+    a.download = 'result.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  });
+  btnDownloadJpg.addEventListener('click', ()=> {
+    if(!currentResultBlob){ alert('لا توجد نتيجة'); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0,0,c.width,c.height);
+      ctx.drawImage(img, 0, 0);
+      c.toBlob(b => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'result.jpg';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }, 'image/jpeg', 0.92);
+    };
+    img.src = URL.createObjectURL(currentResultBlob);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if((e.ctrlKey || e.metaKey) && e.key === 'z'){ btnReset.click(); }
+  });
+
+  </script>
+</body>
+</html>
