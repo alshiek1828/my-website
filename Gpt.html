@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>دردشة ذكية</title>
+  <style>
+    body { margin:0; font-family:Arial, sans-serif; background:#0d1117; color:#fff; }
+    header { padding:15px; background:#161b22; text-align:center; font-size:20px; font-weight:bold; }
+    #chat { height:80vh; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:12px; }
+    .msg { max-width:70%; padding:12px 16px; border-radius:12px; line-height:1.5; }
+    .user { align-self:flex-end; background:#238636; }
+    .bot { align-self:flex-start; background:#30363d; }
+    form { display:flex; gap:10px; padding:15px; background:#161b22; }
+    textarea { flex:1; resize:none; border-radius:8px; border:1px solid #30363d; padding:10px; background:#0d1117; color:#fff; }
+    button { background:#238636; color:#fff; border:none; border-radius:8px; padding:0 20px; cursor:pointer; }
+    button:hover { background:#2ea043; }
+  </style>
+</head>
+<body>
+  <header>محادثة تجريبية</header>
+  <div id="chat"></div>
+  <form id="chatForm">
+    <textarea id="input" rows="2" placeholder="اكتب رسالتك..."></textarea>
+    <button type="submit">إرسال</button>
+  </form>
+
+  <script>
+    const API_URL = "curl -X POST https://sii3.moayman.top/DARK/api/wormgpt.php -d "text=hello""; // ← غيّر الرابط حسب السيرفر
+
+    const chat = document.getElementById("chat");
+    const form = document.getElementById("chatForm");
+    const input = document.getElementById("input");
+
+    function addMessage(text, role) {
+      const div = document.createElement("div");
+      div.className = "msg " + role;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage(text, "user");
+      input.value = "";
+
+      // رسالة مؤقتة
+      const temp = document.createElement("div");
+      temp.className = "msg bot";
+      temp.textContent = "جاري التفكير...";
+      chat.appendChild(temp);
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: "text=" + encodeURIComponent(text)
+        });
+        const reply = await res.text();
+        temp.textContent = reply;
+      } catch (err) {
+        temp.textContent = "خطأ: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
