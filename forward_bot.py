@@ -9,6 +9,6 @@ def start(update: Update, context: CallbackContext):
 updater = Updater(BOT_TOKEN)
 updater.dispatcher.add_handler(CommandHandler("start", start))
 
-print("البوت شغال! 🚀")
-updater.start_polling()
+print("البوت شغال 🚀")
+updater.start_polling()  # <<< هنا البوت يعمل polling
 updater.idle()
