@@ -5,7 +5,7 @@ api_id = 29668409
 api_hash = "6ff15390ad84e8ed5029cec215ee589d"
 
 # ID القنوات
-source_channel = -1002400952  # القناة المصدر (ضع ID)
+source_channel = -2396595955  # القناة المصدر (ضع ID)
 target_channel = -2737286794  # القناة الوجهة (ضع ID)
 
 app = Client("forwarder", api_id=api_id, api_hash=api_hash)
