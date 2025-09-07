@@ -6,6 +6,8 @@ from telethon import TelegramClient, events, Button
 from telethon.sessions import StringSession
 from telethon.errors import SessionPasswordNeededError, PhoneCodeInvalidError, PhoneNumberInvalidError, FloodWaitError, ChannelPrivateError, ChatAdminRequiredError
 from dotenv import load_dotenv
+from keep_alive import keep_alive
+keep_alive()
 import sqlite3
 import threading
 import time
@@ -725,9 +727,9 @@ class MessageForwarder:
 
 class TelegramBot:
     def __init__(self):
-        api_id_str = os.getenv('API_ID')
-        self.api_hash = os.getenv('API_HASH')
-        self.bot_token = os.getenv('BOT_TOKEN')
+        api_id_str = os.getenv('29668409')
+        self.api_hash = os.getenv('6ff15390ad84e8ed5029cec215ee589d')
+        self.bot_token = os.getenv('8062927520:AAGBf3TuQV03Vitdh9xxpoyVfLk6o2iMxDo')
         
         if not api_id_str or not self.api_hash or not self.bot_token:
             raise ValueError("Missing required environment variables")
