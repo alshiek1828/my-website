@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 import sqlite3
 import threading
 import time
+from keep_alive import keep_alive
+keep_alive()
 
 # Load environment variables
 load_dotenv()
