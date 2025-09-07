@@ -6,6 +6,8 @@ from telethon import TelegramClient, events, Button
 from telethon.sessions import StringSession
 from telethon.errors import SessionPasswordNeededError, PhoneCodeInvalidError, PhoneNumberInvalidError, FloodWaitError, ChannelPrivateError, ChatAdminRequiredError
 from dotenv import load_dotenv
+from keep_alive import keep_alive
+keep_alive()
 import sqlite3
 import threading
 import time
