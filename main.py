@@ -14,8 +14,19 @@ import time
 # Load environment variables
 load_dotenv()
 
-# Configure logging
-logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s', level=logging.WARNING)
+# Configure comprehensive logging 
+logging.basicConfig(
+    format='%(asctime)s [%(levelname)8s] %(name)s: %(message)s',
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler('telegram_bot.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+
+# إنشاء logger مخصص للبوت
+bot_logger = logging.getLogger('TelegramBot')
+bot_logger.setLevel(logging.DEBUG)
 
 # Database setup
 def init_database():
@@ -771,125 +782,242 @@ class TelegramBot:
         self.pending_channel_operations = {}
         
         # إضافة نظام تحويل الرسائل المحدث
-        self.message_forwarder = MessageForwarder()
+        try:
+            self.message_forwarder = MessageForwarder()
+        except Exception as e:
+            bot_logger.error(f"❌ خطأ في إنشاء MessageForwarder: {e}")
+            self.message_forwarder = None
 
     async def start_bot(self):
-        if not self.bot_token:
-            raise ValueError("BOT_TOKEN is required")
-        await self.bot.start(bot_token=self.bot_token)
-        print("🤖 تم تشغيل البوت بنجاح!")
-        
-        # تسجيل معالجات الأحداث
-        self.bot.add_event_handler(self.handle_start, events.NewMessage(pattern='/start'))
-        self.bot.add_event_handler(self.handle_help, events.NewMessage(pattern='/help'))
-        self.bot.add_event_handler(self.handle_settings, events.NewMessage(pattern='/settings'))
-        self.bot.add_event_handler(self.handle_admin, events.NewMessage(pattern='/admin'))
-        self.bot.add_event_handler(self.handle_login, events.NewMessage(pattern='/login'))
-        self.bot.add_event_handler(self.handle_callback, events.CallbackQuery())
-        self.bot.add_event_handler(self.handle_message, events.NewMessage())
-        
-        # تشغيل نظام تحويل الرسائل
-        await self.message_forwarder.initialize_user_clients()
-        
-        print("🎯 البوت جاهز لاستقبال الأوامر!")
-        await self.bot.run_until_disconnected()
+        try:
+            bot_logger.info("🚀 بدء تشغيل البوت...")
+            
+            if not self.bot_token:
+                bot_logger.error("❌ BOT_TOKEN غير موجود!")
+                raise ValueError("BOT_TOKEN is required")
+            
+            bot_logger.info("🔑 تم تحميل التوكن بنجاح")
+            
+            # تشغيل البوت مع تسجيل مفصل
+            await self.bot.start(bot_token=self.bot_token)
+            
+            # التحقق من معلومات البوت
+            me = await self.bot.get_me()
+            bot_username = getattr(me, 'username', 'unknown')
+            bot_first_name = getattr(me, 'first_name', 'غير محدد')
+            bot_id = getattr(me, 'id', 0)
+            
+            bot_logger.info(f"✅ البوت متصل بنجاح: @{bot_username}")
+            bot_logger.info(f"📋 اسم البوت: {bot_first_name}")
+            bot_logger.info(f"🆔 معرف البوت: {bot_id}")
+            
+            # تسجيل معالجات الأحداث مع تسجيل مفصل
+            bot_logger.info("📝 تسجيل معالجات الأحداث...")
+            
+            # تسجيل معالجات الأوامر أولاً (أولوية عالية) - أنماط بسيطة
+            command_handlers = [
+                (self.handle_start, events.NewMessage(pattern='/start'), "start"),
+                (self.handle_help, events.NewMessage(pattern='/help'), "help"),
+                (self.handle_settings, events.NewMessage(pattern='/settings'), "settings"),
+                (self.handle_admin, events.NewMessage(pattern='/admin'), "admin"),
+                (self.handle_login, events.NewMessage(pattern='/login'), "login")
+            ]
+            
+            # معالج callbacks  
+            callback_handlers = [
+                (self.handle_callback, events.CallbackQuery(), "callback")
+            ]
+            
+            # معالج الرسائل العام (أولوية منخفضة - آخر شيء)
+            general_handlers = [
+                (self.handle_message, events.NewMessage(), "message")
+            ]
+            
+            # دمج جميع المعالجات بالترتيب الصحيح
+            handlers = command_handlers + callback_handlers + general_handlers
+            
+            for handler, event_type, name in handlers:
+                try:
+                    self.bot.add_event_handler(handler, event_type)
+                    bot_logger.debug(f"✅ تم تسجيل معالج {name}")
+                except Exception as e:
+                    bot_logger.error(f"❌ فشل في تسجيل معالج {name}: {e}")
+            
+            bot_logger.info("🔄 تشغيل نظام تحويل الرسائل...")
+            
+            # تشغيل نظام تحويل الرسائل مع معالجة الأخطاء
+            try:
+                await self.message_forwarder.initialize_user_clients()
+                bot_logger.info("✅ تم تشغيل نظام تحويل الرسائل بنجاح")
+            except Exception as e:
+                bot_logger.error(f"⚠️ خطأ في تشغيل نظام التحويل: {e}")
+            
+            bot_logger.info("🤖 تم تشغيل البوت بنجاح!")
+            bot_logger.info(f"🔗 رابط البوت: https://t.me/{bot_username}")
+            print("🤖 تم تشغيل البوت بنجاح!")
+            print(f"🔗 رابط البوت: https://t.me/{bot_username}")
+            bot_logger.info("🎯 البوت جاهز لاستقبال الأوامر!")
+            
+            await self.bot.run_until_disconnected()
+            
+        except Exception as e:
+            bot_logger.error(f"❌ خطأ حرج في تشغيل البوت: {e}")
+            bot_logger.critical(f"❌ خطأ حرج: {e}")
+            print(f"❌ خطأ حرج: {e}")
+            raise
 
     async def handle_start(self, event):
         user_id = event.sender_id
+        message_text = event.message.text
         
-        # التحقق من حالة البوت
-        bot_status, status_message = get_bot_status()
-        if bot_status != "active" and not is_admin(user_id):
-            if status_message:
-                await event.respond(f"🚫 البوت متوقف حالياً\n\n{status_message}")
+        try:
+            bot_logger.info(f"🎯 معالج /start تم استدعاؤه! المستخدم: {user_id}, الرسالة: '{message_text}'")
+            
+            # التأكد من أن هذه رسالة start حقيقية
+            if not message_text or not message_text.startswith('/start'):
+                bot_logger.warning(f"⚠️ معالج /start استُدعي برسالة خاطئة: '{message_text}'")
+                return
+                
+            bot_logger.info(f"✅ تأكيد: هذه رسالة /start صحيحة من المستخدم {user_id}")
+            
+            # الحصول على معلومات المستخدم
+            user = await event.get_sender()
+            username = user.username or "بدون اسم مستخدم"
+            first_name = user.first_name or "بدون اسم"
+            
+            bot_logger.info(f"👤 معلومات المستخدم: {first_name} (@{username})")
+            
+            # التحقق من حالة البوت
+            bot_status, status_message = get_bot_status()
+            bot_logger.debug(f"🔍 حالة البوت: {bot_status}")
+            
+            if bot_status != "active" and not is_admin(user_id):
+                bot_logger.warning(f"🚫 البوت متوقف - رفض الوصول للمستخدم {user_id}")
+                if status_message:
+                    await event.respond(f"🚫 البوت متوقف حالياً\n\n{status_message}")
+                else:
+                    await event.respond("🚫 البوت متوقف حالياً. يرجى المحاولة لاحقاً")
+                return
+            
+            # التحقق من الحظر
+            if is_user_banned(user_id):
+                bot_logger.warning(f"🚫 المستخدم المحظور {user_id} حاول الوصول")
+                await event.respond("🚫 تم حظرك من استخدام البوت")
+                return
+            
+            bot_logger.info(f"✅ المستخدم {user_id} يستطيع الوصول للبوت")
+            
+            welcome_text = f"مرحباً {user.first_name}! 👋\n\n"
+            welcome_text += "🤖 بوت تحويل الرسائل المطور\n"
+            welcome_text += "📤 يمكنك تحويل الرسائل من قنوات متعددة إلى قنواتك\n\n"
+            
+            keyboard = []
+            
+            if is_user_registered(user_id):
+                bot_logger.info(f"📋 المستخدم {user_id} مسجل في النظام")
+                welcome_text += "✅ أنت مسجل في النظام\n"
+                keyboard = [
+                    [Button.inline("⚙️ الإعدادات", b"user_settings"), Button.inline("📋 قنواتي", b"my_channels")],
+                    [Button.inline("🔄 إعادة تشغيل التحويل", b"restart_forwarding")]
+                ]
             else:
-                await event.respond("🚫 البوت متوقف حالياً. يرجى المحاولة لاحقاً")
-            return
-        
-        # التحقق من الحظر
-        if is_user_banned(user_id):
-            await event.respond("🚫 تم حظرك من استخدام البوت")
-            return
-        
-        user = await event.get_sender()
-        welcome_text = f"مرحباً {user.first_name}! 👋\n\n"
-        welcome_text += "🤖 بوت تحويل الرسائل المطور\n"
-        welcome_text += "📤 يمكنك تحويل الرسائل من قنوات متعددة إلى قنواتك\n\n"
-        
-        keyboard = []
-        
-        if is_user_registered(user_id):
-            welcome_text += "✅ أنت مسجل في النظام\n"
-            keyboard = [
-                [Button.inline("⚙️ الإعدادات", b"user_settings"), Button.inline("📋 قنواتي", b"my_channels")],
-                [Button.inline("🔄 إعادة تشغيل التحويل", b"restart_forwarding")]
-            ]
-        else:
-            welcome_text += "📱 يرجى تسجيل رقم هاتفك أولاً\n"
-            keyboard = [
-                [Button.inline("📱 تسجيل رقم الهاتف", b"register_phone")]
-            ]
-        
-        keyboard.append([Button.inline("📖 المساعدة", b"help")])
-        
-        # إضافة لوحة الأدمن إذا كان المستخدم أدمن
-        if is_admin(user_id):
-            keyboard.append([Button.inline("🛡️ لوحة الأدمن", b"admin_menu")])
-        
-        await self.safe_edit_or_respond(event, welcome_text, buttons=keyboard)
+                bot_logger.info(f"📱 المستخدم {user_id} غير مسجل - يحتاج تسجيل")
+                welcome_text += "📱 يرجى تسجيل رقم هاتفك أولاً\n"
+                keyboard = [
+                    [Button.inline("📱 تسجيل رقم الهاتف", b"register_phone")]
+                ]
+            
+            keyboard.append([Button.inline("📖 المساعدة", b"help")])
+            
+            # إضافة لوحة الأدمن إذا كان المستخدم أدمن
+            if is_admin(user_id):
+                bot_logger.info(f"🛡️ المستخدم {user_id} أدمن - إضافة لوحة الأدمن")
+                keyboard.append([Button.inline("🛡️ لوحة الأدمن", b"admin_menu")])
+            
+            await self.safe_edit_or_respond(event, welcome_text, buttons=keyboard)
+            bot_logger.info(f"✅ تم إرسال رسالة الترحيب للمستخدم {user_id}")
+            
+        except Exception as e:
+            bot_logger.error(f"❌ خطأ في معالج /start للمستخدم {user_id}: {e}")
+            try:
+                await event.respond("❌ حدث خطأ في تشغيل الأمر. يرجى المحاولة لاحقاً")
+            except:
+                bot_logger.error("❌ فشل في إرسال رسالة الخطأ")
 
     async def safe_edit_or_respond(self, event, message, buttons=None, parse_mode='html'):
         """دالة آمنة لتحرير أو إرسال الرسائل"""
         try:
+            bot_logger.debug(f"📤 محاولة إرسال رسالة بطول {len(message)} حرف")
+            
             # التحقق من نوع الحدث
             if hasattr(event, 'query') and event.query:
                 # هذا callback query - يجب استخدام edit
+                bot_logger.debug("🔄 استخدام edit للـ callback query")
                 try:
                     await event.edit(message, buttons=buttons, parse_mode=parse_mode)
+                    bot_logger.debug("✅ تم تعديل الرسالة بنجاح")
                     return
                 except Exception as edit_error:
-                    print(f"فشل في تعديل الرسالة: {edit_error}")
+                    bot_logger.warning(f"⚠️ فشل في تعديل الرسالة: {edit_error}")
                     # إذا فشل التعديل، أرسل رسالة جديدة
                     await event.respond(message, buttons=buttons, parse_mode=parse_mode)
+                    bot_logger.debug("✅ تم إرسال رسالة جديدة بدلاً من التعديل")
                     return
             else:
                 # رسالة عادية
+                bot_logger.debug("📨 إرسال رسالة عادية")
                 await event.respond(message, buttons=buttons, parse_mode=parse_mode)
+                bot_logger.debug("✅ تم إرسال الرسالة بنجاح")
+                
         except Exception as e:
-            print(f"خطأ في إرسال الرسالة: {e}")
+            bot_logger.error(f"❌ خطأ في إرسال الرسالة: {e}")
             try:
                 await event.respond(message, buttons=buttons, parse_mode=parse_mode)
-            except:
+                bot_logger.info("✅ تم إرسال الرسالة في المحاولة الثانية")
+            except Exception as retry_error:
+                bot_logger.error(f"❌ فشل في المحاولة الثانية: {retry_error}")
                 await event.respond("❌ حدث خطأ في إرسال الرسالة")
 
     async def handle_callback(self, event):
         data = event.data.decode('utf-8')
         user_id = event.sender_id
         
-        print(f"تم استلام callback: {data} من المستخدم {user_id}")
-        
-        # التحقق من الحظر
-        if is_user_banned(user_id):
-            await event.answer("🚫 تم حظرك من استخدام البوت", alert=True)
-            return
-        
         try:
+            bot_logger.info(f"🔘 استلام callback: {data} من المستخدم {user_id}")
+            
+            # التحقق من الحظر
+            if is_user_banned(user_id):
+                bot_logger.warning(f"🚫 محاولة callback من مستخدم محظور {user_id}")
+                await event.answer("🚫 تم حظرك من استخدام البوت", alert=True)
+                return
+        
+            # معالجة أنواع الـ callbacks المختلفة مع تسجيل مفصل
+            bot_logger.debug(f"🔍 معالجة callback: {data}")
+            
             if data == "start":
+                bot_logger.info(f"➡️ استدعاء handle_start_callback للمستخدم {user_id}")
                 await self.handle_start_callback(event)
             elif data == "help":
+                bot_logger.info(f"❓ عرض المساعدة للمستخدم {user_id}")
                 await self.show_help(event)
             elif data == "register_phone":
+                bot_logger.info(f"📱 بدء تسجيل الهاتف للمستخدم {user_id}")
                 await self.start_registration(event)
             elif data == "user_settings":
+                bot_logger.info(f"⚙️ عرض إعدادات المستخدم {user_id}")
                 await self.show_user_settings(event)
             elif data == "my_channels":
+                bot_logger.info(f"📋 عرض قنوات المستخدم {user_id}")
                 await self.show_my_channels(event)
             elif data == "restart_forwarding":
+                bot_logger.info(f"🔄 إعادة تشغيل التحويل للمستخدم {user_id}")
                 await self.restart_message_forwarding(event)
             elif data == "admin_menu":
                 if is_admin(user_id):
+                    bot_logger.info(f"🛡️ عرض قائمة الأدمن للمستخدم {user_id}")
                     await self.show_admin_menu(event)
                 else:
+                    bot_logger.warning(f"⛔ محاولة وصول غير مصرح للأدمن من المستخدم {user_id}")
                     await event.answer("⛔ ليس لديك صلاحية الوصول!", alert=True)
             # معالجة أزرار إدارة القنوات الجديدة
             elif data == "add_channel":
@@ -946,31 +1074,55 @@ class TelegramBot:
 
     # معالجة الرسائل النصية
     async def handle_message(self, event):
-        # تجاهل الرسائل من القنوات والمجموعات
-        if event.is_channel or event.is_group:
-            return
-        
-        # تجاهل الأوامر
-        if event.message.text and event.message.text.startswith('/'):
-            return
-            
         user_id = event.sender_id
-        message = event.message.text
+        message_text = event.message.text if event.message.text else "[رسالة بدون نص]"
         
-        if not message:
-            return
-        
-        # معالجة العمليات المعلقة
-        if user_id in self.pending_registrations:
-            await self.handle_phone_input(event, message)
-        elif user_id in self.pending_codes:
-            await self.handle_code_input(event, message)
-        elif user_id in self.pending_2fa:
-            await self.handle_2fa_input(event, message)
-        elif user_id in self.pending_inputs:
-            await self.handle_admin_input(event, message)
-        elif user_id in self.pending_channel_operations:
-            await self.handle_channel_input(event, message)
+        try:
+            bot_logger.info(f"📨 رسالة جديدة من المستخدم {user_id}: {message_text[:50]}...")
+            
+            # تجاهل الرسائل من القنوات والمجموعات
+            if event.is_channel or event.is_group:
+                bot_logger.debug(f"🔇 تجاهل رسالة من قناة/مجموعة: {user_id}")
+                return
+            
+            # تجاهل الأوامر
+            if event.message.text and event.message.text.startswith('/'):
+                bot_logger.debug(f"⚡ تجاهل أمر: {event.message.text} من {user_id}")
+                return
+                
+            message = event.message.text
+            
+            if not message:
+                bot_logger.debug(f"📝 رسالة فارغة من المستخدم {user_id}")
+                return
+            
+            bot_logger.info(f"🔍 معالجة رسالة من المستخدم {user_id}: {message}")
+            
+            # معالجة العمليات المعلقة
+            if user_id in self.pending_registrations:
+                bot_logger.info(f"📱 معالجة إدخال رقم هاتف من المستخدم {user_id}")
+                await self.handle_phone_input(event, message)
+            elif user_id in self.pending_codes:
+                bot_logger.info(f"🔢 معالجة كود التحقق من المستخدم {user_id}")
+                await self.handle_code_input(event, message)
+            elif user_id in self.pending_2fa:
+                bot_logger.info(f"🔐 معالجة 2FA من المستخدم {user_id}")
+                await self.handle_2fa_input(event, message)
+            elif user_id in self.pending_inputs:
+                bot_logger.info(f"🛡️ معالجة إدخال أدمن من المستخدم {user_id}")
+                await self.handle_admin_input(event, message)
+            elif user_id in self.pending_channel_operations:
+                bot_logger.info(f"📋 معالجة عملية قناة من المستخدم {user_id}")
+                await self.handle_channel_input(event, message)
+            else:
+                bot_logger.info(f"🤷 رسالة غير متوقعة من المستخدم {user_id}: {message}")
+                
+        except Exception as e:
+            bot_logger.error(f"❌ خطأ في معالج الرسائل للمستخدم {user_id}: {e}")
+            try:
+                await event.respond("❌ حدث خطأ في معالجة الرسالة. يرجى المحاولة لاحقاً")
+            except:
+                bot_logger.error("❌ فشل في إرسال رسالة الخطأ للمستخدم")
 
     # بدء تسجيل المستخدم
     async def start_registration(self, event):
@@ -2162,10 +2314,23 @@ class TelegramBot:
 
 async def main():
     try:
+        bot_logger.info("🚀 تشغيل التطبيق الرئيسي...")
+        bot_logger.info(f"🔧 Python version: {asyncio.get_event_loop()}")
+        
         bot = TelegramBot()
+        bot_logger.info("✅ تم إنشاء كائن البوت بنجاح")
+        
         await bot.start_bot()
+        
+    except KeyboardInterrupt:
+        bot_logger.info("🛑 تم إيقاف البوت بواسطة المستخدم")
     except Exception as e:
-        print(f"Error starting bot: {e}")
+        bot_logger.critical(f"💥 خطأ حرج في التطبيق الرئيسي: {e}")
+        print(f"❌ خطأ حرج: {e}")
+        raise
 
 if __name__ == "__main__":
+    print("🤖 بدء تشغيل بوت التليغرام...")
+    print("📝 تفعيل نظام تسجيل شامل للأخطاء...")
+    bot_logger.info("🎬 بداية تشغيل البوت")
     asyncio.run(main())
