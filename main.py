@@ -6,8 +6,7 @@ from telethon import TelegramClient, events, Button
 from telethon.sessions import StringSession
 from telethon.errors import SessionPasswordNeededError, PhoneCodeInvalidError, PhoneNumberInvalidError, FloodWaitError, ChannelPrivateError, ChatAdminRequiredError
 from dotenv import load_dotenv
-from keep_alive import keep_alive
-keep_alive()
+# تم حذف keep_alive لحل المشاكل
 import sqlite3
 import threading
 import time
@@ -538,8 +537,8 @@ class MessageForwarder:
                             self.last_forwarded_messages[message_id] = True
                             await self.forward_message(event, target_ch, user_id_val, source_channel)
                             # تنظيف الذاكرة بعد 5 دقائق لتجنب التراكم
-                            await asyncio.sleep(300)  # 5 دقائق
-                            self.last_forwarded_messages.pop(message_id, None)
+                            # تنظيف الذاكرة بعد فترة (بدون انتظار)
+                            asyncio.create_task(self._cleanup_message_cache(message_id))
                     return handle_new_message
                 
                 handler = await create_handler(source, target_channel, user_id)
@@ -568,7 +567,7 @@ class MessageForwarder:
         self.message_handlers.clear()
     
     async def verify_channel_access(self, client, sources, user_id):
-        """التحقق من صلاحية الوصول للقنوات المصدر"""
+        """التحقق من صلاحية الوصول للقنوات المصدر مع تجاهل حد المعدل المؤقت"""
         verified_sources = []
         
         for source in sources:
@@ -581,14 +580,23 @@ class MessageForwarder:
                 verified_sources.append(source)
                 print(f"✅ تحقق من صلاحية الوصول للقناة {source} للمستخدم {user_id}")
                 
+            except FloodWaitError as e:
+                # تجاهل حد المعدل وإضافة المصدر كصالح مؤقتاً
+                print(f"⚠️ حد معدل لـ {source} - سيتم المحاولة لاحقاً")
+                verified_sources.append(source)  # إضافة رغم الخطأ المؤقت
+                continue
             except Exception as e:
                 print(f"❌ خطأ في التحقق من القناة {source} للمستخدم {user_id}: {e}")
+                # إذا كان خطأ في حل الاسم، أضفه أيضاً كمؤقت
+                if "ResolveUsernameRequest" in str(e) or "wait" in str(e).lower():
+                    print(f"⚠️ سيتم إضافة {source} مؤقتاً رغم الخطأ")
+                    verified_sources.append(source)
                 continue
         
         return verified_sources
     
     async def verify_target_channel(self, client, target_channel, user_id):
-        """التحقق من صلاحية القناة المستهدفة"""
+        """التحقق من صلاحية القناة المستهدفة مع تجاهل حد المعدل المؤقت"""
         try:
             entity = await client.get_entity(target_channel)
             
@@ -601,10 +609,22 @@ class MessageForwarder:
             print(f"✅ تحقق من صلاحية القناة المستهدفة {target_channel} للمستخدم {user_id}")
             return True
             
+        except FloodWaitError as e:
+            print(f"⚠️ حد معدل للقناة المستهدفة {target_channel} - سيتم قبولها مؤقتاً")
+            return True  # قبول مؤقت رغم حد المعدل
         except Exception as e:
             print(f"❌ خطأ في التحقق من القناة المستهدفة {target_channel} للمستخدم {user_id}: {e}")
+            # إذا كان خطأ في حل الاسم، اقبلها مؤقتاً
+            if "ResolveUsernameRequest" in str(e) or "wait" in str(e).lower():
+                print(f"⚠️ سيتم قبول القناة المستهدفة {target_channel} مؤقتاً رغم الخطأ")
+                return True
             return False
     
+    async def _cleanup_message_cache(self, message_id):
+        """تنظيف رسالة من الذاكرة بعد فترة"""
+        await asyncio.sleep(300)  # 5 دقائق
+        self.last_forwarded_messages.pop(message_id, None)
+        
     async def forward_message(self, event, target_channel, user_id, source_channel):
         """تحويل الرسالة إلى القناة المستهدفة مع معالجة محسنة للأخطاء ومنع التكرار"""
         # التحقق من عدم تكرار الرسالة
@@ -1707,7 +1727,7 @@ class TelegramBot:
             message = f"📋 قنواتك ({len(channels)}):\n\n"
             
             keyboard = []
-            for i, (_, channel_id, channel_name, sources, created_at) in enumerate(channels, 1):
+            for i, (_, channel_id, channel_name, sources, forward_mode, created_at) in enumerate(channels, 1):
                 display_name = channel_name if channel_name else channel_id
                 sources_count = len([s for s in sources.split(',') if s.strip()]) if sources else 0
                 
