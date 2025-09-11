@@ -6,8 +6,7 @@ from telethon import TelegramClient, events, Button
 from telethon.sessions import StringSession
 from telethon.errors import SessionPasswordNeededError, PhoneCodeInvalidError, PhoneNumberInvalidError, FloodWaitError, ChannelPrivateError, ChatAdminRequiredError
 from dotenv import load_dotenv
-from keep_alive import keep_alive
-keep_alive()
+# keep_alive not needed in this environment
 import sqlite3
 import threading
 import time
@@ -16,7 +15,7 @@ import time
 load_dotenv()
 
 # Configure logging
-logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s', level=logging.WARNING)
+logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s', level=logging.INFO)
 
 # Database setup
 def init_database():
@@ -522,50 +521,128 @@ class MessageForwarder:
             for handler in self.message_handlers[handler_key]:
                 try:
                     client.remove_event_handler(handler)
-                except:
-                    pass
+                except Exception as e:
+                    logging.warning(f"Failed to remove handler: {e}")
         
         self.message_handlers[handler_key] = []
         
         for source in sources:
             try:
-                # إنشاء معالج فريد لكل مصدر
-                async def create_handler(source_channel, target_ch, user_id_val):
+                # إنشاء معالج فريد لكل مصدر مع معالجة محسنة
+                async def create_handler(source_channel, target_ch, user_id_val, forward_mode):
                     async def handle_new_message(event):
-                        # تحقق من عدم تكرار الرسالة
-                        message_id = f"{event.chat_id}_{event.message.id}"
-                        if message_id not in self.last_forwarded_messages:
-                            self.last_forwarded_messages[message_id] = True
-                            await self.forward_message(event, target_ch, user_id_val, source_channel)
-                            # تنظيف الذاكرة بعد 5 دقائق لتجنب التراكم
-                            await asyncio.sleep(300)  # 5 دقائق
-                            self.last_forwarded_messages.pop(message_id, None)
+                        try:
+                            # تحقق من عدم تكرار الرسالة مع مفتاح أكثر تحديداً
+                            message_key = f"{event.chat_id}_{event.message.id}_{user_id_val}_{target_ch}"
+                            current_time = time.time()
+                            
+                            # التحقق من التكرار خلال آخر 5 دقائق
+                            if message_key in self.last_forwarded_messages:
+                                last_time = self.last_forwarded_messages[message_key]
+                                if current_time - last_time < 300:  # 5 دقائق
+                                    return
+                            
+                            # تسجيل الرسالة
+                            self.last_forwarded_messages[message_key] = current_time
+                            
+                            # تحويل الرسالة مع تمرير forward_mode
+                            await self.forward_message(event, target_ch, user_id_val, source_channel, forward_mode)
+                            
+                            # تنظيف دوري للذاكرة
+                            if len(self.last_forwarded_messages) > 1000:
+                                await self._cleanup_old_messages()
+                                
+                        except Exception as e:
+                            logging.error(f"Error in message handler for user {user_id_val}: {e}")
+                    
                     return handle_new_message
                 
-                handler = await create_handler(source, target_channel, user_id)
+                # الحصول على نوع التحويل من إعدادات المستخدم (تم إصلاحه - استخدام forward_mode الصحيح)
+                mapping_key_search = f"{user_id}_{target_channel}"
+                current_mapping = self.forward_mappings.get(mapping_key_search)
+                forward_mode = current_mapping.get('forward_mode', 'with_source') if current_mapping else 'with_source'
+                
+                # تمرير forward_mode بشكل صحيح للhandler
+                handler = await create_handler(source, target_channel, user_id, forward_mode)
+                
+                logging.info(f"Setting up listener for source {source} with forward_mode: {forward_mode}")
                 client.add_event_handler(handler, events.NewMessage(chats=source))
                 self.message_handlers[handler_key].append(handler)
                 
                 print(f"🎯 بدء مراقبة {source} للمستخدم {user_id}")
+                logging.info(f"Setup listener for user {user_id}, source {source}, target {target_channel}")
                 
             except Exception as e:
                 print(f"❌ خطأ في مراقبة {source} للمستخدم {user_id}: {e}")
+                logging.error(f"Failed to setup listener for source {source}: {e}")
     
     async def cleanup_clients(self):
         """إغلاق جميع الجلسات السابقة وإزالة المستمعات"""
+        print("🧹 بدء تنظيف الجلسات القديمة...")
+        
         # إزالة جميع معالجات الرسائل أولاً
-        for user_id, client in self.clients.items():
+        for user_id, client in list(self.clients.items()):
             try:
-                # إزالة جميع معالجات الأحداث لهذا العميل
-                client.remove_event_handlers()
-                await client.disconnect()
+                # إزالة المعالجات المسجلة بشكل موثوق
+                try:
+                    removed_count = 0
+                    # إزالة المعالجات المسجلة يدوياً
+                    for handler_key in list(self.message_handlers.keys()):
+                        if handler_key.startswith(str(user_id)):
+                            handlers = self.message_handlers.get(handler_key, [])
+                            for handler in handlers:
+                                try:
+                                    client.remove_event_handler(handler)
+                                    removed_count += 1
+                                except Exception as handler_error:
+                                    logging.debug(f"Failed to remove handler: {handler_error}")
+                    
+                    if removed_count > 0:
+                        logging.info(f"Removed {removed_count} event handlers for user {user_id}")
+                    
+                except Exception as cleanup_error:
+                    logging.warning(f"Error during handler cleanup: {cleanup_error}")
+                
+                # إغلاق الاتصال
+                if client.is_connected():
+                    await client.disconnect()
+                    
                 print(f"🔌 تم إغلاق جلسة المستخدم {user_id}")
+                logging.info(f"Disconnected client for user {user_id}")
+                
             except Exception as e:
                 print(f"❌ خطأ في إغلاق جلسة المستخدم {user_id}: {e}")
+                logging.error(f"Error disconnecting client for user {user_id}: {e}")
         
+        # تنظيف جميع البيانات
         self.clients.clear()
         self.forward_mappings.clear()
         self.message_handlers.clear()
+        self.last_forwarded_messages.clear()
+        
+        print("✅ تم تنظيف جميع الجلسات والمعالجات")
+    
+    async def _cleanup_old_messages(self):
+        """تنظيف الرسائل القديمة من الذاكرة لتجنب التراكم"""
+        try:
+            current_time = time.time()
+            old_keys = []
+            
+            # إيجاد الرسائل القديمة (أكثر من 10 دقائق)
+            for key, timestamp in list(self.last_forwarded_messages.items()):
+                if current_time - timestamp > 600:  # 10 دقائق
+                    old_keys.append(key)
+            
+            # حذف الرسائل القديمة
+            for key in old_keys:
+                self.last_forwarded_messages.pop(key, None)
+            
+            if old_keys:
+                print(f"🧹 تم تنظيف {len(old_keys)} رسالة قديمة من الذاكرة")
+                logging.info(f"Cleaned up {len(old_keys)} old messages from memory")
+        
+        except Exception as e:
+            logging.error(f"Error cleaning up old messages: {e}")
     
     async def verify_channel_access(self, client, sources, user_id):
         """التحقق من صلاحية الوصول للقنوات المصدر"""
@@ -573,16 +650,33 @@ class MessageForwarder:
         
         for source in sources:
             try:
+                # محاولة الحصول على معلومات القناة
                 entity = await client.get_entity(source)
                 
                 # محاولة قراءة آخر رسالة للتأكد من صحة الوصول
                 messages = await client.get_messages(entity, limit=1)
                 
-                verified_sources.append(source)
-                print(f"✅ تحقق من صلاحية الوصول للقناة {source} للمستخدم {user_id}")
+                # التحقق من أن القناة غير خاصة
+                if hasattr(entity, 'broadcast') and entity.broadcast:
+                    # قناة عامة - التحقق من إمكانية الوصول
+                    verified_sources.append(source)
+                elif hasattr(entity, 'megagroup') and entity.megagroup:
+                    # مجموعة ضخمة - التحقق من العضوية
+                    verified_sources.append(source)
+                else:
+                    # نوع آخر من الكيانات
+                    verified_sources.append(source)
                 
+                print(f"✅ تحقق من صلاحية الوصول للقناة {source} للمستخدم {user_id}")
+                logging.info(f"Verified access to source {source} for user {user_id}")
+                
+            except (ChannelPrivateError, ChatAdminRequiredError) as e:
+                print(f"❌ قناة خاصة أو تحتاج صلاحيات: {source} - {type(e).__name__}")
+                logging.warning(f"Access denied to source {source} for user {user_id}: {type(e).__name__}")
+                continue
             except Exception as e:
                 print(f"❌ خطأ في التحقق من القناة {source} للمستخدم {user_id}: {e}")
+                logging.error(f"Error verifying source {source} for user {user_id}: {e}")
                 continue
         
         return verified_sources
@@ -596,101 +690,143 @@ class MessageForwarder:
             permissions = await client.get_permissions(entity, 'me')
             if permissions and permissions.is_banned:
                 print(f"❌ المستخدم {user_id} محظور من القناة {target_channel}")
+                logging.warning(f"User {user_id} is banned from target channel {target_channel}")
                 return False
             
+            # التحقق من صلاحيات الإرسال بدون إرسال رسائل تجريبية
+            if permissions:
+                can_send = getattr(permissions, 'send_messages', True)
+                if not can_send:
+                    print(f"❌ لا توجد صلاحية إرسال في {target_channel} للمستخدم {user_id}")
+                    logging.error(f"No send permission in target {target_channel} for user {user_id}")
+                    return False  # رفض القناة إذا لم تكن هناك صلاحيات
+            
             print(f"✅ تحقق من صلاحية القناة المستهدفة {target_channel} للمستخدم {user_id}")
+            logging.info(f"Verified target channel {target_channel} for user {user_id}")
             return True
             
+        except (ChannelPrivateError, ChatAdminRequiredError) as e:
+            print(f"❌ قناة خاصة أو تحتاج صلاحيات: {target_channel} - {type(e).__name__}")
+            logging.error(f"Access denied to target {target_channel} for user {user_id}: {type(e).__name__}")
+            return False
         except Exception as e:
             print(f"❌ خطأ في التحقق من القناة المستهدفة {target_channel} للمستخدم {user_id}: {e}")
+            logging.error(f"Error verifying target channel {target_channel} for user {user_id}: {e}")
             return False
     
-    async def forward_message(self, event, target_channel, user_id, source_channel):
+    async def forward_message(self, event, target_channel, user_id, source_channel, forward_mode=None):
         """تحويل الرسالة إلى القناة المستهدفة مع معالجة محسنة للأخطاء ومنع التكرار"""
-        # التحقق من عدم تكرار الرسالة
+        # التحقق من عدم تكرار الرسالة مع مفتاح محسّن
         message_key = f"{event.chat_id}_{event.message.id}_{user_id}_{target_channel}"
-        if message_key in self.last_forwarded_messages:
-            return  # الرسالة تم تحويلها بالفعل
+        current_time = time.time()
         
-        max_retries = 2  # تقليل عدد المحاولات لتجنب التكرار
+        # التحقق من التكرار خلال آخر 5 دقائق
+        if message_key in self.last_forwarded_messages:
+            last_time = self.last_forwarded_messages[message_key]
+            if current_time - last_time < 300:  # 5 دقائق
+                return  # الرسالة تم تحويلها مؤخراً
+        
+        # معاملات إعادة المحاولة محسنة
+        max_retries = 3  # زيادة عدد المحاولات للFloodWait
         retry_count = 0
+        base_delay = 2  # تأخير أساسي
         
         while retry_count < max_retries:
             try:
                 client = self.clients.get(user_id)
                 if not client:
-                    print(f"❌ جلسة المستخدم {user_id} غير موجودة")
+                    logging.error(f"Client for user {user_id} not found")
                     return
                 
-                # التحقق من صلاحيات المستخدم (تبسيط الفحص)
-                if not is_user_registered(user_id) or is_user_banned(user_id):
+                # التحقق من صحة الجلسة
+                if not client.is_connected():
+                    logging.warning(f"Client for user {user_id} is not connected")
                     return
                 
-                # الحصول على نوع التحويل
-                forward_mode = "with_source"  # القيمة الافتراضية
+                # التحقق من صلاحيات المستخدم بشكل محسّن
+                if not await self.verify_user_permissions(user_id):
+                    logging.warning(f"User {user_id} does not have forwarding permissions")
+                    return
                 
-                # البحث عن إعدادات التحويل للمستخدم
-                for mapping_key, mapping_data in self.forward_mappings.items():
-                    if mapping_data['user_id'] == user_id and mapping_data['target'] == target_channel:
-                        forward_mode = mapping_data.get('forward_mode', 'with_source')
-                        break
+                # الحصول على نوع التحويل إذا لم يتم تمريره
+                if forward_mode is None:
+                    mapping_key_search = f"{user_id}_{target_channel}"
+                    current_mapping = self.forward_mappings.get(mapping_key_search)
+                    forward_mode = current_mapping.get('forward_mode', 'with_source') if current_mapping else 'with_source'
                 
-                # تسجيل الرسالة لمنع التكرار
-                self.last_forwarded_messages[message_key] = True
+                logging.info(f"Applying forward_mode '{forward_mode}' for message {event.message.id} from {source_channel} to {target_channel} (user {user_id})")
+                
+                # تسجيل الرسالة قبل التحويل لمنع التكرار
+                self.last_forwarded_messages[message_key] = current_time
                 
                 # تحويل الرسالة بناءً على نوع التحويل
                 if forward_mode == "without_source":
-                    # إرسال الرسالة بدون ذكر المصدر
+                    # إرسال الرسالة بدون ذكر المصدر (نسخ محسّن)
                     if event.message.media:
                         await client.send_file(
                             target_channel,
                             event.message.media,
-                            caption=event.message.text or ""
+                            caption=event.message.text or "",
+                            force_document=False  # تحسين معالجة الوسائط
                         )
                     else:
                         await client.send_message(
                             target_channel,
                             event.message.text or ""
                         )
-                    print(f"📤 تم إرسال رسالة {event.message.id} من {source_channel} إلى {target_channel} (بدون ذكر المصدر)")
+                    mode_text = f"بدون ذكر المصدر (forward_mode={forward_mode})"
                 else:
                     # تحويل الرسالة مع ذكر المصدر
-                    await client.forward_messages(target_channel, event.message)
-                    print(f"📤 تم تحويل رسالة {event.message.id} من {source_channel} إلى {target_channel} (مع ذكر المصدر)")
+                    await client.forward_messages(target_channel, event.message, source_channel)
+                    mode_text = f"مع ذكر المصدر (forward_mode={forward_mode})"
                 
-                # تنظيف الذاكرة بعد 10 دقائق لتجنب التراكم
-                async def cleanup_message_memory():
-                    await asyncio.sleep(600)  # 10 دقائق
-                    self.last_forwarded_messages.pop(message_key, None)
-                
-                asyncio.create_task(cleanup_message_memory())
+                # النجاح - تسجيل النجاح والخروج
+                print(f"✅ تم تحويل رسالة {event.message.id} من {source_channel} إلى {target_channel} ({mode_text})")
+                logging.info(f"Successfully forwarded message {event.message.id} from {source_channel} to {target_channel} for user {user_id} ({mode_text})")
                 
                 # تحديث حالة التحويل
                 update_forwarding_status(user_id, True, 0)
-                break
+                
+                # تنظيف دوري للذاكرة
+                if len(self.last_forwarded_messages) > 1000:
+                    await self._cleanup_old_messages()
+                
+                return  # نجح التحويل
                 
             except FloodWaitError as e:
                 retry_count += 1
-                wait_seconds = e.seconds + 5
-                print(f"⏳ انتظار {wait_seconds} ثانية بسبب FloodWait للمستخدم {user_id}")
+                # حساب زمن الانتظار بحد أقصى
+                wait_seconds = min(e.seconds, 300) + (retry_count * 10)  # حد أقصى 5 دقائق
+                
+                print(f"⏳ FloodWait للمستخدم {user_id}: انتظار {wait_seconds} ثانية (محاولة {retry_count}/{max_retries})")
+                logging.warning(f"FloodWait for user {user_id}: waiting {wait_seconds}s (attempt {retry_count}/{max_retries})")
+                
                 if retry_count < max_retries:
                     await asyncio.sleep(wait_seconds)
                 else:
-                    print(f"❌ فشل تحويل الرسالة بعد {max_retries} محاولات للمستخدم {user_id}")
+                    print(f"❌ فشل تحويل الرسالة بعد {max_retries} محاولات FloodWait للمستخدم {user_id}")
+                    logging.error(f"Failed to forward message after {max_retries} FloodWait attempts for user {user_id}")
                     update_forwarding_status(user_id, False, retry_count)
                     
             except (ChannelPrivateError, ChatAdminRequiredError) as e:
-                print(f"❌ مشكلة في الصلاحيات للمستخدم {user_id}: {e}")
+                print(f"❌ مشكلة صلاحيات للمستخدم {user_id}: {type(e).__name__}")
+                logging.error(f"Permission error for user {user_id}: {type(e).__name__} - {e}")
                 update_forwarding_status(user_id, False, 1)
-                break
+                return  # مشكلة صلاحيات - لا تعيد المحاولة
                 
             except Exception as e:
                 retry_count += 1
-                print(f"❌ خطأ في تحويل الرسالة للمستخدم {user_id} - محاولة {retry_count}: {e}")
+                # تأخير متصاعد (exponential backoff)
+                delay = base_delay * (2 ** (retry_count - 1))
+                
+                print(f"❌ خطأ في تحويل الرسالة للمستخدم {user_id} (محاولة {retry_count}/{max_retries}): {type(e).__name__}")
+                logging.error(f"Error forwarding message for user {user_id} (attempt {retry_count}/{max_retries}): {type(e).__name__} - {e}")
+                
                 if retry_count < max_retries:
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(delay)
                 else:
-                    print(f"❌ فشل تحويل الرسالة نهائياً للمستخدم {user_id}")
+                    print(f"❌ فشل تحويل الرسالة نهائياً للمستخدم {user_id}: {e}")
+                    logging.error(f"Final forwarding failure for user {user_id}: {e}")
                     update_forwarding_status(user_id, False, retry_count)
     
     async def verify_user_permissions(self, user_id):
@@ -719,9 +855,26 @@ class MessageForwarder:
         self._restart_lock = True
         try:
             print("🔄 إعادة تشغيل نظام التحويل...")
+            logging.info("Restarting forwarding system...")
+            
+            # تنظيف الجلسات القديمة
             await self.cleanup_clients()
+            
+            # انتظار قصير قبل إعادة التهيئة
+            await asyncio.sleep(2)
+            
+            # إعادة تهيئة الجلسات
             await self.initialize_user_clients()
-            print("✅ تم إعادة تشغيل نظام التحويل بنجاح")
+            
+            active_sessions = len(self.clients)
+            total_mappings = len(self.forward_mappings)
+            
+            print(f"✅ تم إعادة تشغيل نظام التحويل بنجاح - {active_sessions} جلسة نشطة، {total_mappings} مسار تحويل")
+            logging.info(f"Forwarding system restarted successfully - {active_sessions} active sessions, {total_mappings} mappings")
+            
+        except Exception as e:
+            print(f"❌ خطأ في إعادة تشغيل النظام: {e}")
+            logging.error(f"Error restarting forwarding system: {e}")
         finally:
             self._restart_lock = False
 
