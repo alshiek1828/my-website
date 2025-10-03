@@ -19,3 +19,4 @@ socksio==1.0.0
 tornado==6.5.2
 typing-extensions==4.15.0
 tzlocal==5.3.1
+gunicorn==21.2.0
