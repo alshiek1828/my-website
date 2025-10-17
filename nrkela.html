@@ -594,50 +594,57 @@
     </div>
 
     <script>
-        const WHATSAPP_NUMBER = '962791234567';
+        const WHATSAPP_NUMBER = '9647702604040';
         
         let flavors = [
             {
                 id: 1,
-                name: 'نكهة التفاح المزدوج',
-                description: 'نكهة التفاح الطبيعي المنعش مع لمسة من النعناع',
-                price: 15.00,
+                name: 'ليمون نعناع',
+                description: 'نكهة منعشة من الليمون الطبيعي مع النعناع البارد',
+                price: 13.00,
                 available: true
             },
             {
                 id: 2,
-                name: 'نكهة العنب الأحمر',
-                description: 'عنب أحمر فاخر بطعم غني ومميز',
-                price: 18.00,
+                name: 'علج ونعناع',
+                description: 'علكة طبيعية مع نعناع منعش',
+                price: 13.00,
                 available: true
             },
             {
                 id: 3,
-                name: 'نكهة البطيخ بالنعناع',
-                description: 'بطيخ منعش مع نعناع بارد للتجربة المثالية',
-                price: 16.50,
-                available: false
+                name: 'تفاحتين',
+                description: 'نكهة التفاح المزدوج اللذيذة',
+                price: 13.00,
+                available: true
             },
             {
                 id: 4,
-                name: 'نكهة الليمون بالنعناع',
-                description: 'ليمون حامض منعش مع نعناع طبيعي',
-                price: 14.00,
+                name: 'سبيشل',
+                description: 'خلطة مميزة من النكهات الخاصة',
+                price: 13.00,
                 available: true
             },
             {
                 id: 5,
-                name: 'نكهة الفراولة',
-                description: 'فراولة طبيعية بطعم حلو ومميز',
-                price: 17.00,
+                name: 'ايس كريم',
+                description: 'نكهة البوظة الكريمية اللذيذة',
+                price: 13.00,
                 available: true
             },
             {
                 id: 6,
-                name: 'نكهة المانجو الاستوائي',
-                description: 'مانجو استوائي بنكهة غنية وفاكهية',
-                price: 19.00,
-                available: false
+                name: 'سندي',
+                description: 'نكهة سندي المميزة والمنعشة',
+                price: 13.00,
+                available: true
+            },
+            {
+                id: 7,
+                name: 'فريش أناناس',
+                description: 'أناناس طازج بنكهة استوائية فاخرة',
+                price: 15.00,
+                available: true
             }
         ];
 
@@ -646,7 +653,7 @@
         ];
 
         let currentAdmin = null;
-        let nextFlavorId = 7;
+        let nextFlavorId = 8;
         let logoClickCount = 0;
         let logoClickTimeout = null;
 
