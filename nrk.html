@@ -1,633 +1,952 @@
-<!doctype html>
-<html lang="ar">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>متجر نَركيلة - عرض سريع</title>
-<meta name="description" content="متجر لبيع النكهات - عرض تجريبي. طلب مباشر عبر WhatsApp - لوحة تحكم للمشرف." />
-<style>
-  :root{
-    --bg:#0f1724; --card:#0b1220; --accent:#ff6b35; --muted:#9aa4b2; --glass: rgba(255,255,255,0.03);
-    --success:#28a745; --danger:#dc3545;
-    --rounded:12px; --gap:14px;
-    font-family: "Segoe UI", Tahoma, Arial, "Noto Naskh Arabic", sans-serif;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    background:linear-gradient(180deg,#071028 0%, #071b2a 60%);
-    color:#e6eef6;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    padding:20px;
-    direction:rtl;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="الو نركيلة">
+    <meta name="description" content="أفضل نكهات الراكيل بأفضل الأسعار - متجر الو نركيلة">
+    <link rel="apple-touch-icon" href="attached_assets/IMG_20251017_133425_922_1760697596066.jpg">
+    <link rel="icon" type="image/jpeg" href="attached_assets/IMG_20251017_133425_922_1760697596066.jpg">
+    <title>الو نركيلة - متجر الراكيل</title>
+    <link rel="manifest" id="manifest-placeholder">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  .container{max-width:1100px;margin:0 auto}
-  header{
-    display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px;
-  }
-  .brand{
-    display:flex;align-items:center;gap:12px;
-  }
-  .logo{
-    width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,#122434,#1f4260);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,0.5);
-  }
-  .logo svg{width:46px;height:46px;filter:drop-shadow(0 6px 18px rgba(0,0,0,0.6))}
-  h1{font-size:20px;margin:0}
-  p.lead{margin:0;color:var(--muted);font-size:13px}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-  .controls{display:flex;gap:10px;align-items:center}
-  button, .btn{
-    background:var(--accent);border:0;padding:10px 14px;border-radius:10px;color:white;font-weight:600;cursor:pointer;
-    box-shadow:0 6px 18px rgba(255,107,53,0.12);
-  }
-  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-weight:600}
-  .search{background:var(--card);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);display:flex;gap:8px;align-items:center}
-  input[type="search"]{background:transparent;border:0;color:var(--muted);outline:0;width:200px}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-  main{display:grid;grid-template-columns:1fr 360px;gap:18px}
-  @media(max-width:980px){main{grid-template-columns:1fr} .controls .hide-sm{display:none}}
-  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:var(--rounded);box-shadow:0 8px 40px rgba(2,6,23,0.6)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
-  .card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;gap:8px}
-  .card .img{height:110px;border-radius:8px;background:linear-gradient(180deg,#0f2028,#0b1a24);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px}
-  .tags{display:flex;gap:8px;flex-wrap:wrap}
-  .price{font-weight:800;color:var(--accent)}
-  .avail{font-size:13px;padding:6px 8px;border-radius:8px;background:var(--glass);color:var(--muted);display:inline-block}
-  .avail.in{background:rgba(40,167,69,0.12);color:var(--success)}
-  .avail.out{background:rgba(220,53,69,0.08);color:var(--danger)}
-  .card-actions{margin-top:auto;display:flex;gap:8px;align-items:center}
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
 
-  /* Admin panel styles */
-  .admin-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
-  input[type=text], input[type=email], input[type=number], textarea, select{
-    padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted);outline:0
-  }
-  textarea{min-height:76px;resize:vertical}
-  .small{font-size:12px;color:var(--muted)}
-  .admin-list{display:flex;flex-direction:column;gap:8px}
-  .admin-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.01)}
-  .muted{color:var(--muted);font-size:13px}
+        .logo {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(218, 165, 32, 0.3);
+        }
 
-  footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-  /* modal */
-  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
-  .modal{width:100%;max-width:720px;background:linear-gradient(180deg,#071427,#0b2332);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
-  .row{display:flex;gap:10px}
-  .col{flex:1}
-  .small-btn{padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--muted);cursor:pointer}
+        h1 {
+            font-size: 2.5em;
+            color: #DAA520;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
 
-  /* tiny responsive */
-  @media(max-width:520px){.logo{width:56px;height:56px}.brand h1{font-size:16px}}
-</style>
+        .subtitle {
+            font-size: 1.2em;
+            color: #ccc;
+        }
+
+        .admin-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #DAA520;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .admin-btn.hidden {
+            display: none !important;
+        }
+
+        .admin-btn:hover {
+            background: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(218, 165, 32, 0.4);
+        }
+
+        .toggle-admin-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(218, 165, 32, 0.3);
+            color: #DAA520;
+            border: 2px solid #DAA520;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toggle-admin-btn.hidden {
+            display: none !important;
+        }
+
+        .toggle-admin-btn:hover {
+            background: rgba(218, 165, 32, 0.5);
+        }
+
+        .flavors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .flavor-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(218, 165, 32, 0.2);
+            transition: all 0.3s;
+        }
+
+        .flavor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(218, 165, 32, 0.3);
+            border-color: #DAA520;
+        }
+
+        .flavor-name {
+            font-size: 1.5em;
+            color: #DAA520;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .flavor-description {
+            color: #bbb;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            min-height: 48px;
+        }
+
+        .flavor-price {
+            font-size: 1.8em;
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .flavor-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .available {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+        }
+
+        .unavailable {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .order-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .order-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .order-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .order-btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #2d2d2d;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 2px solid #DAA520;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #DAA520;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(218, 165, 32, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #DAA520;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: #DAA520;
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(218, 165, 32, 0.4);
+        }
+
+        .admin-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            background: #DAA520;
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #FFD700;
+        }
+
+        .admin-flavor-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(218, 165, 32, 0.2);
+        }
+
+        .admin-flavor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #1976D2;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #d32f2f;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .flavors-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+            }
+
+            .admin-btn {
+                position: static;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        .whatsapp-icon::before {
+            content: "📱";
+            margin-left: 8px;
+        }
+
+        .install-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #DAA520 0%, #FFD700 100%);
+            color: #000;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(218, 165, 32, 0.4);
+            display: none;
+        }
+
+        .install-btn.show {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .install-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(218, 165, 32, 0.6);
+        }
+
+        .install-btn::before {
+            content: "📲";
+            font-size: 1.2em;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <div class="brand">
-      <div class="logo" aria-hidden="true">
-        <!-- Inline SVG main image (shisha / hookah icon) -->
-        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <g transform="translate(2,2)" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.95">
-            <path d="M28 6c0 3.5-3 6-6 6s-6-2.5-6-6" stroke="white" opacity="0.9"/>
-            <path d="M18 12v4c0 5 10 6 10 12v4H8v-4c0-6 10-7 10-12V12" fill="rgba(255,255,255,0.02)"/>
-            <path d="M8 34h20v6H8z" fill="rgba(255,255,255,0.02)"/>
-            <circle cx="18" cy="8" r="3" fill="rgba(255,255,255,0.06)"/>
-            <path d="M36 50c0 3-4 6-10 6s-10-3-10-6" />
-            <path d="M36 50h10v4H36z" fill="rgba(255,255,255,0.02)" />
-            <path d="M46 54c0-4 6-8 6-12s-6-6-6-10 0-8 0-12" opacity="0.8"/>
-          </g>
-        </svg>
-      </div>
-      <div>
-        <h1>متجر نَركيلة — عرض سريع</h1>
-        <p class="lead">نكهات، طلب مباشر على WhatsApp، ولوحة تحكم مشرف بسيطة</p>
-      </div>
-    </div>
+    <button class="install-btn" id="installBtn">تثبيت التطبيق</button>
+    
+    <div class="container">
+        <div id="publicView">
+            <header>
+                <div class="logo" id="secretLogo">
+                    <img src="attached_assets/IMG_20251017_133425_922_1760697596066.jpg" alt="الو نركيلة">
+                </div>
+                <h1>الو نركيلة</h1>
+                <p class="subtitle">أفضل نكهات الراكيل بأفضل الأسعار</p>
+            </header>
 
-    <div class="controls">
-      <div class="search panel" style="align-items:center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="#9aa4b2" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="11" r="6" stroke="#9aa4b2" stroke-width="2"/></svg>
-        <input id="searchInput" type="search" placeholder="ابحث عن نكهة..." />
-      </div>
-      <button id="open-admin" class="hide-sm">تسجيل دخول مشرف</button>
-      <button id="open-admin-quick" class="btn ghost">لوحة المشرف</button>
-    </div>
-  </header>
-
-  <main>
-    <section>
-      <div class="panel">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <h2 style="margin:0">قائمة النكهات</h2>
-          <div class="muted">انقر على "طلب نركيله" للاتصال عبر WhatsApp</div>
-        </div>
-
-        <div style="display:flex;gap:10px;margin-bottom:12px">
-          <select id="filterAvail" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.02);color:var(--muted)">
-            <option value="all">العرض الكلّي</option>
-            <option value="available">المتوفر فقط</option>
-            <option value="unavailable">غير متوفر</option>
-          </select>
-          <select id="sortBy" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.02);color:var(--muted)">
-            <option value="default">ترتيب افتراضي</option>
-            <option value="priceAsc">السعر: تصاعدي</option>
-            <option value="priceDesc">السعر: تنازلي</option>
-            <option value="name">حسب الاسم</option>
-          </select>
-        </div>
-
-        <div id="flavorGrid" class="grid"></div>
-      </div>
-
-      <footer>
-        هذا مشروع عرضي واحدي الملف. للتحسينات الإنتاجية — استخدم Firebase / سيرفر وDB حقيقية.
-      </footer>
-    </section>
-
-    <!-- Right column: admin / info -->
-    <aside>
-      <div class="panel">
-        <div class="admin-head">
-          <div>
-            <div class="small muted" id="currentAdminInfo">غير متصل</div>
-            <div style="font-weight:700">لوحة تحكم سريعة</div>
-          </div>
-          <div>
-            <button id="btn-add-sample" class="small-btn">أضف نكهات توضيحية</button>
-            <button id="btn-logout" class="small-btn" style="display:none">تسجيل خروج</button>
-          </div>
-        </div>
-
-        <div id="adminArea" style="display:none">
-          <div style="font-weight:700;margin-bottom:8px">إدارة النكهات</div>
-          <div class="field">
-            <input id="nm" type="text" placeholder="اسم النكهة" />
-          </div>
-          <div class="field">
-            <textarea id="desc" placeholder="وصف النكهة"></textarea>
-          </div>
-          <div class="row" style="margin-bottom:8px">
-            <div class="col"><input id="price" type="number" min="0" placeholder="السعر (مثلاً 12000)" /></div>
-            <div style="width:120px">
-              <select id="avail">
-                <option value="available">متوفّر</option>
-                <option value="unavailable">غير متوفر</option>
-              </select>
+            <div class="flavors-grid" id="flavorsGrid">
             </div>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button id="btn-save-flavor">إضافة / حفظ</button>
-            <button id="btn-clear" class="btn ghost">مسح الحقول</button>
-          </div>
+        </div>
 
-          <hr style="margin:12px 0;border-color:rgba(255,255,255,0.03)" />
-
-          <div style="font-weight:700;margin-bottom:8px">إعدادات المتجر</div>
-          <div class="field">
-            <label class="small">رقم WhatsApp للمزود (اختياري — بدون + أو مسافات، مثال: 96170123456)</label>
-            <input id="sellerPhone" type="text" placeholder="رقم البائع" />
-            <div class="small muted">إذا حُدّد، يتم فتح محادثة مباشرة لهذا الرقم مع الرسالة الجاهزة.</div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button id="btn-save-settings" class="small-btn">حفظ الإعدادات</button>
-              <button id="btn-reset-sample" class="small-btn">إعادة الإعداد الافتراضي</button>
+        <div id="adminView" style="display: none;">
+            <div class="admin-panel">
+                <div class="admin-header">
+                    <h2>لوحة التحكم</h2>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn-secondary" onclick="showAddFlavorModal()">➕ إضافة نكهة جديدة</button>
+                        <button class="btn-secondary" onclick="logout()">تسجيل الخروج</button>
+                    </div>
+                </div>
+                <div id="adminFlavorsGrid"></div>
             </div>
-          </div>
-
-          <hr style="margin:12px 0;border-color:rgba(255,255,255,0.03)" />
-
-          <div style="font-weight:700;margin-bottom:8px">المشرفون</div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <input id="newAdminEmail" type="email" placeholder="البريد المشرف" />
-            <input id="newAdminPass" type="text" placeholder="كلمة السر (تجريبية)" />
-            <select id="newAdminRole">
-              <option value="editor">محرر</option>
-              <option value="owner">المالك</option>
-            </select>
-          </div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <button id="btn-create-admin" class="small-btn">إنشاء مشرف</button>
-            <button id="btn-list-admins" class="small-btn">عرض المشرفين</button>
-          </div>
-
-          <div id="adminsList" class="admin-list" style="margin-top:8px"></div>
         </div>
-
-        <div id="notAdmin" style="display:block">
-          <div style="margin-bottom:8px">للوصول للوحة تحكم المشرفين:</div>
-          <div style="display:flex;gap:8px">
-            <button id="open-login-modal" class="btn">تسجيل دخول</button>
-            <button id="open-signup-modal" class="btn ghost">إنشاء مشرف</button>
-          </div>
-          <div style="margin-top:12px;color:var(--muted);font-size:13px">
-            هذه نسخة عرضية: بيانات المشرفين والمنتجات تعتمد على المتصفح (localStorage). لنسخة إنتاجية استخدم backend وحماية أفضل.
-          </div>
-        </div>
-      </div>
-    </aside>
-  </main>
-</div>
-
-<!-- modal: login / signup -->
-<div id="modal" class="modal-back" role="dialog" aria-hidden="true">
-  <div class="modal panel" role="document">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div>
-        <div id="modalTitle" style="font-weight:800">تسجيل دخول مشرف</div>
-        <div class="small muted" id="modalSubtitle">أدخل بريد المشرف وكلمة السر.</div>
-      </div>
-      <div><button id="modalClose" class="small-btn">إغلاق</button></div>
     </div>
 
-    <div id="modalBody">
-      <div class="field">
-        <label class="small">البريد</label>
-        <input id="modalEmail" type="email" />
-      </div>
-      <div class="field">
-        <label class="small">كلمة السر</label>
-        <input id="modalPass" type="password" />
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="modalLogin" class="btn">تسجيل دخول</button>
-        <button id="modalSignup" class="btn ghost">إنشاء مشرف</button>
-      </div>
-      <div id="modalMsg" class="small muted" style="margin-top:10px"></div>
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('loginModal')">×</button>
+            <h2 style="margin-bottom: 30px; color: #DAA520; text-align: center;">تسجيل الدخول</h2>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn-primary">دخول</button>
+            </form>
+        </div>
     </div>
-  </div>
-</div>
 
-<script>
-/*
-  Single-file demo: store data in localStorage
-  Keys:
-   - shisha_flavors: JSON array of flavor objects {id, name, desc, price, avail, img}
-   - shisha_admins: JSON array of admins {email, pass, role}
-   - shisha_current_admin: email of logged-in admin or null
-   - shisha_settings: {sellerPhone: "..."}
-*/
+    <div class="modal" id="addFlavorModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('addFlavorModal')">×</button>
+            <h2 style="margin-bottom: 30px; color: #DAA520; text-align: center;">إضافة نكهة جديدة</h2>
+            <form onsubmit="addFlavor(event)">
+                <div class="form-group">
+                    <label>اسم النكهة</label>
+                    <input type="text" id="flavorName" required>
+                </div>
+                <div class="form-group">
+                    <label>الوصف</label>
+                    <textarea id="flavorDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>السعر (د.ع)</label>
+                    <input type="number" id="flavorPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select id="flavorAvailable">
+                        <option value="true">متوفر</option>
+                        <option value="false">غير متوفر</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">إضافة النكهة</button>
+            </form>
+        </div>
+    </div>
 
-const LS = {
-  FLAV: 'shisha_flavors',
-  ADM: 'shisha_admins',
-  CUR: 'shisha_current_admin',
-  SET: 'shisha_settings'
-};
+    <div class="modal" id="editFlavorModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('editFlavorModal')">×</button>
+            <h2 style="margin-bottom: 30px; color: #DAA520; text-align: center;">تعديل النكهة</h2>
+            <form onsubmit="updateFlavor(event)">
+                <input type="hidden" id="editFlavorId">
+                <div class="form-group">
+                    <label>اسم النكهة</label>
+                    <input type="text" id="editFlavorName" required>
+                </div>
+                <div class="form-group">
+                    <label>الوصف</label>
+                    <textarea id="editFlavorDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>السعر (د.ع)</label>
+                    <input type="number" id="editFlavorPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select id="editFlavorAvailable">
+                        <option value="true">متوفر</option>
+                        <option value="false">غير متوفر</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">حفظ التعديلات</button>
+            </form>
+        </div>
+    </div>
 
-function uid(){ return 'f'+Math.random().toString(36).slice(2,9) }
+    <script>
+        const WHATSAPP_NUMBER = '96170400568';
+        
+        let flavors = [
+            {
+                id: 1,
+                name: 'نكهة التفاح المزدوج',
+                description: 'نكهة التفاح الطبيعي المنعش مع لمسة من النعناع',
+                price: 15.00,
+                available: true
+            },
+            {
+                id: 2,
+                name: 'نكهة العنب الأحمر',
+                description: 'عنب أحمر فاخر بطعم غني ومميز',
+                price: 18.00,
+                available: true
+            },
+            {
+                id: 3,
+                name: 'نكهة البطيخ بالنعناع',
+                description: 'بطيخ منعش مع نعناع بارد للتجربة المثالية',
+                price: 16.50,
+                available: false
+            },
+            {
+                id: 4,
+                name: 'نكهة الليمون بالنعناع',
+                description: 'ليمون حامض منعش مع نعناع طبيعي',
+                price: 14.00,
+                available: true
+            },
+            {
+                id: 5,
+                name: 'نكهة الفراولة',
+                description: 'فراولة طبيعية بطعم حلو ومميز',
+                price: 17.00,
+                available: true
+            },
+            {
+                id: 6,
+                name: 'نكهة المانجو الاستوائي',
+                description: 'مانجو استوائي بنكهة غنية وفاكهية',
+                price: 19.00,
+                available: false
+            }
+        ];
 
-function safeParse(v, fallback){ try{ return JSON.parse(v) }catch(e){ return fallback } }
+        const admins = [
+            { email: 'admin@alonarkela.com', password: 'admin123' }
+        ];
 
-function getFlavors(){ return safeParse(localStorage.getItem(LS.FLAV), []) }
-function setFlavors(arr){ localStorage.setItem(LS.FLAV, JSON.stringify(arr)); renderFlavors() }
+        let currentAdmin = null;
+        let nextFlavorId = 7;
+        let logoClickCount = 0;
+        let logoClickTimeout = null;
 
-function getAdmins(){ return safeParse(localStorage.getItem(LS.ADM), []) }
-function setAdmins(arr){ localStorage.setItem(LS.ADM, JSON.stringify(arr)); renderAdminsList() }
+        function init() {
+            const logo = document.getElementById('secretLogo');
+            logo.addEventListener('click', handleLogoClick);
+            const savedFlavors = localStorage.getItem('flavors');
+            if (savedFlavors) {
+                flavors = JSON.parse(savedFlavors);
+                nextFlavorId = Math.max(...flavors.map(f => f.id)) + 1;
+            }
+            
+            renderFlavors();
+        }
+        
+        function handleLogoClick() {
+            logoClickCount++;
+            
+            if (logoClickTimeout) {
+                clearTimeout(logoClickTimeout);
+            }
+            
+            if (logoClickCount >= 5) {
+                showLoginModal();
+                logoClickCount = 0;
+            } else {
+                logoClickTimeout = setTimeout(() => {
+                    logoClickCount = 0;
+                }, 2000);
+            }
+        }
 
-function getSettings(){ return safeParse(localStorage.getItem(LS.SET), {sellerPhone: ''}) }
-function setSettings(s){ localStorage.setItem(LS.SET, JSON.stringify(s)) }
+        function saveFlavors() {
+            localStorage.setItem('flavors', JSON.stringify(flavors));
+        }
 
-function getCurrentAdmin(){ return localStorage.getItem(LS.CUR) }
-function setCurrentAdmin(email){ if(email) localStorage.setItem(LS.CUR, email); else localStorage.removeItem(LS.CUR); updateAdminUI() }
+        function renderFlavors() {
+            const grid = document.getElementById('flavorsGrid');
+            
+            if (flavors.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">🌿</div>
+                        <h3>لا توجد نكهات متاحة حالياً</h3>
+                        <p>نعمل على إضافة نكهات جديدة قريباً</p>
+                    </div>
+                `;
+                return;
+            }
 
-/* --- bootstrap defaults --- */
-function ensureDefaults(){
-  if(!localStorage.getItem(LS.FLAV)){
-    const sample = [
-      {id:uid(), name:"تفاح أحمر", desc:"طعم التفاح الحلو والرائحة الزكية.", price:12000, avail:"available", img:""},
-      {id:uid(), name:"فواكه مشكلة", desc:"خليط من البرتقال، المانجو، والفراولة.", price:15000, avail:"available", img:""},
-      {id:uid(), name:"نعناع بارد", desc:"انتعاش النعناع الممزوج مع الحلاوة الخفيفة.", price:10000, avail:"unavailable", img:""}
-    ];
-    setFlavors(sample);
-  }
-  if(!localStorage.getItem(LS.ADM)){
-    // default admin for demo: admin@store.com / admin123
-    const admins = [{email:"admin@store.com", pass:"admin123", role:"owner"}];
-    setAdmins(admins);
-  }
-  if(!localStorage.getItem(LS.SET)){
-    setSettings({sellerPhone: ""});
-  }
-}
-ensureDefaults();
+            grid.innerHTML = flavors.map(flavor => `
+                <div class="flavor-card">
+                    <div class="flavor-name">${flavor.name}</div>
+                    <div class="flavor-description">${flavor.description}</div>
+                    <div class="flavor-price">${flavor.price.toFixed(2)} د.ع</div>
+                    <div class="flavor-status ${flavor.available ? 'available' : 'unavailable'}">
+                        ${flavor.available ? '✓ متوفر' : '✗ غير متوفر'}
+                    </div>
+                    <button class="order-btn" 
+                            onclick="orderFlavor('${flavor.name}', ${flavor.price})"
+                            ${!flavor.available ? 'disabled' : ''}>
+                        <span class="whatsapp-icon"></span>
+                        طلب نركيله
+                    </button>
+                </div>
+            `).join('');
+        }
 
-/* --- rendering flavors --- */
-const flavorGrid = document.getElementById('flavorGrid');
-const searchInput = document.getElementById('searchInput');
-const filterAvail = document.getElementById('filterAvail');
-const sortBy = document.getElementById('sortBy');
+        function renderAdminFlavors() {
+            const grid = document.getElementById('adminFlavorsGrid');
+            
+            if (flavors.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <h3>لا توجد نكهات</h3>
+                        <p>ابدأ بإضافة أول نكهة</p>
+                    </div>
+                `;
+                return;
+            }
 
-function renderFlavors(){
-  const q = (searchInput.value||"").trim().toLowerCase();
-  let list = getFlavors().slice();
-  // filter
-  if(filterAvail.value === 'available') list = list.filter(x=>x.avail==='available');
-  if(filterAvail.value === 'unavailable') list = list.filter(x=>x.avail==='unavailable');
-  // search
-  if(q) list = list.filter(f => (f.name + ' ' + f.desc).toLowerCase().includes(q));
-  // sort
-  if(sortBy.value === 'priceAsc') list.sort((a,b)=>a.price-b.price);
-  if(sortBy.value === 'priceDesc') list.sort((a,b)=>b.price-a.price);
-  if(sortBy.value === 'name') list.sort((a,b)=>a.name.localeCompare(b.name,'ar'));
-  flavorGrid.innerHTML = '';
-  if(list.length === 0){
-    flavorGrid.innerHTML = '<div class="muted">لا توجد نكهات مطابقة</div>';
-    return;
-  }
-  for(const f of list){
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `
-      <div class="img">${f.img ? `<img src="${f.img}" style="max-width:100%;max-height:100%;border-radius:6px" />` : '<div style="text-align:center"><strong>'+escapeHtml(f.name)+'</strong><div class="muted" style="font-size:12px;margin-top:6px">نكهة</div></div>'}</div>
-      <div><strong>${escapeHtml(f.name)}</strong></div>
-      <div class="muted" style="font-size:13px">${escapeHtml(f.desc)}</div>
-      <div class="tags"><div class="price">${formatCurrency(f.price)}</div><div class="avail ${f.avail==='available' ? 'in':'out'}">${f.avail==='available'?'متوفّر':'غير متوفّر'}</div></div>
-      <div class="card-actions">
-        <button class="btn btn-order" data-id="${f.id}">طلب نركيله</button>
-        <button class="btn ghost btn-view" data-id="${f.id}">عرض</button>
-        <div style="margin-left:auto"></div>
-      </div>
-    `;
-    flavorGrid.appendChild(div);
-  }
-  // bind order buttons
-  document.querySelectorAll('.btn-order').forEach(b=>b.addEventListener('click', onOrderClick));
-  document.querySelectorAll('.btn-view').forEach(b=>b.addEventListener('click', onViewClick));
-}
+            grid.innerHTML = flavors.map(flavor => `
+                <div class="admin-flavor-card">
+                    <div class="admin-flavor-header">
+                        <div>
+                            <div class="flavor-name">${flavor.name}</div>
+                            <div style="color: #bbb; margin-top: 5px;">${flavor.description}</div>
+                            <div style="margin-top: 10px;">
+                                <span class="flavor-price">${flavor.price.toFixed(2)} د.ع</span>
+                                <span class="flavor-status ${flavor.available ? 'available' : 'unavailable'}" style="margin-right: 10px;">
+                                    ${flavor.available ? 'متوفر' : 'غير متوفر'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="admin-actions">
+                            <button class="btn-edit" onclick="showEditFlavorModal(${flavor.id})">تعديل</button>
+                            <button class="btn-delete" onclick="deleteFlavor(${flavor.id})">حذف</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-function formatCurrency(n){
-  try{
-    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ل.ل";
-  }catch(e){return n}
-}
+        function orderFlavor(name, price) {
+            const message = `مرحباً، أريد طلب نركيلة:\n\nالنكهة: ${name}\nالسعر: ${price.toFixed(2)} د.ع\nالكمية: 1\n\nشكراً`;
+            const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
 
-function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]) }
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
 
-/* order flow */
-function onOrderClick(e){
-  const id = e.currentTarget.dataset.id;
-  const flavors = getFlavors();
-  const f = flavors.find(x=>x.id===id);
-  if(!f) return alert('نكهة مفقودة');
-  let qty = prompt('كمية النركيلات التي تريد طلبها؟ (أدخل رقم)', '1');
-  if(qty === null) return;
-  qty = parseInt(qty) || 1;
-  // prepare message in Arabic
-  const msg = `مرحباً، أريد طلب نركيلة\n- النكهة: ${f.name}\n- السعر للوحدة: ${formatCurrency(f.price)}\n- الكمية: ${qty}\nالمرجو تأكيد الطلب والشحن.`;
-  const settings = getSettings();
-  if(settings.sellerPhone && settings.sellerPhone.trim()){
-    // whatsapp direct to number
-    const phone = settings.sellerPhone.replace(/[^0-9]/g,'');
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
-  }else{
-    // open WhatsApp web with text (no recipient)
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
-  }
-}
+        function showAddFlavorModal() {
+            document.getElementById('addFlavorModal').classList.add('active');
+        }
 
-/* view details (quick edit if admin) */
-function onViewClick(e){
-  const id = e.currentTarget.dataset.id;
-  const f = getFlavors().find(x=>x.id===id);
-  if(!f) return;
-  alert(`النكهة: ${f.name}\nالسعر: ${formatCurrency(f.price)}\nالحالة: ${f.avail}\nالوصف:\n${f.desc}`);
-}
+        function showEditFlavorModal(id) {
+            const flavor = flavors.find(f => f.id === id);
+            if (!flavor) return;
 
-/* --- admin UI logic --- */
-const adminArea = document.getElementById('adminArea');
-const notAdmin = document.getElementById('notAdmin');
-const currentAdminInfo = document.getElementById('currentAdminInfo');
-const btnLogout = document.getElementById('btn-logout');
-const btnAddSample = document.getElementById('btn-add-sample');
+            document.getElementById('editFlavorId').value = flavor.id;
+            document.getElementById('editFlavorName').value = flavor.name;
+            document.getElementById('editFlavorDescription').value = flavor.description;
+            document.getElementById('editFlavorPrice').value = flavor.price;
+            document.getElementById('editFlavorAvailable').value = flavor.available.toString();
+            
+            document.getElementById('editFlavorModal').classList.add('active');
+        }
 
-function updateAdminUI(){
-  const cur = getCurrentAdmin();
-  document.getElementById('btn-logout').style.display = cur ? 'inline-block' : 'none';
-  document.getElementById('open-admin-quick').textContent = cur ? 'لوحة المشرف (متصل)' : 'لوحة المشرف';
-  currentAdminInfo.textContent = cur ? 'متصل: ' + cur : 'غير متصل';
-  // show admin controls if logged in
-  adminArea.style.display = cur ? 'block' : 'none';
-  notAdmin.style.display = cur ? 'none' : 'block';
-  renderAdminsList();
-}
-updateAdminUI();
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
 
-btnLogout.addEventListener('click', ()=>{ setCurrentAdmin(null); alert('تم تسجيل الخروج'); });
+        function login(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
 
-btnAddSample.addEventListener('click', ()=>{
-  const sample = [
-    {id:uid(), name:"مانجو برفا", desc:"نكهة مانجو طبيعية مع لمسة حلاوة.", price:14000, avail:"available", img:""},
-    {id:uid(), name:"كوكو كراميل", desc:"جوز الهند والكراميل بطعم مثالي.", price:16000, avail:"available", img:""}
-  ];
-  const f = getFlavors().concat(sample);
-  setFlavors(f);
-});
+            const admin = admins.find(a => a.email === email && a.password === password);
+            
+            if (admin) {
+                currentAdmin = admin;
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('adminEmail', email);
+                
+                document.getElementById('publicView').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+                
+                renderAdminFlavors();
+                closeModal('loginModal');
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+            } else {
+                alert('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+            }
+        }
 
-/* admin: add / edit flavors */
-let editingId = null;
-document.getElementById('btn-save-flavor').addEventListener('click', ()=>{
-  const name = document.getElementById('nm').value.trim();
-  const desc = document.getElementById('desc').value.trim();
-  const price = Number(document.getElementById('price').value) || 0;
-  const avail = document.getElementById('avail').value;
-  if(!name){ alert('أدخل اسم النكهة'); return; }
-  if(editingId){
-    const arr = getFlavors().map(x => x.id===editingId ? {...x, name, desc, price, avail} : x);
-    setFlavors(arr);
-    editingId = null;
-    alert('تم تعديل النكهة');
-  }else{
-    const obj = {id:uid(), name, desc, price, avail, img:""};
-    setFlavors(getFlavors().concat([obj]));
-    alert('تم إضافة نكهة جديدة');
-  }
-  clearFields();
-});
+        function logout() {
+            currentAdmin = null;
+            localStorage.setItem('isLoggedIn', 'false');
+            localStorage.removeItem('adminEmail');
+            
+            document.getElementById('publicView').style.display = 'block';
+            document.getElementById('adminView').style.display = 'none';
+        }
 
-document.getElementById('btn-clear').addEventListener('click', clearFields);
+        function addFlavor(event) {
+            event.preventDefault();
+            
+            const newFlavor = {
+                id: nextFlavorId++,
+                name: document.getElementById('flavorName').value,
+                description: document.getElementById('flavorDescription').value,
+                price: parseFloat(document.getElementById('flavorPrice').value),
+                available: document.getElementById('flavorAvailable').value === 'true'
+            };
 
-function clearFields(){
-  editingId = null;
-  document.getElementById('nm').value='';
-  document.getElementById('desc').value='';
-  document.getElementById('price').value='';
-  document.getElementById('avail').value='available';
-}
+            flavors.push(newFlavor);
+            saveFlavors();
+            renderFlavors();
+            renderAdminFlavors();
+            
+            closeModal('addFlavorModal');
+            event.target.reset();
+        }
 
-/* settings */
-document.getElementById('btn-save-settings').addEventListener('click', ()=>{
-  const phone = document.getElementById('sellerPhone').value.trim();
-  const s = getSettings(); s.sellerPhone = phone; setSettings(s);
-  alert('تم حفظ الإعدادات');
-});
+        function updateFlavor(event) {
+            event.preventDefault();
+            
+            const id = parseInt(document.getElementById('editFlavorId').value);
+            const flavorIndex = flavors.findIndex(f => f.id === id);
+            
+            if (flavorIndex !== -1) {
+                flavors[flavorIndex] = {
+                    id: id,
+                    name: document.getElementById('editFlavorName').value,
+                    description: document.getElementById('editFlavorDescription').value,
+                    price: parseFloat(document.getElementById('editFlavorPrice').value),
+                    available: document.getElementById('editFlavorAvailable').value === 'true'
+                };
 
-document.getElementById('btn-reset-sample').addEventListener('click', ()=>{
-  if(!confirm('هل تريد إعادة إعداد المتجر إلى الافتراضي (سوف يستبدل النكهات الحالية)؟')) return;
-  localStorage.removeItem(LS.FLAV);
-  ensureDefaults();
-  alert('تم إعادة الإعداد الافتراضي');
-});
+                saveFlavors();
+                renderFlavors();
+                renderAdminFlavors();
+                closeModal('editFlavorModal');
+            }
+        }
 
-/* admin management */
-document.getElementById('btn-create-admin').addEventListener('click', ()=>{
-  const email = document.getElementById('newAdminEmail').value.trim();
-  const pass = document.getElementById('newAdminPass').value.trim();
-  const role = document.getElementById('newAdminRole').value;
-  if(!email || !pass){ alert('أدخل بريد وكلمة سر'); return; }
-  const admins = getAdmins();
-  if(admins.find(a=>a.email===email)){ alert('مشرف موجود مسبقاً'); return; }
-  admins.push({email, pass, role});
-  setAdmins(admins);
-  alert('تم إنشاء المشرف (تجريبي)');
-  document.getElementById('newAdminEmail').value=''; document.getElementById('newAdminPass').value='';
-});
+        function deleteFlavor(id) {
+            if (confirm('هل أنت متأكد من حذف هذه النكهة؟')) {
+                flavors = flavors.filter(f => f.id !== id);
+                saveFlavors();
+                renderFlavors();
+                renderAdminFlavors();
+            }
+        }
 
-document.getElementById('btn-list-admins').addEventListener('click', renderAdminsList);
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
 
-function renderAdminsList(){
-  const el = document.getElementById('adminsList');
-  el.innerHTML = '';
-  const admins = getAdmins();
-  admins.forEach(a=>{
-    const div = document.createElement('div');
-    div.className = 'admin-item';
-    div.innerHTML = `<div><strong>${escapeHtml(a.email)}</strong> <span class="muted">(${a.role})</span></div>
-      <div style="display:flex;gap:8px">
-        <button class="small-btn btn-admin-delete" data-email="${a.email}">حذف</button>
-      </div>`;
-    el.appendChild(div);
-  });
-  document.querySelectorAll('.btn-admin-delete').forEach(b=>{
-    b.addEventListener('click', (e)=>{
-      const email = e.currentTarget.dataset.email;
-      if(!confirm('حذف المشرف '+email+'؟')) return;
-      const admins = getAdmins().filter(x=>x.email!==email);
-      setAdmins(admins);
-      if(getCurrentAdmin()===email) setCurrentAdmin(null);
-      alert('حُذف المشرف');
-    });
-  });
-}
+        const manifestJson = {
+            "name": "الو نركيلة - متجر الراكيل",
+            "short_name": "الو نركيلة",
+            "description": "أفضل نكهات الراكيل بأفضل الأسعار",
+            "start_url": "/shop.html",
+            "display": "standalone",
+            "background_color": "#1a1a1a",
+            "theme_color": "#1a1a1a",
+            "orientation": "portrait-primary",
+            "icons": [
+                {
+                    "src": "attached_assets/IMG_20251017_133425_922_1760697596066.jpg",
+                    "sizes": "512x512",
+                    "type": "image/jpeg",
+                    "purpose": "any maskable"
+                }
+            ]
+        };
 
-/* login modal */
-const modal = document.getElementById('modal');
-const modalClose = document.getElementById('modalClose');
-const modalLogin = document.getElementById('modalLogin');
-const modalSignup = document.getElementById('modalSignup');
-const openLoginModal = document.getElementById('open-login-modal');
-const openSignupBtn = document.getElementById('open-signup-modal');
+        const manifestBlob = new Blob([JSON.stringify(manifestJson)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
 
-document.getElementById('open-admin').addEventListener('click', ()=> openModal('login'));
-document.getElementById('open-admin-quick').addEventListener('click', ()=> openModal('login'));
-openLoginModal.addEventListener('click', ()=> openModal('login'));
-openSignupBtn.addEventListener('click', ()=> openModal('signup'));
-modalClose.addEventListener('click', ()=> closeModal());
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.add('show');
+        });
 
-function openModal(mode){
-  modal.style.display = 'flex';
-  document.getElementById('modalMsg').textContent = '';
-  if(mode === 'login'){
-    document.getElementById('modalTitle').textContent = 'تسجيل دخول مشرف';
-    modalLogin.style.display = 'inline-block';
-    modalSignup.style.display = 'none';
-  }else{
-    document.getElementById('modalTitle').textContent = 'إنشاء مشرف جديد';
-    modalLogin.style.display = 'none';
-    modalSignup.style.display = 'inline-block';
-  }
-}
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                return;
+            }
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.classList.remove('show');
+            }
+            deferredPrompt = null;
+        });
 
-function closeModal(){ modal.style.display = 'none'; document.getElementById('modalEmail').value=''; document.getElementById('modalPass').value=''; }
+        window.addEventListener('appinstalled', () => {
+            installBtn.classList.remove('show');
+            deferredPrompt = null;
+        });
 
-modalLogin.addEventListener('click', ()=>{
-  const email = document.getElementById('modalEmail').value.trim();
-  const pass = document.getElementById('modalPass').value;
-  const ad = getAdmins().find(a=>a.email===email && a.pass===pass);
-  if(ad){ setCurrentAdmin(email); closeModal(); alert('تم تسجيل الدخول'); } else {
-    document.getElementById('modalMsg').textContent = 'خطأ في البريد أو كلمة السر';
-  }
-});
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'alo-narkela-v1';
+                const urlsToCache = [
+                    '/shop.html',
+                    '/attached_assets/IMG_20251017_133425_922_1760697596066.jpg'
+                ];
 
-modalSignup.addEventListener('click', ()=>{
-  const email = document.getElementById('modalEmail').value.trim();
-  const pass = document.getElementById('modalPass').value;
-  if(!email || !pass){ document.getElementById('modalMsg').textContent = 'أدخل بريد وكلمة سر'; return; }
-  if(getAdmins().find(a=>a.email===email)){ document.getElementById('modalMsg').textContent = 'المشرف موجود مسبقاً'; return; }
-  const admins = getAdmins(); admins.push({email, pass, role:'editor'}); setAdmins(admins);
-  setCurrentAdmin(email);
-  closeModal();
-  alert('تم إنشاء المشرف وتسجيل الدخول (تجريبي)');
-});
+                self.addEventListener('install', (event) => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then((cache) => cache.addAll(urlsToCache))
+                    );
+                });
 
-/* bind search and filters */
-searchInput.addEventListener('input', renderFlavors);
-filterAvail.addEventListener('change', renderFlavors);
-sortBy.addEventListener('change', renderFlavors);
+                self.addEventListener('fetch', (event) => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then((response) => response || fetch(event.request))
+                    );
+                });
+            `;
+            
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(swBlob);
+            
+            navigator.serviceWorker.register(swUrl)
+                .then(() => console.log('Service Worker registered'))
+                .catch((err) => console.log('Service Worker registration failed:', err));
+        }
 
-/* helper: escape current admin display on load */
-document.addEventListener('DOMContentLoaded', ()=>{
-  // populate sellerPhone input
-  document.getElementById('sellerPhone').value = getSettings().sellerPhone || '';
-  updateAdminUI();
-  renderFlavors();
-});
-
-/* utility: small editable actions from admin grid (edit/delete) */
-flavorGrid.addEventListener('click', (e)=>{
-  if(e.target.matches('.card .btn-view') || e.target.closest('.btn-view')) return;
-  // nothing here
-});
-
-// add ability to edit/delete via admin list by double click or via extra admin actions
-// We'll add contextual edit/delete when logged in: click card to edit (for demo)
-flavorGrid.addEventListener('dblclick', (e)=>{
-  if(!getCurrentAdmin()) return;
-  const card = e.target.closest('.card');
-  if(!card) return;
-  const bid = card.querySelector('.btn-order')?.dataset.id;
-  if(!bid) return;
-  const f = getFlavors().find(x=>x.id===bid);
-  if(!f) return;
-  // populate fields for editing
-  editingId = f.id;
-  document.getElementById('nm').value = f.name;
-  document.getElementById('desc').value = f.desc;
-  document.getElementById('price').value = f.price;
-  document.getElementById('avail').value = f.avail;
-  alert('تم تحميل النكهة للتحرير. اضغط "إضافة / حفظ" لحفظ التغييرات.\n(نصيحة: اضغط مرتين على بطاقة النكهة للتحرير)');
-});
-
-/* right-click to delete (admin only) */
-flavorGrid.addEventListener('contextmenu', (e)=>{
-  if(!getCurrentAdmin()) return;
-  const card = e.target.closest('.card');
-  if(!card) return;
-  const id = card.querySelector('.btn-order')?.dataset.id;
-  if(!id) return;
-  e.preventDefault();
-  if(!confirm('حذف هذه النكهة؟')) return;
-  const arr = getFlavors().filter(x=>x.id!==id);
-  setFlavors(arr);
-});
-
-/* tiny helpers */
-document.getElementById('btn-reset-sample').addEventListener('click', ()=>{
-  // already defined above
-});
-
-/* expose a quick function for debugging in console (optional) */
-window._store = {getFlavors, setFlavors, getAdmins, setAdmins, getSettings, setSettings, setCurrentAdmin};
-
-/* initial render */
-renderFlavors();
-renderAdminsList();
-
-</script>
+        init();
+    </script>
 </body>
-      </html>
+</html>
