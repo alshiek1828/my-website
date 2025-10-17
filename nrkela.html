@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="الو نركيلة">
+    <meta name="description" content="أفضل نكهات الراكيل بأفضل الأسعار - متجر الو نركيلة">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="icon" type="image/png" href="logo.png">
+    <title>الو نركيلة - متجر الراكيل</title>
+    <link rel="manifest" id="manifest-placeholder">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(218, 165, 32, 0.3);
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #DAA520;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #ccc;
+        }
+
+        .admin-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #DAA520;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .admin-btn.hidden {
+            display: none !important;
+        }
+
+        .admin-btn:hover {
+            background: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(218, 165, 32, 0.4);
+        }
+
+        .toggle-admin-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(218, 165, 32, 0.3);
+            color: #DAA520;
+            border: 2px solid #DAA520;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toggle-admin-btn.hidden {
+            display: none !important;
+        }
+
+        .toggle-admin-btn:hover {
+            background: rgba(218, 165, 32, 0.5);
+        }
+
+        .flavors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .flavor-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(218, 165, 32, 0.2);
+            transition: all 0.3s;
+        }
+
+        .flavor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(218, 165, 32, 0.3);
+            border-color: #DAA520;
+        }
+
+        .flavor-name {
+            font-size: 1.5em;
+            color: #DAA520;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .flavor-description {
+            color: #bbb;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            min-height: 48px;
+        }
+
+        .flavor-price {
+            font-size: 1.8em;
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .flavor-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .available {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+        }
+
+        .unavailable {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .order-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .order-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .order-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .order-btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #2d2d2d;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 2px solid #DAA520;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #DAA520;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(218, 165, 32, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #DAA520;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: #DAA520;
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(218, 165, 32, 0.4);
+        }
+
+        .admin-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            background: #DAA520;
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #FFD700;
+        }
+
+        .admin-flavor-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(218, 165, 32, 0.2);
+        }
+
+        .admin-flavor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #1976D2;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #d32f2f;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .flavors-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+            }
+
+            .admin-btn {
+                position: static;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        .whatsapp-icon::before {
+            content: "📱";
+            margin-left: 8px;
+        }
+
+        .install-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #DAA520 0%, #FFD700 100%);
+            color: #000;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(218, 165, 32, 0.4);
+            display: none;
+        }
+
+        .install-btn.show {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .install-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(218, 165, 32, 0.6);
+        }
+
+        .install-btn::before {
+            content: "📲";
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <button class="install-btn" id="installBtn">تثبيت التطبيق</button>
+    
+    <div class="container">
+        <div id="publicView">
+            <header>
+                <div class="logo" id="secretLogo">
+                    <img src="logo.png" alt="الو نركيلة">
+                </div>
+                <h1>الو نركيلة</h1>
+                <p class="subtitle">أفضل نكهات الراكيل بأفضل الأسعار</p>
+            </header>
+
+            <div class="flavors-grid" id="flavorsGrid">
+            </div>
+        </div>
+
+        <div id="adminView" style="display: none;">
+            <div class="admin-panel">
+                <div class="admin-header">
+                    <h2>لوحة التحكم</h2>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn-secondary" onclick="showAddFlavorModal()">➕ إضافة نكهة جديدة</button>
+                        <button class="btn-secondary" onclick="logout()">تسجيل الخروج</button>
+                    </div>
+                </div>
+                <div id="adminFlavorsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('loginModal')">×</button>
+            <h2 style="margin-bottom: 30px; color: #DAA520; text-align: center;">تسجيل الدخول</h2>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn-primary">دخول</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="addFlavorModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('addFlavorModal')">×</button>
+            <h2 style="margin-bottom: 30px; color: #DAA520; text-align: center;">إضافة نكهة جديدة</h2>
+            <form onsubmit="addFlavor(event)">
+                <div class="form-group">
+                    <label>اسم النكهة</label>
+                    <input type="text" id="flavorName" required>
+                </div>
+                <div class="form-group">
+                    <label>الوصف</label>
+                    <textarea id="flavorDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>السعر (د.ع)</label>
+                    <input type="number" id="flavorPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select id="flavorAvailable">
+                        <option value="true">متوفر</option>
+                        <option value="false">غير متوفر</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">إضافة النكهة</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="editFlavorModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('editFlavorModal')">×</button>
+            <h2 style="margin-bottom: 30px; color: #DAA520; text-align: center;">تعديل النكهة</h2>
+            <form onsubmit="updateFlavor(event)">
+                <input type="hidden" id="editFlavorId">
+                <div class="form-group">
+                    <label>اسم النكهة</label>
+                    <input type="text" id="editFlavorName" required>
+                </div>
+                <div class="form-group">
+                    <label>الوصف</label>
+                    <textarea id="editFlavorDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>السعر (د.ع)</label>
+                    <input type="number" id="editFlavorPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select id="editFlavorAvailable">
+                        <option value="true">متوفر</option>
+                        <option value="false">غير متوفر</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">حفظ التعديلات</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const WHATSAPP_NUMBER = '9647702604040';
+        
+        let flavors = [
+            {
+                id: 1,
+                name: 'ليمون نعناع',
+                description: 'نكهة منعشة من الليمون الطبيعي مع النعناع البارد',
+                price: 13.00,
+                available: true
+            },
+            {
+                id: 2,
+                name: 'علج ونعناع',
+                description: 'علكة طبيعية مع نعناع منعش',
+                price: 13.00,
+                available: true
+            },
+            {
+                id: 3,
+                name: 'تفاحتين',
+                description: 'نكهة التفاح المزدوج اللذيذة',
+                price: 13.00,
+                available: true
+            },
+            {
+                id: 4,
+                name: 'سبيشل',
+                description: 'خلطة مميزة من النكهات الخاصة',
+                price: 13.00,
+                available: true
+            },
+            {
+                id: 5,
+                name: 'ايس كريم',
+                description: 'نكهة البوظة الكريمية اللذيذة',
+                price: 13.00,
+                available: true
+            },
+            {
+                id: 6,
+                name: 'سندي',
+                description: 'نكهة سندي المميزة والمنعشة',
+                price: 13.00,
+                available: true
+            },
+            {
+                id: 7,
+                name: 'فريش أناناس',
+                description: 'أناناس طازج بنكهة استوائية فاخرة',
+                price: 15.00,
+                available: true
+            }
+        ];
+
+        const admins = [
+            { email: 'admin@alonarkela.com', password: 'admin123' }
+        ];
+
+        let currentAdmin = null;
+        let nextFlavorId = 8;
+        let logoClickCount = 0;
+        let logoClickTimeout = null;
+
+        function init() {
+            const logo = document.getElementById('secretLogo');
+            logo.addEventListener('click', handleLogoClick);
+            const savedFlavors = localStorage.getItem('flavors');
+            if (savedFlavors) {
+                flavors = JSON.parse(savedFlavors);
+                if (flavors.length > 0) {
+                    nextFlavorId = Math.max(...flavors.map(f => f.id)) + 1;
+                }
+            }
+            
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const adminEmail = localStorage.getItem('adminEmail');
+            
+            if (isLoggedIn && adminEmail) {
+                const admin = admins.find(a => a.email === adminEmail);
+                if (admin) {
+                    currentAdmin = admin;
+                    document.getElementById('publicView').style.display = 'none';
+                    document.getElementById('adminView').style.display = 'block';
+                    renderAdminFlavors();
+                } else {
+                    localStorage.setItem('isLoggedIn', 'false');
+                    localStorage.removeItem('adminEmail');
+                    renderFlavors();
+                }
+            } else {
+                renderFlavors();
+            }
+        }
+        
+        function handleLogoClick() {
+            logoClickCount++;
+            
+            if (logoClickTimeout) {
+                clearTimeout(logoClickTimeout);
+            }
+            
+            if (logoClickCount >= 5) {
+                showLoginModal();
+                logoClickCount = 0;
+            } else {
+                logoClickTimeout = setTimeout(() => {
+                    logoClickCount = 0;
+                }, 2000);
+            }
+        }
+
+        function saveFlavors() {
+            localStorage.setItem('flavors', JSON.stringify(flavors));
+        }
+
+        function renderFlavors() {
+            const grid = document.getElementById('flavorsGrid');
+            
+            if (flavors.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">🌿</div>
+                        <h3>لا توجد نكهات متاحة حالياً</h3>
+                        <p>نعمل على إضافة نكهات جديدة قريباً</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = flavors.map(flavor => `
+                <div class="flavor-card">
+                    <div class="flavor-name">${flavor.name}</div>
+                    <div class="flavor-description">${flavor.description}</div>
+                    <div class="flavor-price">${flavor.price.toFixed(2)} د.ع</div>
+                    <div class="flavor-status ${flavor.available ? 'available' : 'unavailable'}">
+                        ${flavor.available ? '✓ متوفر' : '✗ غير متوفر'}
+                    </div>
+                    <button class="order-btn" 
+                            onclick="orderFlavor('${flavor.name}', ${flavor.price})"
+                            ${!flavor.available ? 'disabled' : ''}>
+                        <span class="whatsapp-icon"></span>
+                        طلب نركيله
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminFlavors() {
+            const grid = document.getElementById('adminFlavorsGrid');
+            
+            if (flavors.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <h3>لا توجد نكهات</h3>
+                        <p>ابدأ بإضافة أول نكهة</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = flavors.map(flavor => `
+                <div class="admin-flavor-card">
+                    <div class="admin-flavor-header">
+                        <div>
+                            <div class="flavor-name">${flavor.name}</div>
+                            <div style="color: #bbb; margin-top: 5px;">${flavor.description}</div>
+                            <div style="margin-top: 10px;">
+                                <span class="flavor-price">${flavor.price.toFixed(2)} د.ع</span>
+                                <span class="flavor-status ${flavor.available ? 'available' : 'unavailable'}" style="margin-right: 10px;">
+                                    ${flavor.available ? 'متوفر' : 'غير متوفر'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="admin-actions">
+                            <button class="btn-edit" onclick="showEditFlavorModal(${flavor.id})">تعديل</button>
+                            <button class="btn-delete" onclick="deleteFlavor(${flavor.id})">حذف</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function orderFlavor(name, price) {
+            const message = `مرحباً، أريد طلب نركيلة:\n\nالنكهة: ${name}\nالكمية: 1\n\nشكراً`;
+            const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function showAddFlavorModal() {
+            document.getElementById('addFlavorModal').classList.add('active');
+        }
+
+        function showEditFlavorModal(id) {
+            const flavor = flavors.find(f => f.id === id);
+            if (!flavor) return;
+
+            document.getElementById('editFlavorId').value = flavor.id;
+            document.getElementById('editFlavorName').value = flavor.name;
+            document.getElementById('editFlavorDescription').value = flavor.description;
+            document.getElementById('editFlavorPrice').value = flavor.price;
+            document.getElementById('editFlavorAvailable').value = flavor.available.toString();
+            
+            document.getElementById('editFlavorModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function login(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const admin = admins.find(a => a.email === email && a.password === password);
+            
+            if (admin) {
+                currentAdmin = admin;
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('adminEmail', email);
+                
+                document.getElementById('publicView').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+                
+                renderAdminFlavors();
+                closeModal('loginModal');
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+            } else {
+                alert('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+            }
+        }
+
+        function logout() {
+            currentAdmin = null;
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('adminEmail');
+            
+            document.getElementById('publicView').style.display = 'block';
+            document.getElementById('adminView').style.display = 'none';
+            
+            renderFlavors();
+        }
+
+        function addFlavor(event) {
+            event.preventDefault();
+            
+            const newFlavor = {
+                id: nextFlavorId++,
+                name: document.getElementById('flavorName').value,
+                description: document.getElementById('flavorDescription').value,
+                price: parseFloat(document.getElementById('flavorPrice').value),
+                available: document.getElementById('flavorAvailable').value === 'true'
+            };
+
+            flavors.push(newFlavor);
+            saveFlavors();
+            renderFlavors();
+            renderAdminFlavors();
+            
+            closeModal('addFlavorModal');
+            event.target.reset();
+        }
+
+        function updateFlavor(event) {
+            event.preventDefault();
+            
+            const id = parseInt(document.getElementById('editFlavorId').value);
+            const flavorIndex = flavors.findIndex(f => f.id === id);
+            
+            if (flavorIndex !== -1) {
+                flavors[flavorIndex] = {
+                    id: id,
+                    name: document.getElementById('editFlavorName').value,
+                    description: document.getElementById('editFlavorDescription').value,
+                    price: parseFloat(document.getElementById('editFlavorPrice').value),
+                    available: document.getElementById('editFlavorAvailable').value === 'true'
+                };
+
+                saveFlavors();
+                renderFlavors();
+                renderAdminFlavors();
+                closeModal('editFlavorModal');
+            }
+        }
+
+        function deleteFlavor(id) {
+            if (confirm('هل أنت متأكد من حذف هذه النكهة؟')) {
+                flavors = flavors.filter(f => f.id !== id);
+                saveFlavors();
+                renderFlavors();
+                renderAdminFlavors();
+            }
+        }
+
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        const manifestJson = {
+            "name": "الو نركيلة - متجر الراكيل",
+            "short_name": "الو نركيلة",
+            "description": "أفضل نكهات الراكيل بأفضل الأسعار",
+            "start_url": "./shop.html",
+            "display": "standalone",
+            "background_color": "#1a1a1a",
+            "theme_color": "#1a1a1a",
+            "orientation": "portrait-primary",
+            "icons": [
+                {
+                    "src": "logo.png",
+                    "sizes": "512x512",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                }
+            ]
+        };
+
+        const manifestBlob = new Blob([JSON.stringify(manifestJson)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.add('show');
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                return;
+            }
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.classList.remove('show');
+            }
+            deferredPrompt = null;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.classList.remove('show');
+            deferredPrompt = null;
+        });
+
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            const swCode = `
+                const CACHE_NAME = 'alo-narkela-v1';
+                const urlsToCache = [
+                    './shop.html',
+                    './logo.png'
+                ];
+
+                self.addEventListener('install', (event) => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then((cache) => cache.addAll(urlsToCache))
+                    );
+                });
+
+                self.addEventListener('fetch', (event) => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then((response) => response || fetch(event.request))
+                    );
+                });
+            `;
+            
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(swBlob);
+            
+            navigator.serviceWorker.register(swUrl)
+                .then(() => console.log('Service Worker registered'))
+                .catch((err) => console.log('Service Worker registration failed:', err));
+        }
+
+        init();
+    </script>
+</body>
+</html>
