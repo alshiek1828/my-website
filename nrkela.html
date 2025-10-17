@@ -656,10 +656,29 @@
             const savedFlavors = localStorage.getItem('flavors');
             if (savedFlavors) {
                 flavors = JSON.parse(savedFlavors);
-                nextFlavorId = Math.max(...flavors.map(f => f.id)) + 1;
+                if (flavors.length > 0) {
+                    nextFlavorId = Math.max(...flavors.map(f => f.id)) + 1;
+                }
             }
             
-            renderFlavors();
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const adminEmail = localStorage.getItem('adminEmail');
+            
+            if (isLoggedIn && adminEmail) {
+                const admin = admins.find(a => a.email === adminEmail);
+                if (admin) {
+                    currentAdmin = admin;
+                    document.getElementById('publicView').style.display = 'none';
+                    document.getElementById('adminView').style.display = 'block';
+                    renderAdminFlavors();
+                } else {
+                    localStorage.setItem('isLoggedIn', 'false');
+                    localStorage.removeItem('adminEmail');
+                    renderFlavors();
+                }
+            } else {
+                renderFlavors();
+            }
         }
         
         function handleLogoClick() {
@@ -752,7 +771,7 @@
         }
 
         function orderFlavor(name, price) {
-            const message = `مرحباً، أريد طلب نركيلة:\n\nالنكهة: ${name}\nالسعر: ${price.toFixed(2)} د.ع\nالكمية: 1\n\nشكراً`;
+            const message = `مرحباً، أريد طلب نركيلة:\n\nالنكهة: ${name}\nالكمية: 1\n\nشكراً`;
             const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
         }
@@ -808,11 +827,13 @@
 
         function logout() {
             currentAdmin = null;
-            localStorage.setItem('isLoggedIn', 'false');
+            localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('adminEmail');
             
             document.getElementById('publicView').style.display = 'block';
             document.getElementById('adminView').style.display = 'none';
+            
+            renderFlavors();
         }
 
         function addFlavor(event) {
